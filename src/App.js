@@ -12,7 +12,7 @@ function App() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const response = await axios.get(`${process.env.REACT_APP_API_URL}/test`);
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/test`);
       setHelloWorld(response.data.message);
     }
     fetchData();
