@@ -11,7 +11,6 @@ function App() {
   useEffect(() => {
     const fetchData = async () => {
       const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/test`);
-      console.log(response.data);
       setHelloWorld(response.data.message);
     }
     fetchData();
