@@ -8,8 +8,6 @@ function App() {
 
   const [helloWorld, setHelloWorld] = useState('');
 
-  console.log(process.env.REACT_APP_API_URL);
-
   useEffect(() => {
     const fetchData = async () => {
       const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/test`);
