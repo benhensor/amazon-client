@@ -1,7 +1,6 @@
 import { createGlobalStyle } from 'styled-components';
 
 const GlobalStyles = createGlobalStyle`
-  @import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
 
   :root {
 
@@ -14,7 +13,8 @@ const GlobalStyles = createGlobalStyle`
     --black: #221F1F;
     --lt-grey: #E6E6E6;
     --lt-grey-hover: #D4D4D4;
-    --md-grey: ##666666;
+    --cat-menu-hover: #EAEDED;
+    --md-grey:#8A9899;
     --paleblue: #37475A;
     --paleblue-hover: #485769;
     --md-blue: #232F3E;
@@ -36,18 +36,21 @@ const GlobalStyles = createGlobalStyle`
 
     // spacing
     --spacing-xs: .4rem;
+    --spacing-ms: .6rem;
     --spacing-sm: .8rem;
     --spacing-md: 1.6rem;
     --spacing-lg: 2.4rem;
     --spacing-xl: 3.2rem;
 
     // font-sizes
+    --font-xxs: 1rem;
     --font-xs: 1.2rem;
     --font-sm: 1.4rem;
     --font-md: 1.6rem;
     --font-lg: 1.8rem;
-    --font-xl: 2.0rem;
-    --font-xxl: 2.2rem;
+    --font-xl: 2.4rem;
+    --font-xxl: 3.2rem;
+    --font-xxxl: 4rem;
 
     // line-heights
     --lh-xs: 1.2rem;
@@ -66,9 +69,9 @@ const GlobalStyles = createGlobalStyle`
     --br-50: 50%;
 
     // transitions
-    --tr-fast: .12s;
-    --tr-medium: .3s;
-    --tr-slow: .6s;
+    --tr-fast: all .12s ease-in-out;
+    --tr-medium: all .3s ease-in-out;
+    --tr-slow: all .6s ease-in-out;
     
   }
 
@@ -86,6 +89,38 @@ const GlobalStyles = createGlobalStyle`
     line-height: 1.5;
     color: var(--black);
     background-color: var(--white);
+  }
+
+  main {
+    width: 100%;
+  }
+
+  section {
+    margin: 0 var(--spacing-md);
+  }
+
+  aside {
+    height: 100vh;
+    border-right: 1px solid var(--lt-grey);
+  }
+
+  ul {
+    list-style-type: none;
+  }
+
+  a {
+    text-decoration: none;
+    color: inherit;
+  }
+
+  button {
+    cursor: pointer;
+  }
+
+  @media only screen and (max-width: 450px) {
+    section {
+      margin: 0 var(--spacing-sm);
+    }
   }
 
 `

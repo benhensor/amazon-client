@@ -54,6 +54,8 @@ export default function Logo() {
 const SVG = styled.svg`
   width: 10rem;
   height: auto;
+	position: relative;
+	top: 0.5rem;
   path.tick {
     fill: #FF9900;
   }
