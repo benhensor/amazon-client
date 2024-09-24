@@ -222,6 +222,15 @@ export default function Header() {
 						/>
 					</Content>
 					<Nav>
+						<MenuControl onClick={openCategoryMenu}>
+							<MenuIcon />
+							<p>All</p>
+						</MenuControl>
+						<CategoryMenu
+							closeMenu={closeCategoryMenu}
+							menuOpen={categoryMenuOpen}
+							onSearch={handleSearchByCategory}
+						/>
 						<SearchBar onSearch={handleSearch} />
 					</Nav>
 				</>

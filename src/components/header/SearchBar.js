@@ -111,6 +111,9 @@ const Container = styled.form`
 		&:hover {
 			background-color: var(--lt-grey-hover);
 		}
+    @media only screen and (max-width: 768px) {
+      display: none;
+    }
 	}
 	input {
 		flex: 1;
