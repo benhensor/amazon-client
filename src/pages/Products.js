@@ -1,11 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
-import { starCalculator } from '../utils/starCalculator'
 import { categoryFilters } from '../utils/categoryFilters'
+import Product from '../components/products/Product'
 import styled from 'styled-components'
-import ArrowheadIcon from '../icons/ArrowheadIcon'
-import StarIcon from '../icons/StarIcon'
-import AddToCartBtn from '../components/buttons/AddToCartBtn'
 
 export default function Products() {
 	const { products, searchTerm, selectedCategory, status, error } =
@@ -56,43 +53,6 @@ export default function Products() {
 							</>
 						)}
 					</Header>
-					{/* <SubCategories>
-						<div>
-							Subcategory
-							<ArrowheadIcon
-								fill="var(--md-grey)"
-								direction="down"
-							/>
-						</div>
-						<div>
-							Subcategory
-							<ArrowheadIcon
-								fill="var(--md-grey)"
-								direction="down"
-							/>
-						</div>
-						<div>
-							Subcategory
-							<ArrowheadIcon
-								fill="var(--md-grey)"
-								direction="down"
-							/>
-						</div>
-						<div>
-							Subcategory
-							<ArrowheadIcon
-								fill="var(--md-grey)"
-								direction="down"
-							/>
-						</div>
-						<div>
-							Subcategory
-							<ArrowheadIcon
-								fill="var(--md-grey)"
-								direction="down"
-							/>
-						</div>
-					</SubCategories> */}
 				</HeaderContent>
 			</ProductsPageHeaderContainer>
 
@@ -126,48 +86,7 @@ export default function Products() {
 					<ProductGrid>
 						{products.length > 0 ? (
 							products.map((product) => (
-								<ProductCard key={product.id}>
-									<img
-										src={product.thumbnail}
-										alt={product.name}
-									/>
-									<div className="block">
-										<h3>{product.title}</h3>
-										<p className="description">
-											{product.description}
-										</p>
-									</div>
-									<div className="block">
-										<div className="star-rating">
-											<>
-												{starCalculator(product.rating).map(
-													(star, index) => (
-														<StarIcon
-															key={index}
-															type={star}
-														/>
-													)
-												)}
-											</>
-										</div>
-										<div className="price-container">
-											<p className="discount">
-												-{product.discountPercentage}%
-											</p>
-											<p className="price">
-												£
-												<span className="whole">
-													{Math.floor(product.price)}
-												</span>
-												.
-												{(product.price % 1)
-													.toFixed(2)
-													.slice(2)}
-											</p>
-										</div>
-										<AddToCartBtn product={product} />
-									</div>
-								</ProductCard>
+								<Product key={product.id} product={product} />
 							))
 						) : (
 							<p>No products found</p> // Graceful fallback if no products
@@ -203,19 +122,6 @@ const Header = styled.div`
 	word-wrap: nowrap;	
 	p {
 		font-size: 1.2rem;
-	}
-`
-
-const SubCategories = styled.div`
-	flex: 5;
-	display: grid;
-	grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-	height: 100%;
-	cursor: pointer;
-	> div {
-		display: flex;
-		align-items: center;
-		height: 100%;
 	}
 `
 
@@ -273,77 +179,5 @@ const ProductGrid = styled.div`
 	gap: var(--spacing-md);
 	@media only screen and (max-width: 450px) {
 		padding: var(--spacing-sm);
-	}
-`
-
-const ProductCard = styled.div`
-	border: 1px solid var(--lt-grey);
-	padding: var(--spacing-md);
-	display: flex;
-	flex-direction: column;
-	cursor: pointer;
-	transition: var(--tr-fast);
-	img {
-		max-width: 100%;
-		height: auto;
-		aspect-ratio: 1/1;
-		object-fit: cover;
-	}
-	h3 {
-		font-size: var(--font-md);
-		margin: var(--spacing-xs) 0;
-		overflow: hidden;
-		text-overflow: ellipsis;
-		white-space: nowrap;
-	}
-	.description {
-		display: -webkit-box; /* For Safari */
-		-webkit-box-orient: vertical; /* For Safari */
-		-webkit-line-clamp: 5; /* Limit to 3 lines */
-		overflow: hidden; /* Hide overflow */
-		text-overflow: ellipsis; /* Add ellipsis for overflowed text */
-		font-size: var(--font-sm);
-		color: var(--link-blue);
-		line-height: 1.5; /* Adjust line height as needed */
-		height: calc(1.5em * 5);
-		max-height: calc(1.5em * 5);
-	}
-	.block {
-		display: flex;
-		flex-direction: column;
-		gap: var(--spacing-xs);
-		margin-bottom: var(--spacing-sm);
-	}
-	.star-rating {
-		display: flex;
-		gap: var(--spacing-xs);
-	}
-	.discount {
-		color: var(--discount-red);
-		font-size: var(--font-sm);
-	}
-	.price-container {
-		display: flex;
-		align-items: center;
-		gap: var(--spacing-lg);
-		margin-bottom: var(--spacing-sm);
-	}
-	.price {
-		font-size: var(--font-xs);
-		display: flex;
-		align-items: flex-start;
-		line-height: 1rem;
-		.whole {
-			font-size: var(--font-xl);
-			font-weight: bold;
-			line-height: 1.3rem;
-		}
-
-		.decimal {
-			font-size: 0.8rem; /* Smaller size for decimal */
-		}
-	}
-	&:hover {
-		border-color: var(--lt-grey-hover);
 	}
 `

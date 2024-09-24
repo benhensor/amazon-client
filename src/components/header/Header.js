@@ -357,6 +357,7 @@ const MenuControl = styled.div`
 	gap: var(--spacing-xs);
 	border: 1px solid transparent;
 	padding: var(--spacing-sm) 0 var(--spacing-sm) var(--spacing-sm);
+	margin-right: var(--spacing-sm);
 	cursor: pointer;
 	transition: var(--tr-fast);
 	p {

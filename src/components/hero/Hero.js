@@ -5,6 +5,7 @@ import {
 	setSelectedCategory,
 	setSearchTerm,
 } from '../../redux/slices/productsSlice'
+import ChevronIcon from '../../icons/ChevronIcon'
 import ClothingImg from '../../assets/img/hero/clothing.webp'
 import CosmeticsImg from '../../assets/img/hero/cosmetics.webp'
 import ElectronicsImg from '../../assets/img/hero/electronics.webp'
@@ -28,8 +29,6 @@ export default function Hero() {
 		SportsAndOutdoor,
 	} = useSelector((state) => state.products)
 	const [heroImageIndex, setHeroImageIndex] = useState(0)
-	const [randomisedHeroes, setRandomisedHeroes] = useState([])
-	const [previewProducts, setPreviewProducts] = useState({})
 
 	const heroCategories = [
 		{
@@ -90,55 +89,6 @@ export default function Hero() {
 		},
 	]
 
-	// Utility to shuffle an array
-	const shuffleArray = (array) => {
-		return [...array].sort(() => 0.5 - Math.random())
-	}
-
-	// Select random 4 products from a category
-	const getRandomProducts = (categoryProducts) => {
-		if (!categoryProducts || categoryProducts.length === 0) {
-			return [] // Return empty array if category is undefined or empty
-		}
-		return shuffleArray(categoryProducts).slice(0, 4)
-	}
-
-	// Shuffle heroes on mount
-	useEffect(() => {
-		// Wait until all the supercategory states are populated
-		if (
-			FashionAndAccessories.length > 0 &&
-			BeautyAndPersonalCare.length > 0 &&
-			ElectronicsAndTechnology.length > 0 &&
-			Groceries.length > 0 &&
-			HomeAndLiving.length > 0 &&
-			AutomotiveAndVehicles.length > 0 &&
-			SportsAndOutdoor.length > 0
-		) {
-			const shuffledHeroes = shuffleArray(heroCategories)
-			setRandomisedHeroes(shuffledHeroes)
-		}
-	}, [
-		FashionAndAccessories,
-		BeautyAndPersonalCare,
-		ElectronicsAndTechnology,
-		Groceries,
-		HomeAndLiving,
-		AutomotiveAndVehicles,
-		SportsAndOutdoor,
-	])
-
-	// Generate preview products once heroes are shuffled
-	useEffect(() => {
-		if (randomisedHeroes.length > 0) {
-			const productsMap = {}
-			randomisedHeroes.forEach((hero) => {
-				productsMap[hero.id] = getRandomProducts(hero.category)
-			})
-			setPreviewProducts(productsMap)
-		}
-	}, [randomisedHeroes])
-
 	// Change hero image at an interval
 	useEffect(() => {
 		const interval = setInterval(() => {
@@ -153,34 +103,27 @@ export default function Hero() {
 	const handleHeroClick = () => {
 		dispatch(setSelectedCategory(heroCategories[heroImageIndex].category))
 		dispatch(setSearchTerm(selectedCategory))
-		navigate('/products')
+		navigate(`/products?category=${heroCategories[heroImageIndex].title}`)
 	}
 
 	return (
 		<HeroContainer>
-      <HeroContent $bgImage={heroCategories[heroImageIndex].src} />
+      <HeroContent>
+				<img src={heroCategories[heroImageIndex].src} alt={heroCategories[heroImageIndex].title} />
+				<ChevronButton
+					onClick={() => setHeroImageIndex((prevIndex) => (prevIndex === 0 ? heroCategories.length - 1 : prevIndex - 1))}
+				>
+					<ChevronIcon direction="left" />
+				</ChevronButton>
         <CTAButton onClick={handleHeroClick}>
           {heroCategories[heroImageIndex].cta}
         </CTAButton>
-        <PreviewGrid>
-          {randomisedHeroes.slice(0, 3).map((hero) => (
-            <PreviewItem key={hero.id}>
-              <h2>{hero.previewHeading}</h2>
-              <ProductList>
-                {previewProducts[hero.id]?.map((product, index) => (
-                  <li key={index}>
-                    <img
-                      src={product.thumbnail}
-                      alt={product.title}
-                    />
-                    <h3>{product.title}</h3>
-                  </li>
-                ))}
-              </ProductList>
-              <button>See more</button>
-            </PreviewItem>
-          ))}
-        </PreviewGrid>
+				<ChevronButton
+					onClick={() => setHeroImageIndex((prevIndex) => (prevIndex === heroCategories.length - 1 ? 0 : prevIndex + 1))} 
+				>
+					<ChevronIcon direction="right" />
+				</ChevronButton>
+			</HeroContent>
     </HeroContainer>
 	)
 }
@@ -189,23 +132,44 @@ const HeroContainer = styled.div`
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	position: relative;
-	height: 90rem;
 `
 
 const HeroContent = styled.div`
-  position: absolute;
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: calc(100% - var(--spacing-lg));
+  width: 100%;
   height: 100%;
-	background: url(${(props) => props.$bgImage}) no-repeat center center;
-	background-size: cover;
-  mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 50%, rgba(0, 0, 0, 0));
-  -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 50%, rgba(0, 0, 0, 0));
-  background-color: var(--dk-blue);
-  z-index: -1;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	background: var(--dk-blue-50);
+	position: relative;
+	overflow: hidden;
+	img {
+		position: absolute;
+		top: 0;
+		left: 50%;
+		transform: translateX(-50%);
+		width: 100%;
+		height: auto;
+		object-fit: cover;
+		object-position: center bottom;
+		z-index: 0;
+	}
+`
+
+const ChevronButton = styled.button`
+	width: 5rem;
+	height: 100%;
+	svg {
+		width: 50%;
+		stroke: var(--white);
+		stroke-width: 1;
+	}
+	@media (max-width: 768px) {
+		width: 4rem;
+	}
+	@media (max-width: 450px) {
+		width: 3rem;
+	}
 `
 
 const CTAButton = styled.button`
@@ -214,6 +178,17 @@ const CTAButton = styled.button`
 	color: var(--white);
   width: 100%;
   height: 30rem;
+	overflow: hidden;
+	position: relative;
+	@media (max-width: 1199px) {
+		height: 25rem;
+	}
+	@media (max-width: 768px) {
+		height: 20rem;
+	}
+	@media (max-width: 450px) {
+		height: 15rem;
+	}
 `
 
 const PreviewGrid = styled.section`
@@ -221,15 +196,14 @@ const PreviewGrid = styled.section`
   justify-content: space-around;
   align-items: center;
 	gap: var(--spacing-md);
-	width: 100%;
-	padding: var(--spacing-md);
+	z-index: 1;
 	@media (max-width: 768px) {
 		flex-direction: column;
-    gap: var(--spacing-sm);
+		gap: var(--spacing-sm);
 	}
 
 	@media (max-width: 768px) {
-		grid-template-columns: 1fr; // Single column for smaller screens
+		
 	}
 `
 
@@ -256,6 +230,7 @@ const PreviewItem = styled.div`
 
 	// Adjust padding and text sizes for smaller screens
 	@media (max-width: 768px) {
+		width: 100%;
 		padding: var(--spacing-md);
 		h2 {
 			font-size: 1.5rem;

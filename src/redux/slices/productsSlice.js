@@ -208,7 +208,7 @@ export const fetchProductsByCategory = (category) => async (dispatch) => {
 	dispatch(setStatus('loading'))
 	try {
 		const products = await getProductsByCategory(category)
-		// console.log('fetchProductsByCategory', products.products);
+		console.log('fetchProductsByCategory', products.products);
 		dispatch(setProducts(products.products))
 		dispatch(setStatus('succeeded'))
 	} catch (error) {

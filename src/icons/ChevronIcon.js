@@ -22,5 +22,7 @@ const SVG = styled.svg`
   path {
     stroke: inherit;
     stroke-width: 2;
+		stroke-linecap: round;
+		stroke-linejoin: round;
   }
 `

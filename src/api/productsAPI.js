@@ -16,7 +16,7 @@ export const getProductById = async (id) => {
 }
 
 export const searchProducts = async (query) => {
-  const response = await axios.get(`${API_URL}/search?q=${query}&limit=0`);
+  const response = await axios.get(`${API_URL}/products/search?q=${query}`);
   // const response = await axios.get(`${API_URL}/api/products/search?q=${query}`);
   // console.log('searchProducts', response.data);
   return response.data;

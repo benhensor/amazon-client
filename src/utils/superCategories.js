@@ -1,4 +1,4 @@
-export const fashionAndAccessories = [
+export const fashionAndAccessoriesCategory = [
   'mens-shirts',
   'mens-shoes',
   'mens-watches',
@@ -9,19 +9,19 @@ export const fashionAndAccessories = [
   'womens-watches',
   'tops',
 ]
-export const beautyAndPersonalCare = ['beauty', 'fragrances', 'skin-care']
-export const electronicsAndTechnology = [
+export const beautyAndPersonalCareCategory = ['beauty', 'fragrances', 'skin-care']
+export const electronicsAndTechnologyCategory = [
   'laptops',
   'mobile-accessories',
   'smartphones',
   'tablets',
 ]
-export const groceries = ['groceries']
-export const homeAndLiving = [
+export const groceriesCategory = ['groceries']
+export const homeAndLivingCategory = [
   'furniture',
   'home-decoration',
   'kitchen-accessories',
 ]
-export const automotiveAndVehicles = ['motorcycle', 'vehicle']
-export const sportsAndOutdoor = ['sports-accessories', 'sunglasses']
+export const automotiveAndVehiclesCategory = ['motorcycle', 'vehicle']
+export const sportsAndOutdoorCategory = ['sports-accessories', 'sunglasses']
 

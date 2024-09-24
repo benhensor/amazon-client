@@ -11,7 +11,7 @@ const GlobalStyles = createGlobalStyle`
     // Colors
     --white: #fff;
     --black: #221F1F;
-    --background-grey: #E3E6E6
+    --background-grey: #E3E6E6;
     --lt-grey: #E6E6E6;
     --lt-grey-hover: #D4D4D4;
     --cat-menu-hover: #EAEDED;
@@ -20,6 +20,7 @@ const GlobalStyles = createGlobalStyle`
     --paleblue-hover: #485769;
     --md-blue: #232F3E;
     --dk-blue: #131921;
+    --dk-blue-50: #13192150;
     --yellow: #FFD814;
     --yellow-hover: #F7CA00;
     --lt-orange: #FEBD69;
@@ -83,7 +84,9 @@ const GlobalStyles = createGlobalStyle`
     box-sizing: border-box;
   }
 
-  html {}
+  html {
+    height: 100vh;
+  }
 
   body {
     font-family: 'Open Sans', sans-serif;

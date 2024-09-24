@@ -50,8 +50,6 @@ export default function SearchBar({ onSearch }) {
     }
   }
 
-  // if (error) return null
-
   return (
     <Container onSubmit={handleSubmit}>
       <span
@@ -80,7 +78,7 @@ export default function SearchBar({ onSearch }) {
       <input 
         type="text" 
         placeholder="Search Scamazon" 
-        value={localSearchTerm || ''}
+        value={!error ? localSearchTerm : 'Error fetching categories'}
         onChange={handleSearchChange}
       />
       <button type="submit">
