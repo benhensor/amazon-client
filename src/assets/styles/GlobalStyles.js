@@ -11,6 +11,7 @@ const GlobalStyles = createGlobalStyle`
     // Colors
     --white: #fff;
     --black: #221F1F;
+    --background-grey: #E3E6E6
     --lt-grey: #E6E6E6;
     --lt-grey-hover: #D4D4D4;
     --cat-menu-hover: #EAEDED;
@@ -51,6 +52,7 @@ const GlobalStyles = createGlobalStyle`
     --font-xl: 2.4rem;
     --font-xxl: 3.2rem;
     --font-xxxl: 4rem;
+    --font-cta: clamp(2rem, 5vw, 5rem);
 
     // line-heights
     --lh-xs: 1.2rem;
@@ -88,11 +90,11 @@ const GlobalStyles = createGlobalStyle`
     font-size: 1.6rem;
     line-height: 1.5;
     color: var(--black);
-    background-color: var(--white);
   }
 
   main {
-    width: 100%;
+    width: 100vw;
+    background: var(--background-grey);
   }
 
   section {
@@ -115,6 +117,8 @@ const GlobalStyles = createGlobalStyle`
 
   button {
     cursor: pointer;
+    border: none;
+    background-color: transparent;
   }
 
   @media only screen and (max-width: 450px) {
