@@ -30,6 +30,8 @@ const GlobalStyles = createGlobalStyle`
     --price-red: #B12704;
     --link-blue: #007185;
     --link-hover: #C7511F;
+    --crime-blue: #2193C2;
+    --crime-orange: #F8991D;
     --link-white-hover: #F7FAFA;
     --star-rating: #DF7921;
     --discount-red: #CC0C39;

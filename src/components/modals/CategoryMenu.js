@@ -1,29 +1,14 @@
 import React, { useEffect, useCallback } from 'react'
 import {
-	fashionAndAccessoriesCategory,
-	beautyAndPersonalCareCategory,
-	electronicsAndTechnologyCategory,
-	groceriesCategory,
-	homeAndLivingCategory,
-	automotiveAndVehiclesCategory,
-	sportsAndOutdoorCategory,
+	superCategories
 } from '../../utils/superCategories'
+import { formatCategory } from '../../utils/formatCategory'
 import styled from 'styled-components'
 import ProfileIcon from '../../icons/ProfileIcon'
 import ChevronIcon from '../../icons/ChevronIcon'
 import CloseIcon from '../../icons/CloseIcon'
 
 export default function CategoryMenu({ menuOpen, closeMenu, onSearch }) {
-
-	const categoryGroups = [
-		{ title: 'Fashion & Accessories', categories: fashionAndAccessoriesCategory },
-		{ title: 'Beauty & Personal Care', categories: beautyAndPersonalCareCategory },
-		{ title: 'Consumer Electronics', categories: electronicsAndTechnologyCategory },
-		{ title: 'Groceries', categories: groceriesCategory },
-		{ title: 'Home & Living', categories: homeAndLivingCategory },
-		{ title: 'Automotive & Vehicles', categories: automotiveAndVehiclesCategory },
-		{ title: 'Sports & Outdoors', categories: sportsAndOutdoorCategory },
-	]
 
 	useEffect(() => {
 		// Prevent scroll when menu is open
@@ -34,18 +19,29 @@ export default function CategoryMenu({ menuOpen, closeMenu, onSearch }) {
 	}, [menuOpen])
 
 	// Memoize the formatCategory function for optimization
-	const formatCategory = useCallback((category) => {
-		return category
-			.split('-')
-			.map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-			.join(' ')
-	}, [])
+	// const formatCategory = useCallback((category) => {
+	// 	return category
+	// 		.split('-')
+	// 		.map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+	// 		.join(' ')
+	// }, [])
 
-	// Extract Department component for each category group
-	const renderDepartments = () =>
-		categoryGroups.map(({ title, categories }, i) => (
-			<Department key={i} title={title} categories={categories} formatCategory={formatCategory} onSearch={onSearch} />
-		))
+	// Department component to handle each category section
+  const Department = ({ category }) => (
+    <DepartmentWrapper>
+      <h3>{category.title}</h3>
+      <ul>
+        {category.subCategories.map((subCategory, i) => (
+          <li key={i} onClick={() => onSearch(subCategory)}>
+            <div>
+              <p>{formatCategory(subCategory)}</p>
+              <ChevronIcon direction="right" />
+            </div>
+          </li>
+        ))}
+      </ul>
+    </DepartmentWrapper>
+  )
 
 		return (
 			<>
@@ -61,28 +57,14 @@ export default function CategoryMenu({ menuOpen, closeMenu, onSearch }) {
 					<Heading>
 						<h2>Shop by Department</h2>
 					</Heading>
-					{renderDepartments()}
+					{superCategories.map((category, index) => (
+          <Department key={index} category={category} />
+        ))}
 				</CategoryMenuContainer>
 			</>
 		)
 	}
-	
-	// Department component to handle each category section
-	const Department = ({ title, categories, formatCategory, onSearch }) => (
-		<DepartmentWrapper>
-			<h3>{title}</h3>
-			<ul>
-				{categories.map((category, i) => (
-					<li key={i} onClick={() => onSearch(category)}>
-						<div>
-							<p>{formatCategory(category)}</p>
-							<ChevronIcon direction="right" />
-						</div>
-					</li>
-				))}
-			</ul>
-		</DepartmentWrapper>
-	)
+
 
 const ModalBackground = styled.div`
 	position: fixed;

@@ -116,19 +116,21 @@ export default function Header() {
 								<MenuIcon />
 								<p>All</p>
 							</NavItem>
-							<NavItem>New Stuff</NavItem>
-							<NavItem>Best Selling Stuff</NavItem>
-							<NavItem>Your Stuff</NavItem>
-							<NavItem>More Stuff</NavItem>
-							<NavItem>Gift Stuff</NavItem>
-							<NavItem>Mystery Stuff</NavItem>
-							<NavItem>Things</NavItem>
-							<NavItem>Stuff & Things</NavItem>
-							<NavItem>Extra Things</NavItem>
-							<NavItem>Stranger Things</NavItem>
-							<NavItem>The Thing</NavItem>
-							<NavItem>Must-have Things</NavItem>
-							<NavItem>Tat</NavItem>
+							<ScrollableNavItems>
+								<NavItem>New Stuff</NavItem>
+								<NavItem>Best Selling Stuff</NavItem>
+								<NavItem>Your Stuff</NavItem>
+								<NavItem>More Stuff</NavItem>
+								<NavItem>Gift Stuff</NavItem>
+								<NavItem>Mystery Stuff</NavItem>
+								<NavItem>Things</NavItem>
+								<NavItem>Stuff & Things</NavItem>
+								<NavItem>Extra Things</NavItem>
+								<NavItem>Stranger Things</NavItem>
+								<NavItem>The Thing</NavItem>
+								<NavItem>Must-have Things</NavItem>
+								<NavItem>Tat</NavItem>
+							</ScrollableNavItems>
 						</NavItems>
 						<CategoryMenu
 							closeMenu={closeCategoryMenu}
@@ -379,6 +381,12 @@ const MenuControl = styled.div`
 	@media only screen and (max-width: 450px) {
 		padding: var(--spacing-sm) 0;
 	}
+`
+
+const ScrollableNavItems = styled.div`
+	overflow-x: auto;
+	white-space: nowrap;
+	display: flex;
 `
 
 const NavItems = styled.ul`
