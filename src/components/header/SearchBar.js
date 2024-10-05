@@ -97,7 +97,6 @@ const Container = styled.form`
 	height: 4rem;
 	border-radius: var(--br-sm);
 	overflow: hidden;
-	margin-right: var(--spacing-md);
 	select {
 		height: 100%;
 		border: none;

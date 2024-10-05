@@ -18,13 +18,6 @@ const initialState = {
 	searchTerm: '',
 	selectedCategory: 'All',
 	shouldClearSearch: false,
-	FashionAndAccessories: [],
-	BeautyAndPersonalCare: [],
-	ElectronicsAndTechnology: [],
-	Groceries: [],
-	HomeAndLiving: [],
-	AutomotiveAndVehicles: [],
-	SportsAndOutdoor: [],
 	status: 'idle',
 	error: null,
 }
@@ -55,27 +48,6 @@ const productsSlice = createSlice({
 			state.searchTerm = ''
 			state.shouldClearSearch = false
 		},
-		setFashionAndAccessories(state, action) {
-			state.FashionAndAccessories = action.payload
-		},
-		setBeautyAndPersonalCare(state, action) {
-			state.BeautyAndPersonalCare = action.payload
-		},
-		setElectronicsAndTechnology(state, action) {
-			state.ElectronicsAndTechnology = action.payload
-		},
-		setGroceries(state, action) {
-			state.Groceries = action.payload
-		},
-		setHomeAndLiving(state, action) {
-			state.HomeAndLiving = action.payload
-		},
-		setAutomotiveAndVehicles(state, action) {
-			state.AutomotiveAndVehicles = action.payload
-		},
-		setSportsAndOutdoor(state, action) {
-			state.SportsAndOutdoor = action.payload
-		},
 		setStatus(state, action) {
 			state.status = action.payload
 		},
@@ -93,13 +65,6 @@ export const {
 	setSearchTerm,
 	setSelectedCategory,
 	clearSearchTerm,
-	setFashionAndAccessories,
-	setBeautyAndPersonalCare,
-	setElectronicsAndTechnology,
-	setGroceries,
-	setHomeAndLiving,
-	setAutomotiveAndVehicles,
-	setSportsAndOutdoor,
 	setStatus,
 	setError,
 } = productsSlice.actions
@@ -208,7 +173,7 @@ export const fetchProductsByCategory = (category) => async (dispatch) => {
 	dispatch(setStatus('loading'))
 	try {
 		const products = await getProductsByCategory(category)
-		console.log('fetchProductsByCategory', products.products);
+		//console.log('fetchProductsByCategory', products.products);
 		dispatch(setProducts(products.products))
 		dispatch(setStatus('succeeded'))
 	} catch (error) {

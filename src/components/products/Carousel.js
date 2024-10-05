@@ -1,11 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
-import { setCurrentProduct, setSelectedCategory } from '../../redux/slices/productsSlice'
+import { setProducts, setCurrentProduct, setSelectedCategory } from '../../redux/slices/productsSlice'
 import styled from 'styled-components'
 import ChevronIcon from '../../icons/ChevronIcon'
-import CrimeLogo from '../../icons/CrimeLogo'
-import AddToCartBtn from '../buttons/AddToCartBtn'
+import CarouselItem from './CarouselItem'
 
 const BREAKPOINTS = {
   mobile: 480,
@@ -23,7 +22,7 @@ export default function Carousel({ title, products }) {
     const handleResize = () => {
       if (containerRef.current) {
         const containerWidth = containerRef.current.offsetWidth
-        const cardWidth = window.innerWidth <= BREAKPOINTS.tablet ? 140 : 200
+        const cardWidth = window.innerWidth <= BREAKPOINTS.tablet ? 120 : 180
         const calculatedItemsPerPage = Math.floor((containerWidth - 32) / (cardWidth + 16))
         setItemsPerPage(calculatedItemsPerPage)
       }
@@ -41,8 +40,9 @@ export default function Carousel({ title, products }) {
     navigate(`/product?${product.id}`)
   }
 
-  const handleCategoryClick = (category) => {
+  const handleCategoryClick = (category, products) => {
     dispatch(setSelectedCategory(category))
+    dispatch(setProducts(products))
     navigate(`/department?${category}`)
   }
 
@@ -57,8 +57,8 @@ export default function Carousel({ title, products }) {
   return (
     <CarouselContainer ref={containerRef}>
       <CarouselControls>
-        <Title onClick={() => handleCategoryClick(title)}>{title}</Title>
-        <SeeMoreButton onClick={() => handleCategoryClick(title)}>
+        <Title onClick={() => handleCategoryClick(title, products)}>{title}</Title>
+        <SeeMoreButton onClick={() => handleCategoryClick(title, products)}>
           See more...
         </SeeMoreButton>
       </CarouselControls>
@@ -84,25 +84,7 @@ export default function Carousel({ title, products }) {
         <ProductList $currentPage={currentPage} $itemsPerPage={itemsPerPage}>
           {products.map((product, i) => (
             <ProductItem key={i} onClick={() => handleProductClick(product)}>
-              <ProductCard>
-                <ProductImage src={product.thumbnail} alt={product.title} />
-                <ProductTitle>{product.title}</ProductTitle>
-                <ProductPrice>
-                  <p className="price">
-                    £
-                    <span className="price-span">
-                      {Math.floor(product.price)}
-                    </span>
-                    .{(product.price % 1).toFixed(2).slice(2)}
-                  </p>
-                  <p className="whole">
-                    {(product.price / (1 - product.discountPercentage / 100)).toFixed(2)}
-                  </p>
-                </ProductPrice>
-                <Discount>-{product.discountPercentage}%</Discount>
-                <CrimeLogo width='7rem'/>
-                <AddToCartBtn onClick={() => {}} />
-              </ProductCard>
+              <CarouselItem product={product} BREAKPOINTS={BREAKPOINTS} />
             </ProductItem>
           ))}
         </ProductList>
@@ -115,12 +97,14 @@ const CarouselContainer = styled.div`
 	display: flex;
 	flex-direction: column;
 	gap: var(--spacing-md);
-	padding: var(--spacing-lg) var(--spacing-md);
+	padding: var(--spacing-md);
 	background-color: var(--white);
-	margin: var(--spacing-md);
+	margin-bottom: var(--spacing-md);
 
 	@media only screen and (max-width: ${BREAKPOINTS.tablet}px) {
-		margin: var(--spacing-sm);
+		margin-bottom: var(--spacing-sm);
+    padding: var(--spacing-sm);
+    gap: var(--spacing-sm);
 	}
 `
 
@@ -198,14 +182,17 @@ const ProductList = styled.ul`
 `
 
 const ProductItem = styled.li`
-  flex: 0 0 200px;
-  padding: var(--spacing-sm);
-  border: 1px solid var(--lt-grey);
+  flex: 0 0 180px;
+  margin-right: var(--spacing-md);
   cursor: pointer;
   transition: var(--tr-fast);
 
   @media (max-width: ${BREAKPOINTS.tablet}px) {
-    flex: 0 0 140px;
+    flex: 0 0 120px;
+  }
+
+  @media (max-width: ${BREAKPOINTS.mobile}px) {
+    margin-right: var(--spacing-sm);
   }
 
   &:hover {
@@ -213,61 +200,10 @@ const ProductItem = styled.li`
   }
 `
 
-const ProductImage = styled.img`
-  max-width: 100%;
-  height: 200px;
-  object-fit: cover;
-
-  @media (max-width: ${BREAKPOINTS.tablet}px) {
-    height: 140px;
-  }
-`
-
 const DesktopButtons = styled.div`
   @media (max-width: ${BREAKPOINTS.tablet}px) {
     display: none;
   }
-`
-
-const ProductCard = styled.div`
-	flex: 1;
-  font-size: clamp(var(--font-xxs), 2vw, var(--font-xs));
-`
-
-
-const ProductTitle = styled.p`
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  color: var(--dk-blue);
-  font-size: clamp(var(--font-xxs), 2vw, var(--font-sm));
-  padding: var(--spacing-sm) 0;
-`
-
-const ProductPrice = styled.div`
-  display: flex;
-  gap: var(--spacing-md);
-  line-height: 1;
-  .price {
-    display: flex;
-    align-items: flex-start;
-    .price-span {
-      font-size: clamp(var(--font-sm), 2vw, var(--font-md));
-      font-weight: bold;
-    }
-  }
-  .whole {
-    color: var(--md-grey);
-    text-decoration: line-through;
-  }
-  `
-
-const Discount = styled.p`
-  width: fit-content;
-  padding: var(--spacing-xs);
-  color: var(--white);
-  background-color: var(--discount-red);
-  margin: var(--spacing-sm) 0;
 `
 
 const SeeMoreButton = styled.button`

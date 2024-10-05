@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import {
 	fetchAllProducts,
@@ -15,9 +15,23 @@ export default function Home() {
 		(state) => state.products
 	)
 
+	const [isDataReady, setIsDataReady] = useState(false)
+
 	useEffect(() => {
-		dispatch(fetchAllProducts())
-		dispatch(fetchCategoryList())
+		const fetchData = async () => {
+			try {
+				// Dispatch both actions and wait for them to resolve
+				await Promise.all([
+					dispatch(fetchAllProducts()),
+					dispatch(fetchCategoryList()),
+				])
+				setIsDataReady(true)
+			} catch (err) {
+				console.error("Error fetching data", err)
+			}
+		}
+
+		fetchData()
 	}, [dispatch])
 
 	const DepartmentCarousel = ({ superCategory }) => {
@@ -29,7 +43,7 @@ export default function Home() {
 		)	
 	}
 
-	if (status === 'loading') {
+	if (status === 'loading' || !isDataReady) {
 		return (
 			<section>
 				<div>Loading...</div>
@@ -70,5 +84,4 @@ export default function Home() {
 
 const HomePageContainer = styled.div`
 	height: 100%;
-	background-color: var(--background-grey);
 `

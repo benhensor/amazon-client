@@ -40,7 +40,7 @@ export default function CarouselItem({ product }) {
 
 const ProductCard = styled.div`
 	border: 1px solid var(--lt-grey);
-	padding: var(--spacing-md);
+	padding: var(--spacing-sm);
 	display: flex;
 	flex-direction: column;
 	cursor: pointer;

@@ -89,7 +89,11 @@ export default function Header() {
 							</div>
 						</HeaderItem>
 						<SearchBar onSearch={handleSearch} />
-						<HeaderItem>
+						<HeaderItem
+							style={{
+								marginLeft: 'var(--spacing-md)',
+							}}
+						>
 							<UnionJackIcon />
 						</HeaderItem>
 						<HeaderItem>
@@ -245,6 +249,7 @@ const Container = styled.header`
 	width: 100%;
 	display: flex;
 	flex-direction: column;
+	z-index: 1000000;
 `
 
 const Content = styled.div`
@@ -349,7 +354,7 @@ const Nav = styled.nav`
 	@media only screen and (max-width: 1199px) {
 		display: flex;
 		gap: var(--spacing-xs);
-		padding: var(--spacing-xs);
+		padding: var(--spacing-xs) var(--spacing-md);
 	}
 	@media only screen and (max-width: 768px) {
 		gap: 0;
@@ -367,13 +372,13 @@ const MenuControl = styled.div`
 	align-items: center;
 	gap: var(--spacing-xs);
 	border: 1px solid transparent;
-	padding: var(--spacing-sm) 0 var(--spacing-sm) var(--spacing-sm);
-	margin-right: var(--spacing-sm);
+	padding: var(--spacing-sm) 0;
 	cursor: pointer;
 	transition: var(--tr-fast);
 	p {
 		font-size: var(--font-md);
 		font-weight: bold;
+		margin-right: var(--spacing-sm);
 	}
 	&:hover {
 		border-color: var(--white);
