@@ -115,6 +115,10 @@ const GlobalStyles = createGlobalStyle`
     list-style-type: none;
   }
 
+  h1 {
+    font-size: clamp(var(--font-lg), 3vw, var(--font-xxl));
+  }
+
   a {
     text-decoration: none;
     color: inherit;

@@ -31,6 +31,7 @@ export default function CarouselItem({ product, BREAKPOINTS }) {
 				{starCalculator(product.rating).map((star, index) => (
 					<StarIcon key={index} type={star} />
 				))}
+				<p>{product.rating.length}</p>
 			</ProductRating>
 			<ProductPrice>
 				<p className="price">
@@ -48,7 +49,7 @@ export default function CarouselItem({ product, BREAKPOINTS }) {
 				</p>
 			</ProductPrice>
 			<Discount>-{product.discountPercentage}%</Discount>
-			<CrimeLogo width="7rem" />
+			<CrimeLogo />
 			<AddToCartBtn onClick={() => {}} />
 		</ProductCard>
 	)
@@ -80,11 +81,6 @@ const ProductImage = styled.img`
 	max-width: 100%;
 	height: auto;
 	object-fit: cover;
-
-	/* @media (max-width: ${(props) => props.$BREAKPOINTS.tablet}px) {
-		width: 140px;
-		height: 140px;
-	} */
 `
 
 const ProductTitle = styled.p`

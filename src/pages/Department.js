@@ -1,144 +1,262 @@
 import React, { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { setSelectedCategory, fetchProductsByCategory } from '../redux/slices/productsSlice'
+import {
+	setSelectedCategory,
+	fetchAllProducts,
+} from '../redux/slices/productsSlice'
 import { superCategories } from '../utils/superCategories'
 import { formatCategory } from '../utils/formatCategory'
+import PageHeader from '../components/pageheader/PageHeader'
+import Product from '../components/products/Product'
+import Sidebar from '../components/filters/Sidebar'
+import MobileFilterMenu from '../components/filters/MobileFilterMenu'
 import styled from 'styled-components'
-import Carousel from '../components/products/Carousel'
 
 export default function Department() {
-  const dispatch = useDispatch()
-  const { products, selectedCategory, status, error } = useSelector((state) => state.products)
-  
-  const [department, setDepartment] = useState(null)
+	const dispatch = useDispatch()
+	const { products, selectedCategory, status, error } = useSelector(
+		(state) => state.products
+	)
+	const [department, setDepartment] = useState(null)
+	const [departmentProducts, setDepartmentProducts] = useState([])
+	const [filters, setFilters] = useState({})
+	const [selectedFilters, setSelectedFilters] = useState({})
+	const [filteredProducts, setFilteredProducts] = useState([])
+	const [filtersOpen, setFiltersOpen] = useState(false)
+	const [filterValueMap, setFilterValueMap] = useState({})
 
-  // UseEffect to handle page refresh and set the category from localStorage
-  useEffect(() => {
-    const storedCategory = localStorage.getItem('selectedCategory')
-    
-    if (storedCategory) {
-      // If category exists in localStorage, update the state and dispatch the action to set it
-      dispatch(setSelectedCategory(storedCategory))
-    }
-  }, [dispatch])
+	const [originalProducts, setOriginalProducts] = useState([]) 
+	const [sortType, setSortType] = useState(null) 
+	const [sortDirection, setSortDirection] = useState(null)
 
-  useEffect(() => {
-    // If there's a selectedCategory, update department and store it in localStorage
-    if (selectedCategory) {
-      const currentDepartment = superCategories.find(
-        (superCategory) => superCategory.title === selectedCategory
-      )
-      setDepartment(currentDepartment)
+	useEffect(() => {
+		const storedCategory = localStorage.getItem('selectedCategory')
+		if (storedCategory) {
+			dispatch(setSelectedCategory(storedCategory))
+		}
+	}, [dispatch])
 
-      // Save the selected category in localStorage
-      localStorage.setItem('selectedCategory', selectedCategory)
+	useEffect(() => {
+		if (selectedCategory) {
+			const currentDepartment = superCategories.find(
+				(superCategory) => superCategory.title === selectedCategory
+			)
+			setDepartment(currentDepartment)
+			localStorage.setItem('selectedCategory', selectedCategory)
+			dispatch(fetchAllProducts())
+		}
+	}, [selectedCategory, dispatch])
 
-      // Fetch products for all subCategories
-      if (currentDepartment) {
-        currentDepartment.subCategories.forEach((subCategory) => {
-          dispatch(fetchProductsByCategory(subCategory))
-        })
+	useEffect(() => {
+		if (department && products.length > 0) {
+			// Filter products to only those in the current department's subcategories
+			const productsInDepartment = products.filter((product) =>
+				department.subCategories.includes(product.category)
+			)
+			setDepartmentProducts(productsInDepartment)
+
+			// Create mapping between formatted and original filter values
+			const valueMap = {}
+			const formattedSubCategories = department.subCategories.map(
+				(category) => {
+					const formatted = formatCategory(category)
+					valueMap[formatted] = category
+					return formatted
+				}
+			)
+
+			setFilterValueMap(valueMap)
+
+			// Set up sub-category filters with formatted values
+			const subCategoryFilters = {
+				Category: formattedSubCategories,
+			}
+			setFilters(subCategoryFilters)
+
+			// Initialize selected filters
+			setSelectedFilters({
+				Category: [],
+			})
+
+			setFilteredProducts(productsInDepartment)
+		}
+	}, [department, products])
+
+
+
+	useEffect(() => {
+		if (departmentProducts.length > 0) {
+			setOriginalProducts(departmentProducts) // Store the original unsorted products
+			setFilteredProducts(departmentProducts) // Initialize filteredProducts
+		}
+	}, [departmentProducts])
+
+
+
+	const handleSort = (type) => {
+    if (sortType === type) {
+      // Toggle through: asc -> desc -> reset
+      if (sortDirection === 'asc') {
+        setSortDirection('desc')
+      } else if (sortDirection === 'desc') {
+        // Reset sorting
+        setSortType(null)
+        setSortDirection(null)
+        setFilteredProducts([...originalProducts]) // Reset to original order
+        return
       }
+    } else {
+      // New sort type
+      setSortType(type)
+      setSortDirection('asc')
     }
-  }, [selectedCategory, dispatch])
 
-  if (status === 'loading') {
-    return (
-      <section>
-        <div>Loading...</div>
-      </section>
-    )
+    const sortedProducts = [...filteredProducts].sort((a, b) => {
+      const direction = sortDirection === 'asc' ? 1 : -1
+      if (type === 'price') {
+        return (a.price - b.price) * direction
+      } else if (type === 'rating') {
+        return (a.rating - b.rating) * direction
+      } else if (type === 'discount') {
+        return (a.discountPercentage - b.discountPercentage) * direction
+      }
+      return 0
+    })
+
+    setFilteredProducts(sortedProducts)
   }
 
-  if (error) {
-    return (
-      <section>
-        <div>Error: {error}</div>
-      </section>
-    )
-  }
 
-  // Make sure to only render content when department is defined
-  return (
-    <DepartmentContainer>
-      <DepartmentHeader>
-        <h1>{selectedCategory}</h1>
-      </DepartmentHeader>
 
-      <Content>
-        <Sidebar />
-        
-        <ProductsGrid>
-          {department ? (
-            department.subCategories.map((subCategory) => {
-              const filteredProducts = products.filter(
-                (product) => product.category === subCategory
-              )
-              return (
-                <Carousel
-                  key={subCategory}
-                  title={formatCategory(subCategory)}
-                  products={filteredProducts}
-                />
-              )
-            })
-          ) : (
-            <p>No department found.</p>
-          )}
-        </ProductsGrid>
-      </Content>
-    </DepartmentContainer>
-  )
+	const handleFilterChange = (filterType, formattedValue) => {
+		setSelectedFilters((prev) => {
+			const updated = {
+				...prev,
+				[filterType]: prev[filterType].includes(formattedValue)
+					? prev[filterType].filter((item) => item !== formattedValue)
+					: [...prev[filterType], formattedValue],
+			}
+
+			// Use original values for actual filtering
+			const selectedOriginalValues = updated[filterType].map(
+				(formatted) => filterValueMap[formatted]
+			)
+
+			// Filter department products based on selected Category
+			const newFilteredProducts =
+				selectedOriginalValues.length === 0
+					? departmentProducts
+					: departmentProducts.filter((product) =>
+							selectedOriginalValues.includes(product.category)
+					  )
+
+			setFilteredProducts(newFilteredProducts)
+			return updated
+		})
+	}
+
+	if (status === 'loading') {
+		return (
+			<section>
+				<div>Loading...</div>
+			</section>
+		)
+	}
+
+	if (error) {
+		return (
+			<section>
+				<div>Error: {error}</div>
+			</section>
+		)
+	}
+
+	return (
+		<DepartmentContainer>
+			<PageHeader
+				products={departmentProducts}
+				heading={selectedCategory}
+				filtersOpen={filtersOpen}
+				setFiltersOpen={setFiltersOpen}
+			/>
+
+			<Content>
+				{departmentProducts.length > 0 && (
+					<>
+						<Sidebar
+							filters={filters}
+							selectedFilters={selectedFilters}
+							handleFilterChange={handleFilterChange}
+              handleSort={handleSort}
+              sortType={sortType}
+              sortDirection={sortDirection}
+						/>
+
+						<MobileFilterMenu
+							filters={filters}
+							selectedFilters={selectedFilters}
+							handleFilterChange={handleFilterChange}
+							filtersOpen={filtersOpen}
+							setFiltersOpen={setFiltersOpen}
+						/>
+					</>
+				)}
+
+				<MainContent>
+					<ResultCount>
+						Showing {filteredProducts.length} of{' '}
+						{departmentProducts.length} products in{' '}
+						{selectedCategory}
+					</ResultCount>
+					<ProductGrid>
+						{filteredProducts.map((product) => (
+							<Product key={product.id} product={product} />
+						))}
+					</ProductGrid>
+				</MainContent>
+			</Content>
+		</DepartmentContainer>
+	)
 }
 
+// Styled components remain the same
 const DepartmentContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-`
-
-const DepartmentHeader = styled.div`
-  padding: 0 var(--spacing-md);
-  background-color: var(--white);
-  border-bottom: 1px solid var(--lt-grey);
-  h1 {
-    font-size: clamp(var(--font-lg), 3vw, var(--font-xxl));
-  }
-
-  @media only screen and (max-width: 768px) {
-    padding: var(--spacing-xs) var(--spacing-sm);
-  }
+	display: flex;
+	flex-direction: column;
 `
 
 const Content = styled.div`
-  display: flex;
-  background-color: var(--white);
+	display: flex;
+	background-color: var(--white);
 
-  @media only screen and (max-width: 768px) {
-    flex-direction: column;
-    padding: var(--spacing-sm);
-  }
+	@media only screen and (max-width: 768px) {
+		flex-direction: column;
+	}
 `
 
-const Sidebar = styled.aside`
-  width: 30rem;
-  min-width: 25rem;
-  height: 100vh;
-  padding: var(--spacing-md);
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-md);
-  @media only screen and (max-width: 768px) {
-    display: none;
-  }
+const MainContent = styled.main`
+	flex: 1;
+	padding: var(--spacing-sm);
+	background-color: var(--white);
+
+	@media only screen and (max-width: 768px) {
+		padding: var(--spacing-sm);
+	}
 `
 
-const ProductsGrid = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-md);
-  flex: 1;
-  @media only screen and (max-width: 768px) {
-    gap: var(--spacing-sm);
-  }
+const ResultCount = styled.p`
+	margin-bottom: var(--spacing-sm);
+	font-size: var(--font-sm);
+	color: var(--md-grey);
 `
 
+const ProductGrid = styled.div`
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(22rem, 1fr));
+	gap: var(--spacing-sm);
+
+	@media only screen and (max-width: 768px) {
+		grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+		gap: var(--spacing-sm);
+	}
+`

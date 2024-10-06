@@ -108,23 +108,38 @@ export default function Hero() {
 
 	return (
 		<HeroContainer>
-      <HeroContent>
-				<img src={heroCategories[heroImageIndex].src} alt={heroCategories[heroImageIndex].title} />
+			<HeroContent>
+				<img
+					src={heroCategories[heroImageIndex].src}
+					alt={heroCategories[heroImageIndex].title}
+				/>
 				<ChevronButton
-					onClick={() => setHeroImageIndex((prevIndex) => (prevIndex === 0 ? heroCategories.length - 1 : prevIndex - 1))}
+					onClick={() =>
+						setHeroImageIndex((prevIndex) =>
+							prevIndex === 0
+								? heroCategories.length - 1
+								: prevIndex - 1
+						)
+					}
 				>
 					<ChevronIcon direction="left" />
 				</ChevronButton>
-        <CTAButton onClick={handleHeroClick}>
-          {heroCategories[heroImageIndex].cta}
-        </CTAButton>
+				<CTAButton onClick={handleHeroClick}>
+					{heroCategories[heroImageIndex].cta}
+				</CTAButton>
 				<ChevronButton
-					onClick={() => setHeroImageIndex((prevIndex) => (prevIndex === heroCategories.length - 1 ? 0 : prevIndex + 1))} 
+					onClick={() =>
+						setHeroImageIndex((prevIndex) =>
+							prevIndex === heroCategories.length - 1
+								? 0
+								: prevIndex + 1
+						)
+					}
 				>
 					<ChevronIcon direction="right" />
 				</ChevronButton>
 			</HeroContent>
-    </HeroContainer>
+		</HeroContainer>
 	)
 }
 
@@ -135,8 +150,8 @@ const HeroContainer = styled.div`
 `
 
 const HeroContent = styled.div`
-  width: 100%;
-  height: 100%;
+	width: 100%;
+	height: 100%;
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
@@ -176,8 +191,8 @@ const CTAButton = styled.button`
 	text-transform: uppercase;
 	font-size: var(--font-cta);
 	color: var(--white);
-  width: 100%;
-  height: 30rem;
+	width: 100%;
+	height: 30rem;
 	overflow: hidden;
 	position: relative;
 	@media (max-width: 1199px) {
@@ -193,8 +208,8 @@ const CTAButton = styled.button`
 
 const PreviewGrid = styled.section`
 	display: flex;
-  justify-content: space-around;
-  align-items: center;
+	justify-content: space-around;
+	align-items: center;
 	gap: var(--spacing-md);
 	z-index: 1;
 	@media (max-width: 768px) {
@@ -203,24 +218,23 @@ const PreviewGrid = styled.section`
 	}
 
 	@media (max-width: 768px) {
-		
 	}
 `
 
 const PreviewItem = styled.div`
-  width: 35rem;
-  height: auto;
+	width: 35rem;
+	height: auto;
 	display: flex;
 	flex-direction: column;
 	background-color: var(--white);
 	padding: var(--spacing-lg);
-  overflow: hidden;
+	overflow: hidden;
 	h2 {
 		font-size: clamp(1.6rem, 2.5vw, 2rem);
 		margin-bottom: var(--spacing-md);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
 	}
 	button {
 		color: var(--link-blue);
@@ -239,7 +253,7 @@ const PreviewItem = styled.div`
 `
 
 const ProductList = styled.ul`
-  width: 100%;
+	width: 100%;
 	display: grid;
 	grid-template-columns: repeat(2, 1fr);
 	gap: var(--spacing-sm);

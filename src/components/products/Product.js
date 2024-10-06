@@ -1,12 +1,25 @@
 import React from 'react'
-import styled from 'styled-components'
+import { useNavigate } from 'react-router-dom'
+import { useDispatch } from 'react-redux'
+import { setCurrentProduct } from '../../redux/slices/productsSlice'
 import { starCalculator } from '../../utils/starCalculator'
 import AddToCartBtn from '../buttons/AddToCartBtn'
 import StarIcon from '../../icons/StarIcon'
+import styled from 'styled-components'
 
 export default function CarouselItem({ product }) {
+	const dispatch = useDispatch()
+	const navigate = useNavigate()
+
+	const handleProductClick = () => {
+		dispatch(setCurrentProduct(product))
+		navigate(`/product/${product.id}`)
+	}
+
 	return (
-		<ProductCard>
+		<ProductCard
+			onClick={handleProductClick}
+		>
 			<img src={product.thumbnail} alt={product.name} />
 			<div className="block">
 				<h3>{product.title}</h3>
@@ -35,8 +48,6 @@ export default function CarouselItem({ product }) {
 		</ProductCard>
 	)
 }
-
-
 
 const ProductCard = styled.div`
 	border: 1px solid var(--lt-grey);
@@ -73,7 +84,7 @@ const ProductCard = styled.div`
 	.block {
 		display: flex;
 		flex-direction: column;
-		gap: var(--spacing-xs);
+		gap: var(--spacing-sm);
 		margin-bottom: var(--spacing-sm);
 	}
 	.star-rating {
@@ -88,7 +99,6 @@ const ProductCard = styled.div`
 		display: flex;
 		align-items: center;
 		gap: var(--spacing-lg);
-		margin-bottom: var(--spacing-sm);
 	}
 	.price {
 		font-size: var(--font-xs);

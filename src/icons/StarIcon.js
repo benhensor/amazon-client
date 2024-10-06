@@ -31,8 +31,17 @@ export default function StarIcon({ type }) {
 }
 
 const StarIconContainer = styled.div`
-  width: 2rem; /* Adjust size as needed */
-  height: 2rem; /* Adjust size as needed */
+  width: 1.8rem; 
+  height: 1.8rem;
+
+  @media only screen and (max-width: 768px) {
+    width: 1.6rem; 
+    height: 1.6rem; 
+  }
+  @media only screen and (max-width: 450px) {
+    width: 1.2rem; 
+    height: 1.2rem; 
+  }
 `;
 
 const StarEmpty = styled.svg`

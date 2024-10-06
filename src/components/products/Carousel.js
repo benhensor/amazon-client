@@ -1,96 +1,116 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
-import { setProducts, setCurrentProduct, setSelectedCategory } from '../../redux/slices/productsSlice'
+import {
+	setProducts,
+	setCurrentProduct,
+	setSelectedCategory,
+} from '../../redux/slices/productsSlice'
 import styled from 'styled-components'
 import ChevronIcon from '../../icons/ChevronIcon'
 import CarouselItem from './CarouselItem'
 
 const BREAKPOINTS = {
-  mobile: 480,
-  tablet: 768,
+	mobile: 480,
+	tablet: 768,
 }
 
 export default function Carousel({ title, products }) {
-  const navigate = useNavigate()
-  const dispatch = useDispatch()
-  const [currentPage, setCurrentPage] = useState(0)
-  const [itemsPerPage, setItemsPerPage] = useState(0)
-  const containerRef = useRef(null)
+	const navigate = useNavigate()
+	const dispatch = useDispatch()
+	const [currentPage, setCurrentPage] = useState(0)
+	const [itemsPerPage, setItemsPerPage] = useState(0)
+	const containerRef = useRef(null)
 
-  useEffect(() => {
-    const handleResize = () => {
-      if (containerRef.current) {
-        const containerWidth = containerRef.current.offsetWidth
-        const cardWidth = window.innerWidth <= BREAKPOINTS.tablet ? 120 : 180
-        const calculatedItemsPerPage = Math.floor((containerWidth - 32) / (cardWidth + 16))
-        setItemsPerPage(calculatedItemsPerPage)
-      }
-    }
+	useEffect(() => {
+		const handleResize = () => {
+			if (containerRef.current) {
+				const containerWidth = containerRef.current.offsetWidth
+				const cardWidth =
+					window.innerWidth <= BREAKPOINTS.tablet ? 120 : 180
+				const calculatedItemsPerPage = Math.floor(
+					(containerWidth - 32) / (cardWidth + 16)
+				)
+				setItemsPerPage(calculatedItemsPerPage)
+			}
+		}
 
-    handleResize()
-    window.addEventListener('resize', handleResize)
-    return () => window.removeEventListener('resize', handleResize)
-  }, [])
+		handleResize()
+		window.addEventListener('resize', handleResize)
+		return () => window.removeEventListener('resize', handleResize)
+	}, [])
 
-  const pageCount = Math.ceil(products.length / itemsPerPage)
+	const pageCount = Math.ceil(products.length / itemsPerPage)
 
-  const handleProductClick = (product) => {
-    dispatch(setCurrentProduct(product))
-    navigate(`/product?${product.id}`)
-  }
+	const handleProductClick = (product) => {
+		dispatch(setCurrentProduct(product))
+		navigate(`/product?${product.id}`)
+	}
 
-  const handleCategoryClick = (category, products) => {
-    dispatch(setSelectedCategory(category))
-    dispatch(setProducts(products))
-    navigate(`/department?${category}`)
-  }
+	const handleCategoryClick = (category, products) => {
+		dispatch(setSelectedCategory(category))
+		dispatch(setProducts(products))
+		navigate(`/department?${category}`)
+	}
 
-  const handleNext = () => {
-    setCurrentPage((prev) => Math.min(prev + 1, pageCount - 1))
-  }
+	const handleNext = () => {
+		setCurrentPage((prev) => Math.min(prev + 1, pageCount - 1))
+	}
 
-  const handlePrev = () => {
-    setCurrentPage((prev) => Math.max(prev - 1, 0))
-  }
+	const handlePrev = () => {
+		setCurrentPage((prev) => Math.max(prev - 1, 0))
+	}
 
-  return (
-    <CarouselContainer ref={containerRef}>
-      <CarouselControls>
-        <Title onClick={() => handleCategoryClick(title, products)}>{title}</Title>
-        <SeeMoreButton onClick={() => handleCategoryClick(title, products)}>
-          See more...
-        </SeeMoreButton>
-      </CarouselControls>
+	return (
+		<CarouselContainer ref={containerRef}>
+			<CarouselControls>
+				<Title onClick={() => handleCategoryClick(title, products)}>
+					{title}
+				</Title>
+				<SeeMoreButton
+					onClick={() => handleCategoryClick(title, products)}
+				>
+					See more...
+				</SeeMoreButton>
+			</CarouselControls>
 
-      <CarouselWrapper>
-        <DesktopButtons>
-          <ChevronButton
-            className="left"
-            onClick={handlePrev}
-            disabled={currentPage === 0}
-          >
-            <ChevronIcon direction="left" />
-          </ChevronButton>
-          <ChevronButton
-            className="right"
-            onClick={handleNext}
-            disabled={currentPage === pageCount - 1}
-          >
-            <ChevronIcon direction="right" />
-          </ChevronButton>
-        </DesktopButtons>
+			<CarouselWrapper>
+				<DesktopButtons>
+					<ChevronButton
+						className="left"
+						onClick={handlePrev}
+						disabled={currentPage === 0}
+					>
+						<ChevronIcon direction="left" />
+					</ChevronButton>
+					<ChevronButton
+						className="right"
+						onClick={handleNext}
+						disabled={currentPage === pageCount - 1}
+					>
+						<ChevronIcon direction="right" />
+					</ChevronButton>
+				</DesktopButtons>
 
-        <ProductList $currentPage={currentPage} $itemsPerPage={itemsPerPage}>
-          {products.map((product, i) => (
-            <ProductItem key={i} onClick={() => handleProductClick(product)}>
-              <CarouselItem product={product} BREAKPOINTS={BREAKPOINTS} />
-            </ProductItem>
-          ))}
-        </ProductList>
-      </CarouselWrapper>
-    </CarouselContainer>
-  )
+				<ProductList
+					$currentPage={currentPage}
+					$itemsPerPage={itemsPerPage}
+				>
+					{products.map((product, i) => (
+						<ProductItem
+							key={i}
+							onClick={() => handleProductClick(product)}
+						>
+							<CarouselItem
+								product={product}
+								BREAKPOINTS={BREAKPOINTS}
+							/>
+						</ProductItem>
+					))}
+				</ProductList>
+			</CarouselWrapper>
+		</CarouselContainer>
+	)
 }
 
 const CarouselContainer = styled.div`
@@ -103,15 +123,15 @@ const CarouselContainer = styled.div`
 
 	@media only screen and (max-width: ${BREAKPOINTS.tablet}px) {
 		margin-bottom: var(--spacing-sm);
-    padding: var(--spacing-sm);
-    gap: var(--spacing-sm);
+		padding: var(--spacing-sm);
+		gap: var(--spacing-sm);
 	}
 `
 
 const CarouselControls = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
 `
 
 const Title = styled.button`
@@ -163,47 +183,47 @@ const ChevronButton = styled.button`
 `
 
 const ProductList = styled.ul`
-  display: flex;
-  gap: var(--spacing-xs);
-  transition: var(--tr-medium);
+	display: flex;
+	gap: var(--spacing-xs);
+	transition: var(--tr-medium);
 
-  @media (min-width: ${BREAKPOINTS.tablet + 1}px) {
-    transform: translateX(-${props => props.$currentPage * 100}%);
-  }
+	@media (min-width: ${BREAKPOINTS.tablet + 1}px) {
+		transform: translateX(-${(props) => props.$currentPage * 100}%);
+	}
 
-  @media (max-width: ${BREAKPOINTS.tablet}px) {
-    overflow-x: auto;
-    scroll-behavior: smooth;
-    -webkit-overflow-scrolling: touch;
-    &::-webkit-scrollbar {
-      display: none;
-    }
-  }
+	@media (max-width: ${BREAKPOINTS.tablet}px) {
+		overflow-x: auto;
+		scroll-behavior: smooth;
+		-webkit-overflow-scrolling: touch;
+		&::-webkit-scrollbar {
+			display: none;
+		}
+	}
 `
 
 const ProductItem = styled.li`
-  flex: 0 0 180px;
-  margin-right: var(--spacing-md);
-  cursor: pointer;
-  transition: var(--tr-fast);
+	flex: 0 0 180px;
+	margin-right: var(--spacing-md);
+	cursor: pointer;
+	transition: var(--tr-fast);
 
-  @media (max-width: ${BREAKPOINTS.tablet}px) {
-    flex: 0 0 120px;
-  }
+	@media (max-width: ${BREAKPOINTS.tablet}px) {
+		flex: 0 0 120px;
+	}
 
-  @media (max-width: ${BREAKPOINTS.mobile}px) {
-    margin-right: var(--spacing-sm);
-  }
+	@media (max-width: ${BREAKPOINTS.mobile}px) {
+		margin-right: var(--spacing-sm);
+	}
 
-  &:hover {
-    border-color: var(--lt-grey-hover);
-  }
+	&:hover {
+		border-color: var(--lt-grey-hover);
+	}
 `
 
 const DesktopButtons = styled.div`
-  @media (max-width: ${BREAKPOINTS.tablet}px) {
-    display: none;
-  }
+	@media (max-width: ${BREAKPOINTS.tablet}px) {
+		display: none;
+	}
 `
 
 const SeeMoreButton = styled.button`

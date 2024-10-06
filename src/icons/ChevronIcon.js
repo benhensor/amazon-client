@@ -2,7 +2,21 @@ import React from 'react'
 import styled from 'styled-components'
 
 export default function ChevronIcon({ direction }) {
-	const rotation = direction === 'left' ? 'rotate(0deg)' : 'rotate(180deg)'
+	const rotation = () => {
+		switch (direction) {
+			case 'up':
+				return 'rotate(270deg)'
+			case 'right':
+				return 'rotate(180deg)'
+			case 'down':
+				return 'rotate(90deg)'
+			case 'left':
+				return 'rotate(0deg)'
+			default:
+				return 'rotate(0deg)'
+		}
+	}
+
 	return (
 		<SVG
 			viewBox="0 0 8 12"
@@ -15,14 +29,14 @@ export default function ChevronIcon({ direction }) {
 }
 
 const SVG = styled.svg`
-  width: .6rem;
-  height: auto;
+	width: 0.6rem;
+	height: auto;
 	fill: none;
 	transform: ${({ $rotation }) => $rotation};
-  path {
-    stroke: inherit;
-    stroke-width: 2;
+	path {
+		stroke: inherit;
+		stroke-width: 2;
 		stroke-linecap: round;
 		stroke-linejoin: round;
-  }
+	}
 `
