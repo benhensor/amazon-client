@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from 'react'
+import React, { useEffect } from 'react'
 import {
 	superCategories
 } from '../../utils/superCategories'
@@ -17,14 +17,6 @@ export default function CategoryMenu({ menuOpen, closeMenu, onSearch }) {
 			document.body.style.overflow = 'auto'
 		}
 	}, [menuOpen])
-
-	// Memoize the formatCategory function for optimization
-	// const formatCategory = useCallback((category) => {
-	// 	return category
-	// 		.split('-')
-	// 		.map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-	// 		.join(' ')
-	// }, [])
 
 	// Department component to handle each category section
   const Department = ({ category }) => (

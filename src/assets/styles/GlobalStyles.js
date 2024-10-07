@@ -130,6 +130,11 @@ const GlobalStyles = createGlobalStyle`
     background-color: transparent;
   }
 
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+
   @media only screen and (max-width: 450px) {
     section {
       margin: 0 var(--spacing-sm);
