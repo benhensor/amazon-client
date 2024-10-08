@@ -211,8 +211,8 @@ export default function Product() {
 			<InfoBlock>
 				<div className="button-container">
 					<QuantityBtn>Quantity:</QuantityBtn>
-					<BuyButton onClick={() => {}} text="Add to Basket" />
-					<BuyButton onClick={() => {}} text="Buy Now" />
+					<BuyButton onClick={() => {}} text="Add to Basket" type='large'/>
+					<BuyButton onClick={() => {}} text="Buy Now" type='large'/>
 				</div>
 			</InfoBlock>
 		)
@@ -223,12 +223,12 @@ export default function Product() {
 			<InfoBlock>
 				<div className="spec-block">
 					<div className="spec-key">
-						<p>Brand:</p>
+						{currentProduct.brand && <p>Brand:</p>}
 						<p>SKU:</p>
 						<p>Weight:</p>
 					</div>
 					<div className="spec-value">
-						<p>{currentProduct.brand}</p>
+						{currentProduct.brand && <p>{currentProduct.brand}</p>}
 						<p>{currentProduct.sku}</p>
 						<p>{currentProduct.weight}g</p>
 					</div>
@@ -284,6 +284,7 @@ export default function Product() {
 						{renderProductDescription()}
 						{renderProductAvailability()}
 						{renderProductPricing()}
+						{renderProductBuyingOptions()}
 						{renderProductSpecifications()}
 						{renderProductReviews()}
 					</ProductInfo>
@@ -488,7 +489,6 @@ const InfoBlock = styled.div`
 	p {
 		display: flex;
 		align-items: center;
-		
 	}
 	p.title {
 		font-size: clamp(var(--font-lg), 2vw, var(--font-xl));
@@ -534,5 +534,11 @@ const InfoBlock = styled.div`
 	}
 	p.out {
 		color: var(--price-red);
+	}
+
+	@media only screen and (max-width: 768px) {
+		div.button-container {
+			align-self: center;
+		}
 	}
 `

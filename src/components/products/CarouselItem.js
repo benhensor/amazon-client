@@ -45,7 +45,7 @@ export default function CarouselItem({ product, BREAKPOINTS }) {
 			<Discount>-{product.discountPercentage}%</Discount>
 			<CrimeLogo />
 			<div className="btn-container">
-				<BuyButton onClick={() => {}} text="Add to Basket" />
+				<BuyButton onClick={() => {}} text="Add to Basket" type='small'/>
 			</div>
 		</ProductCard>
 	)

@@ -34,7 +34,7 @@ export default function CarouselItem({ product }) {
 						.{(product.price % 1).toFixed(2).slice(2)}
 					</p>
 				</div>
-				<BuyButton onClick={() => {}} text="Add to Basket" />
+				<BuyButton onClick={() => {}} text="Add to Basket" type='small'/>
 			</div>
 		</ProductCard>
 	)
