@@ -376,7 +376,6 @@ const BreadcrumbList = styled.ol`
 
 const ProductContent = styled.div`
 	display: flex;
-	gap: var(--spacing-lg);
 	@media only screen and (max-width: 768px) {
 		flex-direction: column;
 	}
@@ -385,8 +384,10 @@ const ProductContent = styled.div`
 const ProductImages = styled.div`
 	display: flex;
 	flex: 1;
+	margin-right: var(--spacing-md);
 	@media only screen and (max-width: 768px) {
 		flex-direction: column-reverse;
+		margin-right: 0;
 	}
 `
 
@@ -444,16 +445,18 @@ const ProductInfo = styled.div`
 	flex: 1;
 	display: flex;
 	flex-direction: column;
-	gap: var(--spacing-md);
 `
 
 const InfoBlock = styled.div`
-	padding-bottom: var(--spacing-md);
+	padding: var(--spacing-md) 0;
 	border-bottom: 1px solid var(--lt-grey);
 	gap: var(--spacing-xs);
 	display: flex;
 	flex-direction: column;
 	user-select: none;
+	&:first-child {
+		padding-top: 0;
+	}
 	div.spec-block {
 		display: flex;
 	}
@@ -537,6 +540,10 @@ const InfoBlock = styled.div`
 	}
 
 	@media only screen and (max-width: 768px) {
+		&:first-child {
+			padding-top: var(--spacing-sm);
+			border-bottom: none;
+		}
 		div.button-container {
 			align-self: center;
 		}
