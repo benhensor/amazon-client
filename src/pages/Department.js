@@ -5,7 +5,7 @@ import {
 	fetchAllProducts,
 } from '../redux/slices/productsSlice'
 import { superCategories } from '../utils/superCategories'
-import { formatCategory } from '../utils/formatCategory'
+import { formatQuery } from '../utils/formatCategory'
 import PageHeader from '../components/pageheader/PageHeader'
 import Product from '../components/products/Product'
 import Sidebar from '../components/filters/Sidebar'
@@ -29,12 +29,18 @@ export default function Department() {
 	const [sortType, setSortType] = useState(null) 
 	const [sortDirection, setSortDirection] = useState(null)
 
+
+
+
 	useEffect(() => {
 		const storedCategory = localStorage.getItem('selectedCategory')
 		if (storedCategory) {
 			dispatch(setSelectedCategory(storedCategory))
 		}
 	}, [dispatch])
+
+
+
 
 	useEffect(() => {
 		if (selectedCategory) {
@@ -46,6 +52,9 @@ export default function Department() {
 			dispatch(fetchAllProducts())
 		}
 	}, [selectedCategory, dispatch])
+
+
+
 
 	useEffect(() => {
 		if (department && products.length > 0) {
@@ -59,7 +68,7 @@ export default function Department() {
 			const valueMap = {}
 			const formattedSubCategories = department.subCategories.map(
 				(category) => {
-					const formatted = formatCategory(category)
+					const formatted = formatQuery(category)
 					valueMap[formatted] = category
 					return formatted
 				}
@@ -84,12 +93,14 @@ export default function Department() {
 
 
 
+
 	useEffect(() => {
 		if (departmentProducts.length > 0) {
 			setOriginalProducts(departmentProducts) // Store the original unsorted products
 			setFilteredProducts(departmentProducts) // Initialize filteredProducts
 		}
 	}, [departmentProducts])
+
 
 
 
@@ -128,6 +139,7 @@ export default function Department() {
 
 
 
+
 	const handleFilterChange = (filterType, formattedValue) => {
 		setSelectedFilters((prev) => {
 			const updated = {
@@ -154,6 +166,9 @@ export default function Department() {
 			return updated
 		})
 	}
+
+
+
 
 	if (status === 'loading') {
 		return (
@@ -198,6 +213,9 @@ export default function Department() {
 							handleFilterChange={handleFilterChange}
 							filtersOpen={filtersOpen}
 							setFiltersOpen={setFiltersOpen}
+							handleSort={handleSort}
+              sortType={sortType}
+              sortDirection={sortDirection}
 						/>
 					</>
 				)}

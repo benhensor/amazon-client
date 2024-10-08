@@ -14,6 +14,7 @@ const GlobalStyles = createGlobalStyle`
     --background-grey: #E3E6E6;
     --lt-grey: #E6E6E6;
     --lt-grey-hover: #D4D4D4;
+    --border-grey: #D5D9D9;
     --cat-menu-hover: #EAEDED;
     --md-grey:#8A9899;
     --paleblue: #37475A;
@@ -26,6 +27,8 @@ const GlobalStyles = createGlobalStyle`
     --lt-orange: #FEBD69;
     --lt-orange-hover: #F3A847;
     --md-orange: #F08804;
+    --bin-orange: #FFA41C;
+    --bin-orange-hover: #FA8900; 
     --dk-orange: #C45500;
     --price-red: #B12704;
     --link-blue: #007185;
@@ -37,6 +40,7 @@ const GlobalStyles = createGlobalStyle`
     --discount-red: #CC0C39;
     --highlight-red: #E5061D;
     --order-header: #F0F2F2;
+    --stock-green: #007600;
 
     // spacing
     --spacing-xs: .4rem;

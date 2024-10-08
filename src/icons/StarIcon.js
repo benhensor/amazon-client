@@ -33,6 +33,9 @@ export default function StarIcon({ type }) {
 const StarIconContainer = styled.div`
   width: 1.8rem; 
   height: 1.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
   @media only screen and (max-width: 768px) {
     width: 1.6rem; 

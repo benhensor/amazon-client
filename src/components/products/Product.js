@@ -2,9 +2,8 @@ import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import { setCurrentProduct } from '../../redux/slices/productsSlice'
-import { starCalculator } from '../../utils/starCalculator'
-import AddToCartBtn from '../buttons/AddToCartBtn'
-import StarIcon from '../../icons/StarIcon'
+import BuyButton from '../buttons/BuyButton'
+import ProductRating from './ProductRating'
 import styled from 'styled-components'
 
 export default function CarouselItem({ product }) {
@@ -13,26 +12,18 @@ export default function CarouselItem({ product }) {
 
 	const handleProductClick = () => {
 		dispatch(setCurrentProduct(product))
-		navigate(`/product?${product.title}`)
+		navigate(`/product?${product.id}`)
 	}
 
 	return (
-		<ProductCard
-			onClick={handleProductClick}
-		>
+		<ProductCard onClick={handleProductClick}>
 			<img src={product.thumbnail} alt={product.name} />
 			<div className="block">
 				<h3>{product.title}</h3>
 				<p className="description">{product.description}</p>
 			</div>
 			<div className="block">
-				<div className="star-rating">
-					<>
-						{starCalculator(product.rating).map((star, index) => (
-							<StarIcon key={index} type={star} />
-						))}
-					</>
-				</div>
+				<ProductRating rating={product.rating} />
 				<div className="price-container">
 					<p className="discount">-{product.discountPercentage}%</p>
 					<p className="price">
@@ -43,7 +34,7 @@ export default function CarouselItem({ product }) {
 						.{(product.price % 1).toFixed(2).slice(2)}
 					</p>
 				</div>
-				<AddToCartBtn product={product} />
+				<BuyButton onClick={() => {}} text="Add to Basket" />
 			</div>
 		</ProductCard>
 	)
@@ -117,5 +108,9 @@ const ProductCard = styled.div`
 	}
 	&:hover {
 		border-color: var(--lt-grey-hover);
+	}
+
+	@media only screen and (max-width: 768px) {
+		padding: var(--spacing-xs);
 	}
 `

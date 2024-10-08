@@ -16,7 +16,7 @@ const initialState = {
 	categoryList: [],
 	currentProduct: null,
 	searchTerm: '',
-	selectedCategory: 'All',
+	selectedCategory: '',
 	shouldClearSearch: false,
 	status: 'idle',
 	error: null,

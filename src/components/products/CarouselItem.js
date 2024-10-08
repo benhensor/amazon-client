@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react'
-import { starCalculator } from '../../utils/starCalculator'
 import styled from 'styled-components'
-import StarIcon from '../../icons/StarIcon'
+import ProductRating from './ProductRating'
 import CrimeLogo from '../../icons/CrimeLogo'
-import AddToCartBtn from '../buttons/AddToCartBtn'
+import BuyButton from '../buttons/BuyButton'
 
 export default function CarouselItem({ product, BREAKPOINTS }) {
 	const [isImageLoaded, setIsImageLoaded] = useState(false)
@@ -27,12 +26,7 @@ export default function CarouselItem({ product, BREAKPOINTS }) {
 				<LoadingSpinner>Loading Image...</LoadingSpinner> // Or use a placeholder image
 			)}
 			<ProductTitle>{product.title}</ProductTitle>
-			<ProductRating>
-				{starCalculator(product.rating).map((star, index) => (
-					<StarIcon key={index} type={star} />
-				))}
-				<p>{product.rating.length}</p>
-			</ProductRating>
+			<ProductRating rating={product.rating} review={false} />
 			<ProductPrice>
 				<p className="price">
 					£
@@ -50,7 +44,9 @@ export default function CarouselItem({ product, BREAKPOINTS }) {
 			</ProductPrice>
 			<Discount>-{product.discountPercentage}%</Discount>
 			<CrimeLogo />
-			<AddToCartBtn onClick={() => {}} />
+			<div className="btn-container">
+				<BuyButton onClick={() => {}} text="Add to Basket" />
+			</div>
 		</ProductCard>
 	)
 }
@@ -68,11 +64,14 @@ const LoadingSpinner = styled.div`
 const ProductCard = styled.div`
 	flex: 1;
 	font-size: clamp(var(--font-xxs), 2vw, var(--font-xs));
-	width: 180px;
+	width: 20rem;
 	height: auto;
 
+	div.btn-container {
+		width: 75%;
+	}
 	@media (max-width: ${(props) => props.$BREAKPOINTS.tablet}px) {
-		width: 120px;
+		width: 14rem;
 		height: auto;
 	}
 `
@@ -90,12 +89,6 @@ const ProductTitle = styled.p`
 	color: var(--dk-blue);
 	font-size: clamp(var(--font-xxs), 2vw, var(--font-sm));
 	padding: var(--spacing-sm) 0;
-`
-
-const ProductRating = styled.div`
-	display: flex;
-	gap: var(--spacing-xs);
-	margin-bottom: var(--spacing-sm);
 `
 
 const ProductPrice = styled.div`

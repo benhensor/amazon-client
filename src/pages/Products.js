@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react'
+import { useLocation } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import { categoryFilters } from '../utils/categoryFilters'
+import { formatQuery } from '../utils/formatCategory'
 import Sidebar from '../components/filters/Sidebar'
 import MobileFilterMenu from '../components/filters/MobileFilterMenu'
 import Product from '../components/products/Product'
@@ -8,72 +10,137 @@ import FilterIcon from '../icons/FilterIcon'
 import styled from 'styled-components'
 
 export default function Products() {
-	const { products, searchTerm, selectedCategory, status, error } =
+	const location = useLocation()
+	const searchQuery = location.search ? location.search.substring(1) : ''
+	const { products, selectedCategory, status, error } =
 		useSelector((state) => state.products || [])
 	const [heading, setHeading] = useState('')
 	const [filters, setFilters] = useState([])
 	const [selectedFilters, setSelectedFilters] = useState({})
 	const [filteredProducts, setFilteredProducts] = useState([])
 	const [filtersOpen, setFiltersOpen] = useState(false)
+	// Add new state for sorting
+  const [originalProducts, setOriginalProducts] = useState([])
+  const [sortType, setSortType] = useState(null)
+  const [sortDirection, setSortDirection] = useState(null)
+
+
+
+
+
+
 
 	useEffect(() => {
-		if (searchTerm) {
-			setHeading(searchTerm.charAt(0).toUpperCase() + searchTerm.slice(1))
+		if (!selectedCategory) {
+			setHeading(formatQuery(searchQuery))
 		}
+  
 
-		if (selectedCategory) {
-			setHeading(
-				selectedCategory.charAt(0).toUpperCase() +
-					selectedCategory.slice(1)
-			)
-			const newFilters = categoryFilters(selectedCategory, products)
-			setFilters(newFilters)
 
-			// Initialize selected filters
-			const initialSelectedFilters = Object.keys(newFilters).reduce(
-				(acc, filterType) => {
-					acc[filterType] = []
-					return acc
-				},
-				{}
-			)
-			setSelectedFilters(initialSelectedFilters)
-		}
+    if (selectedCategory) {
+      setHeading(
+        selectedCategory.charAt(0).toUpperCase() +
+          selectedCategory.slice(1)
+      )
+      const newFilters = categoryFilters(selectedCategory, products)
+      setFilters(newFilters)
 
-		setFilteredProducts(products)
-	}, [searchTerm, selectedCategory, products])
+      const initialSelectedFilters = Object.keys(newFilters).reduce(
+        (acc, filterType) => {
+          acc[filterType] = []
+          return acc
+        },
+        {}
+      )
+      setSelectedFilters(initialSelectedFilters)
+    } 
 
-	const handleFilterChange = (filterType, value) => {
-		setSelectedFilters((prev) => {
-			const updated = {
-				...prev,
-				[filterType]: prev[filterType].includes(value)
-					? prev[filterType].filter((item) => item !== value)
-					: [...prev[filterType], value],
-			}
+    setFilteredProducts(products)
+    setOriginalProducts(products) // Store original products for reset functionality
+  }, [selectedCategory, products, searchQuery])
 
-			// Apply filters
-			const newFilteredProducts = products.filter((product) => {
-				return Object.entries(updated).every(([type, values]) => {
-					if (values.length === 0) return true
 
-					if (type === 'tags') {
-						return values.some((value) =>
-							product.tags?.includes(value)
-						)
-					}
-					if (type === 'brand') {
-						return values.includes(product.brand)
-					}
-					// Handle simulated filters (this is just for UI, adjust as needed)
-					return true
-				})
-			})
 
-			setFilteredProducts(newFilteredProducts)
-			return updated
-		})
-	}
+  const handleSort = (type) => {
+    if (sortType === type) {
+      // Toggle through: asc -> desc -> reset
+      if (sortDirection === 'asc') {
+        setSortDirection('desc')
+      } else if (sortDirection === 'desc') {
+        // Reset sorting
+        setSortType(null)
+        setSortDirection(null)
+        setFilteredProducts([...originalProducts]) // Reset to original order
+        return
+      }
+    } else {
+      // New sort type
+      setSortType(type)
+      setSortDirection('asc')
+    }
+
+    const sortedProducts = [...filteredProducts].sort((a, b) => {
+      const direction = sortDirection === 'asc' ? 1 : -1
+      if (type === 'price') {
+        return (a.price - b.price) * direction
+      } else if (type === 'rating') {
+        return (a.rating - b.rating) * direction
+      } else if (type === 'discount') {
+        return (a.discountPercentage - b.discountPercentage) * direction
+      }
+      return 0
+    })
+
+    setFilteredProducts(sortedProducts)
+  }
+
+
+
+  // Modified handleFilterChange to maintain sorting after filtering
+  const handleFilterChange = (filterType, value) => {
+    setSelectedFilters((prev) => {
+      const updated = {
+        ...prev,
+        [filterType]: prev[filterType].includes(value)
+          ? prev[filterType].filter((item) => item !== value)
+          : [...prev[filterType], value],
+      }
+
+      // Apply filters
+      let newFilteredProducts = products.filter((product) => {
+        return Object.entries(updated).every(([type, values]) => {
+          if (values.length === 0) return true
+          if (type === 'tags') {
+            return values.some((value) => product.tags?.includes(value))
+          }
+          if (type === 'brand') {
+            return values.includes(product.brand)
+          }
+          return true
+        })
+      })
+
+      // Reapply current sorting if active
+      if (sortType) {
+        newFilteredProducts = [...newFilteredProducts].sort((a, b) => {
+          const direction = sortDirection === 'asc' ? 1 : -1
+          if (sortType === 'price') {
+            return (a.price - b.price) * direction
+          } else if (sortType === 'rating') {
+            return (a.rating - b.rating) * direction
+          } else if (sortType === 'discount') {
+            return (a.discountPercentage - b.discountPercentage) * direction
+          }
+          return 0
+        })
+      }
+
+      setFilteredProducts(newFilteredProducts)
+      return updated
+    })
+  }
+
+
 
 	if (status === 'loading')
 		return (
@@ -116,6 +183,9 @@ export default function Products() {
 							filters={filters}
 							selectedFilters={selectedFilters}
 							handleFilterChange={handleFilterChange}
+							handleSort={handleSort}
+              sortType={sortType}
+              sortDirection={sortDirection}
 						/>
 
 						{/* Mobile Filter Menu */}
@@ -125,6 +195,9 @@ export default function Products() {
 							handleFilterChange={handleFilterChange}
 							filtersOpen={filtersOpen}
 							setFiltersOpen={setFiltersOpen}
+							handleSort={handleSort}
+              sortType={sortType}
+              sortDirection={sortDirection}
 						/>
 					</>
 				)}
@@ -206,7 +279,7 @@ const MainContent = styled.main`
 
 const ProductGrid = styled.div`
 	display: grid;
-	grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
+	grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
 	gap: var(--spacing-sm);
 	padding: var(--spacing-sm);
 	@media only screen and (max-width: 768px) {

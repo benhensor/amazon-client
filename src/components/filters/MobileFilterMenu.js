@@ -1,4 +1,5 @@
 import React from 'react'
+import SortingBtn from '../buttons/SortingBtn'
 import styled from 'styled-components'
 
 export default function MobileFilterMenu({
@@ -7,7 +8,16 @@ export default function MobileFilterMenu({
   handleFilterChange,
   filtersOpen,
   setFiltersOpen,
+	handleSort,
+	sortType,
+	sortDirection,
 }) {
+	const getChevronDirection = (buttonType) => {
+		if (sortType === buttonType) {
+			return sortDirection === 'asc' ? 'up' : 'down'
+		}
+		return 'right' // default direction for inactive buttons
+	}
 	return (
 		<>
 			{/* Mobile Filter Menu */}
@@ -46,6 +56,29 @@ export default function MobileFilterMenu({
 						</FilterGroup>
 					))}
 				</FilterSectionContent>
+				<FilterSectionContent>
+				<p>Sort by:</p>
+				<SortingControls>
+					<SortingBtn
+						text="Price"
+						onClick={() => handleSort('price')}
+						isActive={sortType === 'price'}
+						direction={getChevronDirection('price')}
+					/>
+					<SortingBtn
+						text="Rating"
+						onClick={() => handleSort('rating')}
+						isActive={sortType === 'rating'}
+						direction={getChevronDirection('rating')}
+					/>
+					<SortingBtn
+						text="Discount"
+						onClick={() => handleSort('discount')}
+						isActive={sortType === 'discount'}
+						direction={getChevronDirection('discount')}
+					/>
+				</SortingControls>
+			</FilterSectionContent>
 			</FilterMenu>
 
 			{/* Overlay for mobile menu */}
@@ -116,6 +149,13 @@ const FilterSectionContent = styled.div`
 		margin-bottom: var(--spacing-xs);
 		color: var(--dk-blue);
 	}
+`
+
+const SortingControls = styled.div`
+	margin-top: var(--spacing-md);
+	display: flex;
+	flex-direction: column;
+	gap: var(--spacing-md);
 `
 
 const FilterGroup = styled.div`

@@ -2,7 +2,7 @@ import React, { useEffect } from 'react'
 import {
 	superCategories
 } from '../../utils/superCategories'
-import { formatCategory } from '../../utils/formatCategory'
+import { formatQuery } from '../../utils/formatCategory'
 import styled from 'styled-components'
 import ProfileIcon from '../../icons/ProfileIcon'
 import ChevronIcon from '../../icons/ChevronIcon'
@@ -26,7 +26,7 @@ export default function CategoryMenu({ menuOpen, closeMenu, onSearch }) {
         {category.subCategories.map((subCategory, i) => (
           <li key={i} onClick={() => onSearch(subCategory)}>
             <div>
-              <p>{formatCategory(subCategory)}</p>
+              <p>{formatQuery(subCategory)}</p>
               <ChevronIcon direction="right" />
             </div>
           </li>
