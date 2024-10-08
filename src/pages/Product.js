@@ -541,7 +541,7 @@ const InfoBlock = styled.div`
 
 	@media only screen and (max-width: 768px) {
 		&:first-child {
-			padding-top: var(--spacing-sm);
+			padding-bottom: var(--spacing-xs);
 			border-bottom: none;
 		}
 		div.button-container {

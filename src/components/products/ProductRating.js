@@ -5,18 +5,15 @@ import styled from 'styled-components'
 
 export default function ProductRating({ rating, review }) {
 
-  console.log(review)
-  // Function to generate a number of votes based on the rating
   const generateVoteCount = (rating) => {
-    const baseVotes = 10; // Minimum number of votes
-    const multiplier = 10; // Multiplier to scale votes up for higher ratings
-    const randomFactor = Math.random() * 150; // Adds some randomness to the number
+    const baseVotes = 10; 
+    const multiplier = 10;
+    const randomFactor = Math.random() * 150; 
 
-    // Higher ratings should generate more votes, scaled up
+    // Higher ratings generate more votes
     return Math.round(baseVotes + (rating * multiplier) + randomFactor);
   };
 
-  // Get the generated number of votes
   const voteCount = generateVoteCount(rating);
 
   return (
