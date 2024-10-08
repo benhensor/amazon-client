@@ -40,7 +40,9 @@ export default function CategoryMenu({ menuOpen, closeMenu, onSearch }) {
 				<ModalBackground $menuOpen={menuOpen} onClick={closeMenu} />
 				<CategoryMenuContainer $menuOpen={menuOpen}>
 					<CategoryMenuHeader>
-						<ProfileIcon />
+						<div className='profile'>
+							<ProfileIcon />
+						</div>
 						<p>Hello...</p>
 						<button onClick={closeMenu}>
 							<CloseIcon />
@@ -96,6 +98,13 @@ const CategoryMenuHeader = styled.div`
 	padding: var(--spacing-md) var(--spacing-lg);
 	background-color: var(--md-blue);
 	position: relative;
+	div.profile {
+		width: 3rem;
+		height: 3rem;
+		svg {
+			fill: var(--white);
+		}
+	}
 	p {
 		font-size: var(--font-lg);
 		font-weight: bold;
