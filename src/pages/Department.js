@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react'
+import { useParams } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import {
-	setSelectedCategory,
 	fetchAllProducts,
+	fetchDepartmentData,
 } from '../redux/slices/productsSlice'
 import { superCategories } from '../utils/superCategories'
 import { formatQuery } from '../utils/formatCategory'
@@ -14,10 +15,11 @@ import styled from 'styled-components'
 
 export default function Department() {
 	const dispatch = useDispatch()
-	const { products, selectedCategory, status, error } = useSelector(
+	const { slug } = useParams()
+	const { products, selectedDepartment, status, error } = useSelector(
 		(state) => state.products
 	)
-	const [department, setDepartment] = useState(null)
+	// const [department, setDepartment] = useState(null)
 	const [departmentProducts, setDepartmentProducts] = useState([])
 	const [filters, setFilters] = useState({})
 	const [selectedFilters, setSelectedFilters] = useState({})
@@ -31,42 +33,32 @@ export default function Department() {
 
 
 
-
 	useEffect(() => {
-		const storedCategory = localStorage.getItem('selectedCategory')
-		if (storedCategory) {
-			dispatch(setSelectedCategory(storedCategory))
+		if (slug) {
+			const setCurrentDepartment = async () => {
+				const currentDepartment = superCategories.find(
+					(superCategory) => superCategory.slug === slug
+				)
+				dispatch(fetchDepartmentData(currentDepartment))
+				dispatch(fetchAllProducts())
+			}
+			setCurrentDepartment()
 		}
-	}, [dispatch])
 
-
-
-
-	useEffect(() => {
-		if (selectedCategory) {
-			const currentDepartment = superCategories.find(
-				(superCategory) => superCategory.title === selectedCategory
-			)
-			setDepartment(currentDepartment)
-			localStorage.setItem('selectedCategory', selectedCategory)
-			dispatch(fetchAllProducts())
-		}
-	}, [selectedCategory, dispatch])
-
-
+	}, [slug, dispatch])
 
 
 	useEffect(() => {
-		if (department && products.length > 0) {
+		if (selectedDepartment && selectedDepartment.subCategories && products.length > 0) {
 			// Filter products to only those in the current department's subcategories
 			const productsInDepartment = products.filter((product) =>
-				department.subCategories.includes(product.category)
+				selectedDepartment.subCategories.includes(product.category)
 			)
 			setDepartmentProducts(productsInDepartment)
 
 			// Create mapping between formatted and original filter values
 			const valueMap = {}
-			const formattedSubCategories = department.subCategories.map(
+			const formattedSubCategories = selectedDepartment.subCategories.map(
 				(category) => {
 					const formatted = formatQuery(category)
 					valueMap[formatted] = category
@@ -89,7 +81,7 @@ export default function Department() {
 
 			setFilteredProducts(productsInDepartment)
 		}
-	}, [department, products])
+	}, [selectedDepartment, products])
 
 
 
@@ -190,7 +182,7 @@ export default function Department() {
 		<DepartmentContainer>
 			<PageHeader
 				products={departmentProducts}
-				heading={selectedCategory}
+				heading={selectedDepartment.title}
 				filtersOpen={filtersOpen}
 				setFiltersOpen={setFiltersOpen}
 			/>
@@ -224,7 +216,7 @@ export default function Department() {
 					<ResultCount>
 						Showing {filteredProducts.length} of{' '}
 						{departmentProducts.length} products in{' '}
-						{selectedCategory}
+						{selectedDepartment.title}
 					</ResultCount>
 					<ProductGrid>
 						{filteredProducts.map((product) => (

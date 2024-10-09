@@ -27,7 +27,7 @@ export default function Home() {
 				])
 				setIsDataReady(true)
 			} catch (err) {
-				console.error("Error fetching data", err)
+				console.error('Error fetching data', err)
 			}
 		}
 
@@ -39,8 +39,8 @@ export default function Home() {
 			superCategory.subCategories.includes(product.category)
 		)
 		return (
-			<Carousel title={superCategory.title} products={filteredProducts} />
-		)	
+			<Carousel superCategory={superCategory} products={filteredProducts} />
+		)
 	}
 
 	if (status === 'loading' || !isDataReady) {
@@ -59,11 +59,7 @@ export default function Home() {
 		)
 	}
 
-	// console.log('Status:', status)
-	// console.log('Products:', products)
-	// console.log('CategoryList:', categoryList)
-
-	if (categoryList.length === 0) {
+	if (!Array.isArray(categoryList) || categoryList.length === 0) {
 		return (
 			<section>
 				<h1>Home</h1>

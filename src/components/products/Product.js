@@ -12,7 +12,7 @@ export default function CarouselItem({ product }) {
 
 	const handleProductClick = () => {
 		dispatch(setCurrentProduct(product))
-		navigate(`/product?${product.id}`)
+		navigate(`/product/${product.id}`)
 	}
 
 	return (

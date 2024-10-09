@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react'
-import { useNavigate, useLocation } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import {
-	setSelectedCategory,
 	fetchProductsByCategory,
 	fetchSingleProduct,
 } from '../redux/slices/productsSlice'
@@ -19,12 +18,9 @@ import styled from 'styled-components'
 export default function Product() {
 	const dispatch = useDispatch()
 	const navigate = useNavigate()
-	const location = useLocation()
+	const { id } = useParams()
 	const width = useWindowWidth()
 	const { currentProduct } = useSelector((state) => state.products)
-
-	// Extract product ID from URL
-	const productId = location.search.substring(1)
 
 	const [isLoading, setIsLoading] = useState(true)
 	const [error, setError] = useState(null)
@@ -42,9 +38,9 @@ export default function Product() {
 				// If we don't have a current product or the URL ID doesn't match the current product
 				if (
 					!currentProduct ||
-					currentProduct.id.toString() !== productId
+					currentProduct.id.toString() !== id
 				) {
-					await dispatch(fetchSingleProduct(productId)).unwrap()
+					await dispatch(fetchSingleProduct(id)).unwrap()
 				}
 			} catch (err) {
 				setError('Failed to load product. Please try again later.')
@@ -53,10 +49,10 @@ export default function Product() {
 			}
 		}
 
-		if (productId) {
+		if (id) {
 			loadProduct()
 		}
-	}, [dispatch, productId, currentProduct])
+	}, [dispatch, id, currentProduct])
 
 	useEffect(() => {
 		if (
@@ -65,21 +61,18 @@ export default function Product() {
 			currentProduct.images.length > 0
 		) {
 			setCurrentImage(currentProduct.images[0])
-			setActiveThumbnail(0) // Reset thumbnail selection when product changes
+			setActiveThumbnail(0) 
 		}
 	}, [currentProduct])
 
-	// Early return for loading state
 	if (isLoading) {
 		return <div>Loading...</div>
 	}
 
-	// Early return for error state
 	if (error) {
 		return <div>{error}</div>
 	}
 
-	// Early return if no product is found
 	if (!currentProduct) {
 		return <div>Product not found</div>
 	}
@@ -88,31 +81,23 @@ export default function Product() {
 		superCategory.subCategories.includes(currentProduct.category)
 	)
 
-	const currentSubCategory = currentSuperCategory
-		? currentSuperCategory.subCategories.find(
-				(subCategory) => subCategory === currentProduct.category
-		  )
-		: null
-
-	const handleDepartmentBreadcrumbClick = (category) => {
-		dispatch(setSelectedCategory(category))
+	const handleDepartmentBreadcrumbClick = (slug) => {
 		navigate(
-			`/department?${currentSuperCategory.title
-				.toLowerCase()
-				.replace(/\s+/g, '-')}`
+			`/department/${slug}`
 		)
 	}
 
 	const handleCategoryBreadcrumbClick = (category) => {
-		dispatch(setSelectedCategory(category))
 		dispatch(fetchProductsByCategory(category))
-		navigate(`/products?${category}`)
+		navigate(`/category/${category}`)
 	}
 
 	const handleThumbnailClick = (i) => {
 		setActiveThumbnail(i)
 		setCurrentImage(currentProduct.images[i])
 	}
+
+
 
 	const renderProductImages = () => {
 		return (
@@ -299,15 +284,15 @@ export default function Product() {
 					<li
 						onClick={() =>
 							handleDepartmentBreadcrumbClick(
-								currentSuperCategory.title
+								currentSuperCategory.slug
 							)
 						}
 					>
-						{currentSuperCategory.title}
+						{currentSuperCategory.slug}
 					</li>
 					<li
 						onClick={() =>
-							handleCategoryBreadcrumbClick(currentSubCategory)
+							handleCategoryBreadcrumbClick(currentProduct.category)
 						}
 					>
 						{formatQuery(currentProduct.category)}

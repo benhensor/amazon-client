@@ -4,7 +4,6 @@ import { useDispatch } from 'react-redux'
 import {
 	setProducts,
 	setCurrentProduct,
-	setSelectedCategory,
 } from '../../redux/slices/productsSlice'
 import styled from 'styled-components'
 import ChevronIcon from '../../icons/ChevronIcon'
@@ -15,9 +14,10 @@ const BREAKPOINTS = {
 	tablet: 768,
 }
 
-export default function Carousel({ title, products }) {
+export default function Carousel({ superCategory, products }) {
 	const navigate = useNavigate()
 	const dispatch = useDispatch()
+	const { slug, title } = superCategory
 	const [currentPage, setCurrentPage] = useState(0)
 	const [itemsPerPage, setItemsPerPage] = useState(0)
 	const containerRef = useRef(null)
@@ -44,13 +44,12 @@ export default function Carousel({ title, products }) {
 
 	const handleProductClick = (product) => {
 		dispatch(setCurrentProduct(product))
-		navigate(`/product?${product.id}`)
+		navigate(`/product/${product.id}`)
 	}
 
-	const handleCategoryClick = (category, products) => {
-		dispatch(setSelectedCategory(category))
+	const handleDepartmentClick = (slug, products) => {
 		dispatch(setProducts(products))
-		navigate(`/department?${category}`)
+		navigate(`/department/${slug}`)
 	}
 
 	const handleNext = () => {
@@ -64,11 +63,11 @@ export default function Carousel({ title, products }) {
 	return (
 		<CarouselContainer ref={containerRef}>
 			<CarouselControls>
-				<Title onClick={() => handleCategoryClick(title, products)}>
+				<Title onClick={() => handleDepartmentClick(slug, products)}>
 					{title}
 				</Title>
 				<SeeMoreButton
-					onClick={() => handleCategoryClick(title, products)}
+					onClick={() => handleDepartmentClick(slug, products)}
 				>
 					See more...
 				</SeeMoreButton>

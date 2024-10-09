@@ -1,13 +1,5 @@
 import React, { useState } from 'react'
-import { useDispatch } from 'react-redux'
 import { Link } from 'react-router-dom'
-import {
-	fetchSearchResults,
-	fetchProductsByCategory,
-	setSelectedCategory,
-	setSearchTerm,
-	clearSearchTerm,
-} from '../../redux/slices/productsSlice'
 import { useNavigate } from 'react-router-dom'
 import { useWindowWidth } from '../../utils/useWindowWidth'
 import Logo from '../../icons/Logo'
@@ -22,10 +14,8 @@ import BasketIcon from '../../icons/BasketIcon'
 import styled from 'styled-components'
 
 export default function Header() {
-	const dispatch = useDispatch()
 	const navigate = useNavigate()
 	const windowWidth = useWindowWidth()
-	// const { status, error } = useSelector((state) => state.products)
 
 	const [categoryMenuOpen, setCategoryMenuOpen] = useState(false)
 	const [navMenuOpen, setNavMenuOpen] = useState(false)
@@ -48,22 +38,17 @@ export default function Header() {
 
 	const handleSearch = (searchTerm) => {
 		if (searchTerm.trim()) {
-			dispatch(setSearchTerm(searchTerm))
-			dispatch(fetchSearchResults(searchTerm))
-			navigate(`/products?search=${searchTerm}`)
+			navigate(`/category/search/${encodeURIComponent(searchTerm.trim())}`)
 		}
 	}
 
 	const handleSearchByCategory = (category) => {
 		const formattedCategory = category.toLowerCase().replace(/\s+/g, '-') // Replace spaces with hyphens
-
 		const encodedCategory = encodeURIComponent(formattedCategory)
-		dispatch(setSearchTerm(''))
-		dispatch(setSelectedCategory(formattedCategory))
-		dispatch(clearSearchTerm())
-		dispatch(fetchProductsByCategory(encodedCategory))
-		setCategoryMenuOpen(false)
-		navigate(`/products?category=${encodedCategory}`)
+
+    setCategoryMenuOpen(false)
+		console.log(formattedCategory)
+    navigate(`/category/${encodedCategory}`)
 	}
 
 	return (

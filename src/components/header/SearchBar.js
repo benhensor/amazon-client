@@ -1,91 +1,92 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { fetchCategoryList, setSelectedCategory, clearSearchTerm } from '../../redux/slices/productsSlice'
+import { fetchCategoryList } from '../../redux/slices/productsSlice'
+import { formatQuery } from '../../utils/formatCategory'
 import styled from 'styled-components'
 import SearchIcon from '../../icons/SearchIcon'
 
 export default function SearchBar({ onSearch }) {
-  const dispatch = useDispatch()
-  const { categories, status, error, selectedCategory, shouldClearSearch } = useSelector((state) => state.products)
+	const dispatch = useDispatch()
+	const { categoryList, status, error } = useSelector(
+		(state) => state.products
+	)
 
-  const [localSearchTerm, setLocalSearchTerm] = useState('')
-  const selectRef = useRef(null)
-  const spanRef = useRef(null)
+	const [localSearchTerm, setLocalSearchTerm] = useState('')
+	const [localCategory, setLocalCategory] = useState('All')
+	const selectRef = useRef(null)
+	const spanRef = useRef(null)
 
-  useEffect(() => {
-    if (status === 'idle') {
-      dispatch(fetchCategoryList())
-    }
-  }, [dispatch, status])
+	useEffect(() => {
+		if (status === 'idle') {
+			dispatch(fetchCategoryList())
+		}
+	}, [dispatch, status])
 
-  useEffect(() => {
-    if (shouldClearSearch) {
-      setLocalSearchTerm('')
-      dispatch(clearSearchTerm())
-    }
-  }, [shouldClearSearch, dispatch])
+	useEffect(() => {
+		if (spanRef.current && selectRef.current) {
+			spanRef.current.textContent =
+				selectRef.current.options[selectRef.current.selectedIndex].text
+			selectRef.current.style.width = `${
+				spanRef.current.offsetWidth + 36
+			}px`
+		}
+	}, [localCategory])
 
-  useEffect(() => {
-    if (spanRef.current && selectRef.current) {
-      spanRef.current.textContent =
-        selectRef.current.options[selectRef.current.selectedIndex].text
-      selectRef.current.style.width = `${
-        spanRef.current.offsetWidth + 36
-      }px`
-    }
-  }, [selectedCategory])
+	const handleCategoryChange = (e) => {
+		setLocalCategory(e.target.value) 
+	}
 
-  const handleCategoryChange = (e) => {
-    dispatch(setSelectedCategory(e.target.value))
-  }
+	const handleSearchChange = (e) => {
+		setLocalSearchTerm(e.target.value)
+	}
 
-  const handleSearchChange = (e) => {
-    setLocalSearchTerm(e.target.value)
-  }
+	const handleSubmit = (e) => {
+		e.preventDefault()
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    if (localSearchTerm.trim()) {
-      onSearch(localSearchTerm, selectedCategory)
-    }
-  }
+		if (localSearchTerm.trim()) {
+			onSearch(localSearchTerm, localCategory)
+			setLocalSearchTerm('')
+		}
+	}
 
-  return (
-    <Container onSubmit={handleSubmit}>
-      <span
-        ref={spanRef}
-        style={{
-          visibility: 'hidden',
-          whiteSpace: 'nowrap',
-          position: 'absolute',
-        }}
-      ></span>
+	return (
+		<Container onSubmit={handleSubmit}>
+			<span
+				ref={spanRef}
+				style={{
+					visibility: 'hidden',
+					whiteSpace: 'nowrap',
+					position: 'absolute',
+				}}
+			></span>
 
-      <select
-        name="category"
-        value={selectedCategory}
-        onChange={handleCategoryChange}
-        ref={selectRef}
-      >
-        <option value="All">All</option>
-        {categories.map((category, i) => (
-          <option key={i} value={category.name}>
-            {category.name}
-          </option>
-        ))}
-      </select>
+<select
+				name="category"
+				value={localCategory} 
+				onChange={handleCategoryChange} 
+				ref={selectRef}
+			>
+				<option value="All">All</option>
+				{categoryList &&
+					categoryList.length > 0 &&
+					categoryList.map((category, i) => (
+						<option key={i} value={category}>
+							{formatQuery(category)}
+						</option>
+					))}
+			</select>
 
-      <input 
-        type="text" 
-        placeholder="Search Scamazon" 
-        value={!error ? localSearchTerm : 'Error fetching categories'}
-        onChange={handleSearchChange}
-      />
-      <button type="submit">
-        <SearchIcon />
-      </button>
-    </Container>
-  )
+			<input
+				type="text"
+				placeholder="Search Scamazon"
+				value={!error ? localSearchTerm : 'Error fetching categories'}
+				onChange={handleSearchChange}
+			/>
+			<button type="submit">
+				<SearchIcon />
+			</button>
+		</Container>
+	)
 }
 
 const Container = styled.form`
@@ -110,9 +111,9 @@ const Container = styled.form`
 		&:hover {
 			background-color: var(--lt-grey-hover);
 		}
-    @media only screen and (max-width: 768px) {
-      display: none;
-    }
+		@media only screen and (max-width: 768px) {
+			display: none;
+		}
 	}
 	input {
 		flex: 1;
@@ -136,7 +137,7 @@ const Container = styled.form`
 			background-color: var(--lt-orange-hover);
 		}
 	}
-  @media only screen and (max-width: 768px) {
-    margin-right: 0;
-  }
+	@media only screen and (max-width: 768px) {
+		margin-right: 0;
+	}
 `

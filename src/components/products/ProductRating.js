@@ -38,6 +38,7 @@ const ProductRatingContainer = styled.div`
     color: var(--link-blue);
   }
   @media only screen and (max-width: 768px) {
+    gap: var(--spacing-xxs);
     margin-bottom: var(--spacing-xs);
   }
 `

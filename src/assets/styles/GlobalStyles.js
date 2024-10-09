@@ -43,6 +43,7 @@ const GlobalStyles = createGlobalStyle`
     --stock-green: #007600;
 
     // spacing
+    --spacing-xxs: .2rem;
     --spacing-xs: .4rem;
     --spacing-ms: .6rem;
     --spacing-sm: .8rem;

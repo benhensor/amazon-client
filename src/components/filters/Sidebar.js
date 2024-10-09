@@ -19,32 +19,37 @@ export default function Sidebar({
 
 	return (
 		<DesktopSidebar>
-			<SectionContent>
-				<p>Filter by:</p>
-				{Object.entries(filters).map(([filterType, values]) => (
-					<FilterGroup key={filterType}>
-						<FilterType>
-							{filterType.charAt(0).toUpperCase() +
-								filterType.slice(1)}
-						</FilterType>
-						{values.map((value) => (
-							<FilterOption key={value}>
-								<input
-									type="checkbox"
-									checked={selectedFilters[
-										filterType
-									]?.includes(value)}
-									onChange={() =>
-										handleFilterChange(filterType, value)
-									}
-								/>
-								{value}
-							</FilterOption>
-						))}
-						<Separator />
-					</FilterGroup>
-				))}
-			</SectionContent>
+			{filters.length > 0 && (
+				<SectionContent>
+					<p>Filter by:</p>
+					{Object.entries(filters).map(([filterType, values]) => (
+						<FilterGroup key={filterType}>
+							<FilterType>
+								{filterType.charAt(0).toUpperCase() +
+									filterType.slice(1)}
+							</FilterType>
+							{values.map((value) => (
+								<FilterOption key={value}>
+									<input
+										type="checkbox"
+										checked={selectedFilters[
+											filterType
+										]?.includes(value)}
+										onChange={() =>
+											handleFilterChange(
+												filterType,
+												value
+											)
+										}
+									/>
+									{value}
+								</FilterOption>
+							))}
+							<Separator />
+						</FilterGroup>
+					))}
+				</SectionContent>
+			)}
 			<SectionContent>
 				<p>Sort by:</p>
 				<SortingControls>

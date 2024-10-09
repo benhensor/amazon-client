@@ -15,9 +15,7 @@ const initialState = {
 	categories: [],
 	categoryList: [],
 	currentProduct: null,
-	searchTerm: '',
-	selectedCategory: '',
-	shouldClearSearch: false,
+	selectedDepartment: {},
 	status: 'idle',
 	error: null,
 }
@@ -38,15 +36,8 @@ const productsSlice = createSlice({
 		setCurrentProduct(state, action) {
 			state.currentProduct = action.payload
 		},
-		setSearchTerm(state, action) {
-			state.searchTerm = action.payload
-		},
-		setSelectedCategory(state, action) {
-			state.selectedCategory = action.payload
-		},
-		clearSearchTerm(state) {
-			state.searchTerm = ''
-			state.shouldClearSearch = false
+		setDepartment(state, action) {
+			state.selectedDepartment = action.payload
 		},
 		setStatus(state, action) {
 			state.status = action.payload
@@ -62,9 +53,7 @@ export const {
 	setCategories,
 	setCategoryList,
 	setCurrentProduct,
-	setSearchTerm,
-	setSelectedCategory,
-	clearSearchTerm,
+	setDepartment,
 	setStatus,
 	setError,
 } = productsSlice.actions
@@ -82,11 +71,6 @@ export const fetchAllProducts = () => async (dispatch) => {
 		dispatch(setError(error.toString()))
 		dispatch(setStatus('failed'))
 	}
-}
-
-export const selectCategory = (category) => async (dispatch) => {
-	dispatch(setSelectedCategory(category))
-	dispatch(fetchProductsByCategory(category))
 }
 
 export const fetchAllCategories = () => async (dispatch) => {
@@ -131,8 +115,6 @@ export const fetchSearchResults = (query, category) => async (dispatch) => {
 		}
 
 		dispatch(setProducts(filteredProducts))
-		dispatch(setSearchTerm(query))
-		dispatch(setSelectedCategory(category))
 		dispatch(setStatus('succeeded'))
 	} catch (error) {
 		console.error('Error fetching results: ', error) // Helps trace the exact error during development
@@ -173,11 +155,26 @@ export const fetchProductsByCategory = (category) => async (dispatch) => {
 	dispatch(setStatus('loading'))
 	try {
 		const products = await getProductsByCategory(category)
-		//console.log('fetchProductsByCategory', products.products);
+		// console.log('fetchProductsByCategory', products.products);
 		dispatch(setProducts(products.products))
 		dispatch(setStatus('succeeded'))
 	} catch (error) {
 		console.error('Error fetching products: ', error) // Helps trace the exact error during development
+		dispatch(setError(error.toString()))
+		dispatch(setStatus('failed'))
+	}
+}
+
+export const fetchDepartmentData = (department) => async (dispatch) => {
+	dispatch(setStatus('loading'))
+	try {
+		const products = await getAllProducts()
+		dispatch(setProducts(products))
+		dispatch(setDepartment(department))
+		// console.log('fetchDepartmentData', products.products);
+		dispatch(setStatus('succeeded'))
+	} catch (error) {
+		console.error('Error fetching department data: ', error) // Helps trace the exact error during development
 		dispatch(setError(error.toString()))
 		dispatch(setStatus('failed'))
 	}

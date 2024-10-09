@@ -95,6 +95,7 @@ const ProductPrice = styled.div`
 	display: flex;
 	gap: var(--spacing-md);
 	line-height: 1;
+	margin-top: var(--spacing-sm);
 	.price {
 		display: flex;
 		align-items: flex-start;

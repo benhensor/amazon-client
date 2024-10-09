@@ -7,6 +7,7 @@ import Products from './pages/Products'
 import Product from './pages/Product'
 import Department from './pages/Department'
 import Account from './pages/Account'
+import Basket from './pages/Basket'
 
 function App() {
 	return (
@@ -17,9 +18,11 @@ function App() {
 					<Routes>
 						<Route path="*" element={<Navigate to="/" />} />
 						<Route path="/" element={<Home />} />
-						<Route path="/products" element={<Products />} />
-						<Route path="/department" element={<Department />} />
-						<Route path="/product" element={<Product />} />
+						<Route path="/category/:slug" element={<Products />} />
+						<Route path="/category/search/:searchTerm" element={<Products />} />
+						<Route path="/department/:slug" element={<Department />} />
+						<Route path="/product/:id" element={<Product />} />
+						<Route path="/basket" element={<Basket />} />
 
 						<Route
 							path="/account"

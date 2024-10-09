@@ -1,123 +1,40 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useDispatch, useSelector } from 'react-redux'
-import {
-	setSelectedCategory,
-	setSearchTerm,
-} from '../../redux/slices/productsSlice'
+import { superCategories } from '../../utils/superCategories'
 import ChevronIcon from '../../icons/ChevronIcon'
-import ClothingImg from '../../assets/img/hero/clothing.webp'
-import CosmeticsImg from '../../assets/img/hero/cosmetics.webp'
-import ElectronicsImg from '../../assets/img/hero/electronics.webp'
-import GroceriesImg from '../../assets/img/hero/groceries.webp'
-import VehiclesImg from '../../assets/img/hero/vehicles.webp'
-import HomeImg from '../../assets/img/hero/home.webp'
-import SportsImg from '../../assets/img/hero/sports.webp'
 import styled from 'styled-components'
 
 export default function Hero() {
 	const navigate = useNavigate()
-	const dispatch = useDispatch()
-	const {
-		selectedCategory,
-		FashionAndAccessories,
-		BeautyAndPersonalCare,
-		ElectronicsAndTechnology,
-		Groceries,
-		HomeAndLiving,
-		AutomotiveAndVehicles,
-		SportsAndOutdoor,
-	} = useSelector((state) => state.products)
 	const [heroImageIndex, setHeroImageIndex] = useState(0)
-
-	const heroCategories = [
-		{
-			id: 0,
-			title: 'Clothing',
-			category: FashionAndAccessories,
-			src: ClothingImg,
-			cta: 'make yourself presentable',
-			previewHeading: 'Clothing',
-		},
-		{
-			id: 1,
-			title: 'Cosmetics',
-			category: BeautyAndPersonalCare,
-			src: CosmeticsImg,
-			cta: 'fix your appearance',
-			previewHeading: 'Beauty Products',
-		},
-		{
-			id: 2,
-			title: 'Consumer Electronics',
-			category: ElectronicsAndTechnology,
-			src: ElectronicsImg,
-			cta: 'got gadgets?',
-			previewHeading: 'Consumer Electronics',
-		},
-		{
-			id: 3,
-			title: 'Groceries',
-			category: Groceries,
-			src: GroceriesImg,
-			cta: 'eat more',
-			previewHeading: 'Groceries',
-		},
-		{
-			id: 4,
-			title: 'Home Decor',
-			category: HomeAndLiving,
-			src: HomeImg,
-			cta: 'sort your home out',
-			previewHeading: 'Home & Living',
-		},
-		{
-			id: 5,
-			title: 'Automotive & Vehicles',
-			category: AutomotiveAndVehicles,
-			src: VehiclesImg,
-			cta: 'drive away in style',
-			previewHeading: 'Automotive & Vehicles',
-		},
-		{
-			id: 6,
-			title: 'Sports & Outdoor',
-			category: SportsAndOutdoor,
-			src: SportsImg,
-			cta: 'get active',
-			previewHeading: 'Sports & Outdoor',
-		},
-	]
 
 	// Change hero image at an interval
 	useEffect(() => {
 		const interval = setInterval(() => {
 			setHeroImageIndex((prevIndex) =>
-				prevIndex === heroCategories.length - 1 ? 0 : prevIndex + 1
+				prevIndex === superCategories.length - 1 ? 0 : prevIndex + 1
 			)
 		}, 5000)
 
 		return () => clearInterval(interval)
-	}, [heroCategories.length])
+	}, [])
 
 	const handleHeroClick = () => {
-		dispatch(setSelectedCategory(heroCategories[heroImageIndex].category))
-		dispatch(setSearchTerm(selectedCategory))
-		navigate(`/products?category=${heroCategories[heroImageIndex].title}`)
+		navigate(`/department/${superCategories[heroImageIndex].slug}`)
 	}
 
 	return (
 		<HeroContainer>
 			<HeroContent>
 				<img
-					src={heroCategories[heroImageIndex].src}
-					alt={heroCategories[heroImageIndex].title}
+					src={superCategories[heroImageIndex].image}
+					alt={superCategories[heroImageIndex].title}
 				/>
 				<ChevronButton
 					onClick={() =>
 						setHeroImageIndex((prevIndex) =>
 							prevIndex === 0
-								? heroCategories.length - 1
+								? superCategories.length - 1
 								: prevIndex - 1
 						)
 					}
@@ -125,12 +42,12 @@ export default function Hero() {
 					<ChevronIcon direction="left" />
 				</ChevronButton>
 				<CTAButton onClick={handleHeroClick}>
-					{heroCategories[heroImageIndex].cta}
+					{superCategories[heroImageIndex].cta}
 				</CTAButton>
 				<ChevronButton
 					onClick={() =>
 						setHeroImageIndex((prevIndex) =>
-							prevIndex === heroCategories.length - 1
+							prevIndex === superCategories.length - 1
 								? 0
 								: prevIndex + 1
 						)
@@ -203,77 +120,5 @@ const CTAButton = styled.button`
 	}
 	@media (max-width: 450px) {
 		height: 15rem;
-	}
-`
-
-const PreviewGrid = styled.section`
-	display: flex;
-	justify-content: space-around;
-	align-items: center;
-	gap: var(--spacing-md);
-	z-index: 1;
-	@media (max-width: 768px) {
-		flex-direction: column;
-		gap: var(--spacing-sm);
-	}
-
-	@media (max-width: 768px) {
-	}
-`
-
-const PreviewItem = styled.div`
-	width: 35rem;
-	height: auto;
-	display: flex;
-	flex-direction: column;
-	background-color: var(--white);
-	padding: var(--spacing-lg);
-	overflow: hidden;
-	h2 {
-		font-size: clamp(1.6rem, 2.5vw, 2rem);
-		margin-bottom: var(--spacing-md);
-		overflow: hidden;
-		text-overflow: ellipsis;
-		white-space: nowrap;
-	}
-	button {
-		color: var(--link-blue);
-		width: fit-content;
-		margin-top: var(--spacing-md);
-	}
-
-	// Adjust padding and text sizes for smaller screens
-	@media (max-width: 768px) {
-		width: 100%;
-		padding: var(--spacing-md);
-		h2 {
-			font-size: 1.5rem;
-		}
-	}
-`
-
-const ProductList = styled.ul`
-	width: 100%;
-	display: grid;
-	grid-template-columns: repeat(2, 1fr);
-	gap: var(--spacing-sm);
-	li {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		overflow: hidden;
-		img {
-			width: 100%;
-			height: auto;
-			object-fit: cover;
-		}
-		h3 {
-			width: 100%;
-			font-size: var(--font-sm);
-			text-align: center;
-			overflow: hidden;
-			text-overflow: ellipsis;
-			white-space: nowrap;
-		}
 	}
 `

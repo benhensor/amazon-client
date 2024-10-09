@@ -103,7 +103,7 @@ const Review = styled.div`
 	}
 `
 
-const Rating = styled.p`
+const Rating = styled.div`
   padding: var(--spacing-xs) 0;
 	font-size: clamp(var(--font-xs), 2vw, var(--font-sm));
   display: flex;

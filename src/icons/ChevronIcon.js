@@ -33,6 +33,7 @@ const SVG = styled.svg`
 	height: auto;
 	fill: none;
 	transform: ${({ $rotation }) => $rotation};
+	transition: var(--tr-fast);
 	path {
 		stroke: inherit;
 		stroke-width: 2;
