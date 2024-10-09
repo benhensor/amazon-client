@@ -8,6 +8,7 @@ import {
 import { superCategories } from '../utils/superCategories'
 import { formatQuery } from '../utils/formatCategory'
 import { useWindowWidth } from '../utils/useWindowWidth'
+import { generateVoteCount } from '../utils/starCalculator'
 import BuyButton from '../components/buttons/BuyButton'
 import QuantityBtn from '../components/buttons/QuantityBtn'
 import CrimeLogo from '../icons/CrimeLogo'
@@ -144,9 +145,10 @@ export default function Product() {
 	}
 
 	const renderProductAvailability = () => {
+		const voteCount = generateVoteCount(currentProduct.rating);
 		return (
 			<InfoBlock>
-				<ProductRating rating={currentProduct.rating} />
+				<ProductRating rating={currentProduct.rating} voteCount={voteCount} />
 				<p
 					className={
 						currentProduct.availabilityStatus === 'In Stock'
@@ -489,15 +491,15 @@ const InfoBlock = styled.div`
 	}
 	p.discount {
 		color: var(--discount-red);
-		font-size: clamp(var(--font-md), 2vw, var(--font-xl));
+		font-size: clamp(var(--font-md), 2vw, var(--font-lg));
 	}
 	p.price {
 		display: flex;
 		align-items: flex-start;
-		font-size: clamp(var(--font-xs), 2vw, var(--font-sm));
+		font-size: var(--font-xs);
 		span.price-span {
 			line-height: 1.1;
-			font-size: clamp(var(--font-lg), 2vw, var(--font-xxl));
+			font-size: var(--font-xxl);
 			font-weight: bold;
 		}
 	}
@@ -529,6 +531,8 @@ const InfoBlock = styled.div`
 			padding-bottom: var(--spacing-xs);
 			border-bottom: none;
 		}
+	}
+	@media only screen and (max-width: 450px) {
 		div.button-container {
 			align-self: center;
 		}

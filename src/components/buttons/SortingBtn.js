@@ -3,11 +3,9 @@ import ChevronIcon from '../../icons/ChevronIcon'
 import styled from 'styled-components'
 
 export default function SortingBtn({ text, onClick, direction, isActive }) {
-	console.log(direction)
-	const sortDirection = direction === 'asc' ? 'Low to high' : 'High to low'
 	return (
 		<Button onClick={onClick} $isActive={isActive}>
-			Sort by: {sortDirection} {text}
+			{text}
 			<ChevronIcon direction={direction} />
 		</Button>
 	)
@@ -29,6 +27,11 @@ const Button = styled.button`
 	cursor: pointer;
 	transition: var(--tr-fast);
 
+	p {
+		display: flex;
+		align-items: center;
+		gap: var(--spacing-sm);
+	}
 	svg {
 		float: right;
 		path {

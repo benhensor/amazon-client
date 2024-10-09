@@ -33,7 +33,7 @@ export default function SearchBar({ onSearch }) {
 	}, [localCategory])
 
 	const handleCategoryChange = (e) => {
-		setLocalCategory(e.target.value) 
+		setLocalCategory(e.target.value)
 	}
 
 	const handleSearchChange = (e) => {
@@ -60,10 +60,10 @@ export default function SearchBar({ onSearch }) {
 				}}
 			></span>
 
-<select
+			<select
 				name="category"
-				value={localCategory} 
-				onChange={handleCategoryChange} 
+				value={localCategory}
+				onChange={handleCategoryChange}
 				ref={selectRef}
 			>
 				<option value="All">All</option>
@@ -98,6 +98,7 @@ const Container = styled.form`
 	height: 4rem;
 	border-radius: var(--br-sm);
 	overflow: hidden;
+	margin-right: var(--spacing-md);
 	select {
 		height: 100%;
 		border: none;
@@ -113,6 +114,7 @@ const Container = styled.form`
 		}
 		@media only screen and (max-width: 768px) {
 			display: none;
+			margin-right: 0;
 		}
 	}
 	input {

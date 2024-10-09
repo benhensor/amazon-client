@@ -4,7 +4,7 @@ import ProductRating from './ProductRating'
 import CrimeLogo from '../../icons/CrimeLogo'
 import BuyButton from '../buttons/BuyButton'
 
-export default function CarouselItem({ product, BREAKPOINTS }) {
+export default function CarouselItem({ product, BREAKPOINTS, onAddToBasket }) {
 	const [isImageLoaded, setIsImageLoaded] = useState(false)
 
 	useEffect(() => {
@@ -23,7 +23,7 @@ export default function CarouselItem({ product, BREAKPOINTS }) {
 					$BREAKPOINTS={BREAKPOINTS}
 				/>
 			) : (
-				<LoadingSpinner>Loading Image...</LoadingSpinner> // Or use a placeholder image
+				<LoadingSpinner>Loading Image...</LoadingSpinner> 
 			)}
 			<ProductTitle>{product.title}</ProductTitle>
 			<ProductRating rating={product.rating} review={false} />
@@ -45,7 +45,7 @@ export default function CarouselItem({ product, BREAKPOINTS }) {
 			<Discount>-{product.discountPercentage}%</Discount>
 			<CrimeLogo />
 			<div className="btn-container">
-				<BuyButton onClick={() => {}} text="Add to Basket" type='small'/>
+				<BuyButton onClick={onAddToBasket} text="Add to Basket" type='small'/>
 			</div>
 		</ProductCard>
 	)

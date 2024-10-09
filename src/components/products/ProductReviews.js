@@ -29,11 +29,14 @@ export default function ProductReviews({ reviews }) {
               <div className='avatar-container'>
                 <ProfileIcon />
               </div>
+							<div>
                 <ReviewerName>{review.reviewerName}</ReviewerName>
+								<Date>Reviewed in the United Kingdom on {formatDate(review.date)}</Date>
+							</div>
             </Avatar>
-						<Date>Reviewed in the United Kingdom on {formatDate(review.date)}</Date>
 						<Rating>
               <ProductRating rating={review.rating} review={true} />
+							<span>{review.rating}</span>
 						  <Comment>"{review.comment}"</Comment>
 						</Rating>
 						<ReviewerEmail>{review.reviewerEmail}</ReviewerEmail>
@@ -123,11 +126,14 @@ const Comment = styled.p`
 
 const ReviewerName = styled.p`
 	font-weight: bold;
+	cursor: pointer;
 `
 
 const ReviewerEmail = styled.p`
+	font-size: clamp(var(--font-xs), 2vw, var(--font-sm));
 	font-style: italic;
 	color: var(--link-blue);
+	cursor: pointer;
 `
 
 const Date = styled.p`

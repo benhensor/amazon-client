@@ -3,18 +3,7 @@ import { starCalculator } from '../../utils/starCalculator'
 import StarIcon from '../../icons/StarIcon'
 import styled from 'styled-components'
 
-export default function ProductRating({ rating, review }) {
-
-  const generateVoteCount = (rating) => {
-    const baseVotes = 10; 
-    const multiplier = 10;
-    const randomFactor = Math.random() * 150; 
-
-    // Higher ratings generate more votes
-    return Math.round(baseVotes + (rating * multiplier) + randomFactor);
-  };
-
-  const voteCount = generateVoteCount(rating);
+export default function ProductRating({ rating, review, voteCount }) {
 
   return (
     <ProductRatingContainer>

@@ -5,28 +5,28 @@ import ChevronIcon from '../../icons/ChevronIcon'
 import CloseIcon from '../../icons/CloseIcon'
 
 export default function NavMenu({ menuOpen, closeMenu }) {
-
 	useEffect(() => {
 		// Disable scroll when modal is open
 		if (menuOpen) {
-			document.body.style.overflow = 'hidden';
+			document.body.style.overflow = 'hidden'
 		} else {
-			document.body.style.overflow = 'auto'; // Restore scroll
+			document.body.style.overflow = 'auto' // Restore scroll
 		}
 
 		// Cleanup function to restore scroll on unmount
 		return () => {
-			document.body.style.overflow = 'auto';
-		};
+			document.body.style.overflow = 'auto'
+		}
 	}, [menuOpen])
 
-	
 	return (
 		<>
 			<ModalBackground $menuOpen={menuOpen} onClick={closeMenu} />
 			<MenuContainer $menuOpen={menuOpen}>
 				<MenuHeader>
-					<ProfileIcon />
+					<div className="profile">
+						<ProfileIcon />
+					</div>
 					<p>Hello...</p>
 					<button onClick={closeMenu}>
 						<CloseIcon />
@@ -34,27 +34,27 @@ export default function NavMenu({ menuOpen, closeMenu }) {
 				</MenuHeader>
 
 				<MenuItem>
-					<ChevronIcon direction='left'/>
+					<ChevronIcon direction="left" />
 					<p>Account</p>
 				</MenuItem>
 
 				<MenuItem>
-					<ChevronIcon direction='left'/>
+					<ChevronIcon direction="left" />
 					<p>Lists</p>
 				</MenuItem>
 
 				<MenuItem>
-					<ChevronIcon direction='left'/>
+					<ChevronIcon direction="left" />
 					<p>Currency</p>
 				</MenuItem>
 
 				<MenuItem>
-					<ChevronIcon direction='left'/>
+					<ChevronIcon direction="left" />
 					<p>Update location</p>
 				</MenuItem>
 
 				<MenuItem>
-					<ChevronIcon direction='left'/>
+					<ChevronIcon direction="left" />
 					<p>Orders & Returns</p>
 				</MenuItem>
 
@@ -111,6 +111,13 @@ const MenuHeader = styled.div`
 	> div {
 		display: flex;
 		align-items: center;
+	}
+	div.profile {
+		width: 3rem;
+		height: 3rem;
+		svg {
+			fill: var(--white);
+		}
 	}
 	p {
 		color: var(--white);

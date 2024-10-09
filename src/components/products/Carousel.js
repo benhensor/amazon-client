@@ -5,6 +5,7 @@ import {
 	setProducts,
 	setCurrentProduct,
 } from '../../redux/slices/productsSlice'
+import { addToBasket } from '../../redux/slices/basketSlice'
 import styled from 'styled-components'
 import ChevronIcon from '../../icons/ChevronIcon'
 import CarouselItem from './CarouselItem'
@@ -60,6 +61,12 @@ export default function Carousel({ superCategory, products }) {
 		setCurrentPage((prev) => Math.max(prev - 1, 0))
 	}
 
+	const handleAddToBasketClick = (e, product) => {
+		e.preventDefault()
+		e.stopPropagation()
+		dispatch(addToBasket(product))
+	}
+
 	return (
 		<CarouselContainer ref={containerRef}>
 			<CarouselControls>
@@ -103,6 +110,11 @@ export default function Carousel({ superCategory, products }) {
 							<CarouselItem
 								product={product}
 								BREAKPOINTS={BREAKPOINTS}
+								onAddToBasket={(e) => {
+									e.preventDefault()
+									e.stopPropagation() // Stop event from bubbling up
+									handleAddToBasketClick(e, product)
+								}}
 							/>
 						</ProductItem>
 					))}

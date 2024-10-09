@@ -1,10 +1,20 @@
 import React from 'react'
+import { addToBasket } from '../../redux/slices/basketSlice'
 import styled from 'styled-components'
 
 export default function BuyButton({ onClick, text, type }) {
+	const handleClick = () => {
+		if (text === 'Add to Basket') {
+			onClick(addToBasket())
+		}
+		if (text === 'Buy it Now') {
+			onClick()
+		}
+	}
+
 	return (
 		<Container>
-			<Button type="button" onClick={onClick} $text={text} $type={type}>
+			<Button type="button" onClick={handleClick} $text={text} $type={type}>
 				{text}
 			</Button>
 		</Container>

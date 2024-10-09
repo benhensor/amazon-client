@@ -34,6 +34,7 @@ const GlobalStyles = createGlobalStyle`
     --link-blue: #007185;
     --link-hover: #C7511F;
     --crime-blue: #2193C2;
+    --basket-total: #91F6FE,
     --crime-orange: #F8991D;
     --link-white-hover: #F7FAFA;
     --star-rating: #DF7921;

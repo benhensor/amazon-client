@@ -15,3 +15,12 @@ export const starCalculator = (rating) => {
   
   return stars;
 };
+
+export const generateVoteCount = (rating) => {
+  const baseVotes = 10; 
+  const multiplier = 10;
+  const randomFactor = Math.random() * 150; 
+
+  // Higher ratings generate more votes
+  return Math.round(baseVotes + (rating * multiplier) + randomFactor);
+};

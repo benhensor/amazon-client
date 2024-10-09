@@ -1,12 +1,14 @@
 import { createSlice } from '@reduxjs/toolkit';
 
+const initialState = {
+  items: [],
+  totalQuantity: 0,
+  totalAmount: 0,
+};
+
 const basketSlice = createSlice({
   name: 'basket',
-  initialState: {
-    items: [],
-    totalQuantity: 0,
-    totalAmount: 0,
-  },
+  initialState,
   reducers: {
     addToBasket(state, action) {
       const newItem = action.payload;
@@ -31,25 +33,30 @@ const basketSlice = createSlice({
     removeFromBasket(state, action) {
       const id = action.payload;
       const existingItem = state.items.find(item => item.id === id);
-      state.totalQuantity--;
-      state.totalAmount -= existingItem.price;
       
-      if (existingItem.quantity === 1) {
-        state.items = state.items.filter(item => item.id !== id);
-      } else {
-        existingItem.quantity--;
-        existingItem.totalPrice -= existingItem.price;
+      if (existingItem) {
+        state.totalQuantity--;
+        state.totalAmount -= existingItem.price;
+        
+        if (existingItem.quantity === 1) {
+          state.items = state.items.filter(item => item.id !== id);
+        } else {
+          existingItem.quantity--;
+          existingItem.totalPrice -= existingItem.price;
+        }
       }
     },
     clearBasket(state) {
-      state.items = [];
-      state.totalQuantity = 0;
-      state.totalAmount = 0;
+      return initialState;
     }
   }
 });
 
 export const { addToBasket, removeFromBasket, clearBasket } = basketSlice.actions;
 
-export default basketSlice.reducer;
+// Selectors
+export const selectBasketItems = state => state.basket.items;
+export const selectBasketTotalQuantity = state => state.basket.totalQuantity;
+export const selectBasketTotalAmount = state => state.basket.totalAmount;
 
+export default basketSlice.reducer;
