@@ -15,7 +15,7 @@ import styled from 'styled-components'
 
 export default function Products() {
 	const dispatch = useDispatch()
-	const { slug, searchTerm } = useParams()
+	const { slug, category, searchTerm } = useParams()
 	const { products, selectedCategory, status, error } = useSelector(
 		(state) => state.products || []
 	)
@@ -28,19 +28,29 @@ export default function Products() {
 	const [sortType, setSortType] = useState(null)
 	const [sortDirection, setSortDirection] = useState(null)
 
+	console.log(slug, category, searchTerm)
 	useEffect(() => {
 		const loadData = async () => {
-				if (slug) {
+			// If there's a slug, we're showing products by category
+			if (slug) {
 				dispatch(fetchProductsByCategory(slug))
 				setHeading(formatQuery(slug))
-			} else if (searchTerm) {
+			}
+			// If there's a searchTerm (e.g., from `/search/searchTerm` route)
+			else if (searchTerm) {
 				dispatch(fetchSearchResults(searchTerm))
 				setHeading(formatQuery(searchTerm))
+			}
+			// If there's a category and searchTerm (e.g., from `/category/categoryName/search/searchTerm`)
+			else if (category && searchTerm) {
+				dispatch(fetchProductsByCategory(category))
+				dispatch(fetchSearchResults(searchTerm))
+				setHeading(`${formatQuery(category)}: ${searchTerm}`)
 			}
 		}
 
 		loadData()
-	}, [dispatch, slug, searchTerm])
+	}, [dispatch, slug, category, searchTerm])
 
 	useEffect(() => {
 		if (selectedCategory) {

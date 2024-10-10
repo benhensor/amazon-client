@@ -12,10 +12,12 @@ const GlobalStyles = createGlobalStyle`
     --white: #fff;
     --black: #221F1F;
     --background-grey: #E3E6E6;
+    --continue-grey: #F7F7F7;
     --lt-grey: #E6E6E6;
     --lt-grey-hover: #D4D4D4;
     --border-grey: #D5D9D9;
     --cat-menu-hover: #EAEDED;
+    --lt-text: #767676;
     --md-grey:#8A9899;
     --paleblue: #37475A;
     --paleblue-hover: #485769;
@@ -34,7 +36,7 @@ const GlobalStyles = createGlobalStyle`
     --link-blue: #007185;
     --link-hover: #C7511F;
     --crime-blue: #2193C2;
-    --basket-total: #91F6FE,
+    --basket-total: #91F6FE;
     --crime-orange: #F8991D;
     --link-white-hover: #F7FAFA;
     --star-rating: #DF7921;
@@ -42,6 +44,8 @@ const GlobalStyles = createGlobalStyle`
     --highlight-red: #E5061D;
     --order-header: #F0F2F2;
     --stock-green: #007600;
+    --input-focus: #c8f3fa;
+    --input-focus-border: #75B1BB;
 
     // spacing
     --spacing-xxs: .2rem;
@@ -51,6 +55,7 @@ const GlobalStyles = createGlobalStyle`
     --spacing-md: 1.6rem;
     --spacing-lg: 2.4rem;
     --spacing-xl: 3.2rem;
+    --spacing-xxl: 4rem;
 
     // font-sizes
     --font-xxs: 1rem;

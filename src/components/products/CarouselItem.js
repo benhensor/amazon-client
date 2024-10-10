@@ -2,9 +2,8 @@ import React, { useState, useEffect } from 'react'
 import styled from 'styled-components'
 import ProductRating from './ProductRating'
 import CrimeLogo from '../../icons/CrimeLogo'
-import BuyButton from '../buttons/BuyButton'
 
-export default function CarouselItem({ product, BREAKPOINTS, onAddToBasket }) {
+export default function CarouselItem({ product, BREAKPOINTS }) {
 	const [isImageLoaded, setIsImageLoaded] = useState(false)
 
 	useEffect(() => {
@@ -23,7 +22,7 @@ export default function CarouselItem({ product, BREAKPOINTS, onAddToBasket }) {
 					$BREAKPOINTS={BREAKPOINTS}
 				/>
 			) : (
-				<LoadingSpinner>Loading Image...</LoadingSpinner> 
+				<LoadingSpinner>Loading Image...</LoadingSpinner>
 			)}
 			<ProductTitle>{product.title}</ProductTitle>
 			<ProductRating rating={product.rating} review={false} />
@@ -44,9 +43,6 @@ export default function CarouselItem({ product, BREAKPOINTS, onAddToBasket }) {
 			</ProductPrice>
 			<Discount>-{product.discountPercentage}%</Discount>
 			<CrimeLogo />
-			<div className="btn-container">
-				<BuyButton onClick={onAddToBasket} text="Add to Basket" type='small'/>
-			</div>
 		</ProductCard>
 	)
 }
@@ -67,9 +63,6 @@ const ProductCard = styled.div`
 	width: 20rem;
 	height: auto;
 
-	div.btn-container {
-		width: 75%;
-	}
 	@media (max-width: ${(props) => props.$BREAKPOINTS.tablet}px) {
 		width: 14rem;
 		height: auto;

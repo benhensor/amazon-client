@@ -1,11 +1,12 @@
 import React from 'react'
 import styled from 'styled-components'
 
-export default function Logo() {
+export default function Logo({ letterColor}) {
 	return (
 		<SVG
 			viewBox="0 0 755 181"
 			xmlns="http://www.w3.org/2000/svg"
+			$letterColor={letterColor}
 		>
 			<path
 				d="M525.319 141.861C483.054 167.383 421.793 181 369.048 181C295.092 181 228.512 158.59 178.142 121.318C174.185 118.388 177.73 114.393 182.479 116.676C236.839 142.587 304.051 158.175 373.481 158.175C420.305 158.175 471.815 150.238 519.177 133.768C526.332 131.278 532.316 137.607 525.319 141.861Z"
@@ -60,6 +61,6 @@ const SVG = styled.svg`
     fill: #FF9900;
   }
   path.letter {
-    fill: #FFF;
+    fill: ${(props) => props.$letterColor};
   }
 `

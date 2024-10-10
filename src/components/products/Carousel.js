@@ -9,6 +9,7 @@ import { addToBasket } from '../../redux/slices/basketSlice'
 import styled from 'styled-components'
 import ChevronIcon from '../../icons/ChevronIcon'
 import CarouselItem from './CarouselItem'
+import BuyButton from '../buttons/BuyButton'
 
 const BREAKPOINTS = {
 	mobile: 480,
@@ -61,9 +62,7 @@ export default function Carousel({ superCategory, products }) {
 		setCurrentPage((prev) => Math.max(prev - 1, 0))
 	}
 
-	const handleAddToBasketClick = (e, product) => {
-		e.preventDefault()
-		e.stopPropagation()
+	const handleAddToBasketClick = (product) => {
 		dispatch(addToBasket(product))
 	}
 
@@ -103,19 +102,21 @@ export default function Carousel({ superCategory, products }) {
 					$itemsPerPage={itemsPerPage}
 				>
 					{products.map((product, i) => (
-						<ProductItem
-							key={i}
-							onClick={() => handleProductClick(product)}
-						>
+						<ProductItem key={i}>
 							<CarouselItem
 								product={product}
 								BREAKPOINTS={BREAKPOINTS}
-								onAddToBasket={(e) => {
-									e.preventDefault()
-									e.stopPropagation() // Stop event from bubbling up
-									handleAddToBasketClick(e, product)
-								}}
+								onClick={() => handleProductClick(product)}
 							/>
+							<div className="btn-container">
+								<BuyButton
+									onClick={() =>
+										handleAddToBasketClick(product)
+									}
+									text="Add to Basket"
+									type="small"
+								/>
+							</div>
 						</ProductItem>
 					))}
 				</ProductList>
@@ -217,6 +218,10 @@ const ProductItem = styled.li`
 	margin-right: var(--spacing-md);
 	cursor: pointer;
 	transition: var(--tr-fast);
+
+	div.btn-container {
+		width: 75%;
+	}
 
 	@media (max-width: ${BREAKPOINTS.tablet}px) {
 		flex: 0 0 120px;

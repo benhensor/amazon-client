@@ -47,12 +47,15 @@ export default function Header() {
 	const [navMenuOpen, setNavMenuOpen] = useState(false)
 
 	const handleSearch = (searchTerm, category) => {
-		if (searchTerm.trim()) {
-			navigate(
-				`/category/search/${encodeURIComponent(searchTerm.trim())}`
-			)
-		}
-	}
+    if (searchTerm.trim()) {
+        const searchUrl = category && category !== 'all'
+            ? `/category/${encodeURIComponent(category)}/search/${encodeURIComponent(searchTerm.trim())}`
+            : `/search/${encodeURIComponent(searchTerm.trim())}`
+
+        navigate(searchUrl)
+    }
+}
+
 
 	const handleSearchByCategory = (category) => {
 		const formattedCategory = category.toLowerCase().replace(/\s+/g, '-')
@@ -60,12 +63,16 @@ export default function Header() {
 		navigate(`/category/${encodeURIComponent(formattedCategory)}`)
 	}
 
+	const handleBasketClick = () => {
+		navigate('/basket')
+	}
+
 	// Reusable components
 	const LogoSection = () => (
 		<HeaderItem>
 			<Link to="/">
 				<LogoContainer>
-					<Logo />
+					<Logo letterColor='var(--white)' />
 					<p>.co.uk</p>
 				</LogoContainer>
 			</Link>
@@ -86,9 +93,11 @@ export default function Header() {
 
 	const BasketSection = () => (
 		<HeaderItem>
-			<BasketContainer>
+			<BasketContainer
+				onClick={() => handleBasketClick()}
+			>
 				<BasketIcon />
-				<p className='total'>{totalQuantity}</p>
+				{totalQuantity > 0 && <p className='total'>{totalQuantity}</p>}
 				<span>Basket</span>
 			</BasketContainer>
 		</HeaderItem>
@@ -197,11 +206,7 @@ export default function Header() {
 			<Content>
 				<LogoSection />
 				<ContentTabletView>
-					<HeaderItem>
-						<BasketContainer>
-							<BasketIcon />
-						</BasketContainer>
-					</HeaderItem>
+					<BasketSection />
 					<MenuControl onClick={() => setNavMenuOpen(true)}>
 						<MenuIcon />
 					</MenuControl>
@@ -313,12 +318,6 @@ const HeaderItem = styled.div`
 	> p {
 		font-size: var(--font-xs);
 	}
-	span {
-		font-size: var(--font-sm);
-		font-weight: bold;
-		display: flex;
-		align-items: center;
-	}
 	&::after {
 		content: '';
 		position: absolute;
@@ -350,17 +349,32 @@ const BasketContainer = styled.div`
 	display: flex;
 	align-items: flex-end;
 	position: relative;
-	color: var(--basket-total);
+	flex-shrink: 0;
+	cursor: pointer;
 	p.total {
 		position: absolute;
 		top: -0.2rem;
 		left: 1.8rem;
-		color: var(--basket-total);
+		color: var(--md-orange);
 		border-radius: 50%;
-		font-size: var(--font-lg);
+		font-size: var(--font-md);
+		font-weight: bold;
+	}
+	span {
+		font-size: var(--font-sm);
+		font-weight: bold;
+		display: flex;
+		align-items: center;
+		color: var(--white);
 	}
 	path {
 		fill: var(--white);
+	}
+
+	@media only screen and (max-width: 768px) {
+		span {
+			display: none;
+		}
 	}
 `
 

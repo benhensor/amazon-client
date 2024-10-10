@@ -1,20 +1,12 @@
 import React from 'react'
-import { addToBasket } from '../../redux/slices/basketSlice'
 import styled from 'styled-components'
 
 export default function BuyButton({ onClick, text, type }) {
-	const handleClick = () => {
-		if (text === 'Add to Basket') {
-			onClick(addToBasket())
-		}
-		if (text === 'Buy it Now') {
-			onClick()
-		}
-	}
+
 
 	return (
 		<Container>
-			<Button type="button" onClick={handleClick} $text={text} $type={type}>
+			<Button type="button" onClick={onClick} $text={text} $type={type}>
 				{text}
 			</Button>
 		</Container>
@@ -30,7 +22,7 @@ const Container = styled.div`
 const Button = styled.button`
 	width: 100%;
 	background-color: ${({ $text }) =>
-		$text === 'Add to Basket' ? 'var(--yellow)' : 'var(--bin-orange)'};
+		$text === 'Add to Basket' || $text === 'Proceed to Checkout' ? 'var(--yellow)' : 'var(--bin-orange)'};
 	color: var(--black);
 	border: none;
 	padding: var(--spacing-sm) var(--spacing-md);
@@ -41,7 +33,7 @@ const Button = styled.button`
 
 	&:hover {
 		background-color: ${({ $text }) =>
-			$text === 'Add to Basket' ? 'var(--yellow-hover)' : 'var(--bin-orange-hover)'};
+			$text === 'Add to Basket' || $text === 'Proceed to Checkout' ? 'var(--yellow-hover)' : 'var(--bin-orange-hover)'};
 	}
 
 	@media only screen and (max-width: 768px) {
