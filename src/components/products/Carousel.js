@@ -63,7 +63,8 @@ export default function Carousel({ superCategory, products }) {
 	}
 
 	const handleAddToBasketClick = (product) => {
-		dispatch(addToBasket(product))
+		const quantity = 1
+		dispatch(addToBasket({ product: product, quantity: quantity }))
 	}
 
 	return (

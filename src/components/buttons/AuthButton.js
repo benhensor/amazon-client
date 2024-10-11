@@ -1,15 +1,15 @@
 import React from 'react'
 import styled from 'styled-components'
 
-export default function SignInBtn({ onClick, text, type }) {
-	const login = type === 'login'
+export default function AuthButton({ onClick, text, type }) {
+	const login = text === 'Continue' ? true : false
 	const handleClick = () => {
 		onClick()
 	}
 
 	return (
 		<Container>
-			<Button type="button" onClick={handleClick} $login={login} $type={type}>
+			<Button type={type} onClick={handleClick} $text={text} $login={login} $type={type}>
 				{text}
 			</Button>
 		</Container>
@@ -24,8 +24,8 @@ const Container = styled.div`
 
 const Button = styled.button`
 	width: 100%;
-	background-color: ${({ $type }) =>
-		$type === 'login' ? 'var(--yellow)' : 'var(--white)'};
+	background-color: ${({ $text }) =>
+		$text === 'Continue' ? 'var(--yellow)' : 'var(--white)'};
 	color: var(--black);
 	border: ${({ $login }) => ($login ? 'none' : '1px solid var(--border-grey)' )};
 	padding: var(--spacing-sm) var(--spacing-md);
@@ -35,7 +35,7 @@ const Button = styled.button`
 	transition: var(--tr-fast);
 
 	&:hover {
-		background-color: ${({ $type }) =>
-			$type === 'login' ? 'var(--yellow-hover)' : 'var(--continue-grey)'};
+		background-color: ${({ $text }) =>
+			$text === 'Continue' ? 'var(--yellow-hover)' : 'var(--continue-grey)'};
 	}
 `

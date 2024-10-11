@@ -46,6 +46,8 @@ const GlobalStyles = createGlobalStyle`
     --stock-green: #007600;
     --input-focus: #c8f3fa;
     --input-focus-border: #75B1BB;
+    --input-focus-bg: #E8F0FE;
+    --signin-link: #0066C0;
 
     // spacing
     --spacing-xxs: .2rem;

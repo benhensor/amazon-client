@@ -25,11 +25,10 @@ export const addToBasket = createAsyncThunk(
   'basket/add',
   async (newItem, { rejectWithValue }) => {
     try {
+      console.log('product', newItem.product, 'quantity', newItem.quantity);
       return await basketAPI.addItemToBasket({
-        id: newItem.id,
-        price: newItem.price,
-        title: newItem.title,
-        image: newItem.image
+        product: newItem.product,
+        quantity: newItem.quantity, 
       });
     } catch (error) {
       return rejectWithValue(error.response?.data || 'Failed to add item to basket');

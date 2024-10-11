@@ -1,7 +1,7 @@
 import React from 'react'
 import { BrowserRouter as Router, Routes, Navigate, Route } from 'react-router-dom'
 import ProtectedRoute from './components/protected/ProtectedRoute'
-import SignIn from './pages/SignIn'
+import AuthPortal from './pages/AuthPortal'
 import Register from './pages/Register'
 import Header from './components/header/Header'
 import Home from './pages/Home'
@@ -41,8 +41,7 @@ function App() {
     <Router>
       <Routes>
         {/* Auth routes without header */}
-        <Route path="/signin" element={<SignIn />} />
-        <Route path="/register" element={<Register />} />
+        <Route path="/auth" element={<AuthPortal />} />
         
         {/* All other routes with header */}
         <Route path="/*" element={<HeaderLayout />} />
