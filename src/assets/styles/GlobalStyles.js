@@ -13,6 +13,7 @@ const GlobalStyles = createGlobalStyle`
     --black: #221F1F;
     --background-grey: #E3E6E6;
     --continue-grey: #F7F7F7;
+    --qty-select-grey: #F0F2F2;
     --lt-grey: #E6E6E6;
     --lt-grey-hover: #D4D4D4;
     --border-grey: #D5D9D9;

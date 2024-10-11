@@ -1,9 +1,13 @@
-import React from 'react'
+import React, { useState } from 'react'
 import Logo from '../../icons/Logo'
 import UnionJackIcon from '../../icons/UnionJackIcon'
 import styled from 'styled-components'
 
 export default function Footer() {
+	const [openSection, setOpenSection] = useState(null)
+	const toggleSection = (section) => {
+		setOpenSection(openSection === section ? null : section)
+	}
 	const footerLists = {
 		getToKnowUs: [
 			'Careers',
@@ -60,32 +64,52 @@ export default function Footer() {
 			</a>
 			<div className="footer-links">
 				<div className="column">
-					<h5>Get to Know Us</h5>
-					<ul>
+					<h5 onClick={() => toggleSection('getToKnowUs')}>
+						Get to Know Us
+					</h5>
+					<ul className={openSection === 'getToKnowUs' ? 'open' : ''}>
 						{footerLists.getToKnowUs.map((item, i) => (
 							<li key={i}>{item}</li>
 						))}
 					</ul>
 				</div>
 				<div className="column">
-					<h5>Make Money with Us</h5>
-					<ul>
+					<h5 onClick={() => toggleSection('makeMoneyWithUs')}>
+						Make Money with Us
+					</h5>
+					<ul
+						className={
+							openSection === 'makeMoneyWithUs' ? 'open' : ''
+						}
+					>
 						{footerLists.makeMoneyWithUs.map((item, i) => (
 							<li key={i}>{item}</li>
 						))}
 					</ul>
 				</div>
 				<div className="column">
-					<h5>Scamazon Payment Methods</h5>
-					<ul>
+					<h5 onClick={() => toggleSection('scamazonPaymentMethods')}>
+						Scamazon Payment Methods
+					</h5>
+					<ul
+						className={
+							openSection === 'scamazonPaymentMethods'
+								? 'open'
+								: ''
+						}
+					>
 						{footerLists.scamazonPaymentMethods.map((item, i) => (
 							<li key={i}>{item}</li>
 						))}
 					</ul>
 				</div>
 				<div className="column">
-					<h5>Let Us Help You</h5>
-					<ul>
+					<h5 onClick={() => toggleSection('letUsHelpYou')}>
+						Let Us Help You
+					</h5>
+					<ul
+						className={openSection === 'letUsHelpYou' ? 'open' : ''}
+					>
 						{footerLists.letUsHelpYou.map((item, i) => (
 							<li key={i}>{item}</li>
 						))}
@@ -137,13 +161,13 @@ const StyledFooter = styled.footer`
 			text-align: left;
 			h5 {
 				color: var(--white);
-				font-size: var(--font-sm);
+				font-size: clamp(var(--font-sm), 2vw, var(--font-md));
 			}
 			ul {
 				list-style: none;
 				margin-top: var(--spacing-ms);
 				li {
-					font-size: var(--font-xs);
+					font-size: clamp(var(--font-xxs), 2vw, var(--font-xs));
 					padding: var(--spacing-xs) 0;
 					cursor: pointer;
 					&:hover {
@@ -169,7 +193,7 @@ const StyledFooter = styled.footer`
 			display: flex;
 			align-items: center;
 			gap: var(--spacing-md);
-      cursor: pointer;
+			cursor: pointer;
 		}
 		div.item {
 			display: flex;
@@ -181,5 +205,45 @@ const StyledFooter = styled.footer`
 				font-size: var(--font-xs);
 			}
 		}
+	}
+
+	@media only screen and (max-width: 1199px) {
+		div.footer-links {
+			justify-content: space-between;
+			padding: 0 var(--spacing-md);
+			div.column {
+				margin-bottom: var(--spacing-lg);
+			}
+		}
+		div.base-section {
+			gap: var(--spacing-lg);
+		}
+	}
+
+	@media only screen and (max-width: 768px) {
+		div.footer-links {
+			flex-direction: column;
+			width: 30rem;
+			align-items: center;
+			div.column {
+				margin-bottom: var(--spacing-lg);
+				h5 {
+					text-align: center;
+				}
+				ul {
+					display: none;
+					&.open {
+						display: block;
+						text-align: center;
+					}
+				}
+			}
+		}
+	}
+	div.base-section {
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+		gap: var(--spacing-lg);
 	}
 `

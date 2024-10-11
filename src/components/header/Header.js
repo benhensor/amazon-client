@@ -3,7 +3,9 @@ import { Link } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom'
 import { useWindowWidth } from '../../utils/useWindowWidth'
 import { useSelector } from 'react-redux'
-import { selectBasketTotalQuantity } from '../../redux/slices/basketSlice'
+import { 
+  selectBasketItemCount, 
+} from '../../redux/slices/basketSlice';
 import styled from 'styled-components'
 import Logo from '../../icons/Logo'
 import MenuIcon from '../../icons/MenuIcon'
@@ -41,7 +43,7 @@ const NAV_ITEMS = [
 export default function Header() {
 	const navigate = useNavigate()
 	const windowWidth = useWindowWidth()
-	const totalQuantity = useSelector(selectBasketTotalQuantity)
+	const cartItemCount = useSelector(selectBasketItemCount)
 
 	const [categoryMenuOpen, setCategoryMenuOpen] = useState(false)
 	const [navMenuOpen, setNavMenuOpen] = useState(false)
@@ -97,7 +99,7 @@ export default function Header() {
 				onClick={() => handleBasketClick()}
 			>
 				<BasketIcon />
-				{totalQuantity > 0 && <p className='total'>{totalQuantity}</p>}
+				{cartItemCount > 0 && <p className='total'>{cartItemCount}</p>}
 				<span>Basket</span>
 			</BasketContainer>
 		</HeaderItem>

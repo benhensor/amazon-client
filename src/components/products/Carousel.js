@@ -5,7 +5,7 @@ import {
 	setProducts,
 	setCurrentProduct,
 } from '../../redux/slices/productsSlice'
-import { addToBasket } from '../../redux/slices/basketSlice'
+import { addItem } from '../../redux/slices/basketSlice'
 import styled from 'styled-components'
 import ChevronIcon from '../../icons/ChevronIcon'
 import CarouselItem from './CarouselItem'
@@ -63,8 +63,7 @@ export default function Carousel({ superCategory, products }) {
 	}
 
 	const handleAddToBasketClick = (product) => {
-		const quantity = 1
-		dispatch(addToBasket({ product: product, quantity: quantity }))
+		dispatch(addItem(product))
 	}
 
 	return (
