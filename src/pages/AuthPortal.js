@@ -1,16 +1,23 @@
 import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import Logo from '../icons/Logo'
-import AuthButton from '../components/buttons/AuthButton'
-import ChevronIcon from '../icons/ChevronIcon'
+import ArrowheadIcon from '../icons/ArrowheadIcon'
 import styled from 'styled-components'
 
-export default function AuthPortal() {
+export default function AuthPortal({ setIsAuthenticated }) {
+	const navigate = useNavigate()
 	const [isSignIn, setIsSignIn] = useState(true)
+
+	const handleSubmit = (e) => {
+		e.preventDefault()
+		setIsAuthenticated(true)
+		navigate('/')
+	}
 
 	const signIn = {
 		heading: 'Sign-In',
 		form: (
-			<Form onSubmit={(e) => e.preventDefault()}>
+			<Form onSubmit={handleSubmit}>
 				<div className="email">
 					<label htmlFor="email">Email or mobile phone number</label>
 					<input
@@ -18,10 +25,11 @@ export default function AuthPortal() {
 						name="email"
 						id="email"
 						onChange={() => {}}
-						required
 					/>
 				</div>
-				<AuthButton onClick={() => {}} text="Continue" type="submit" />
+				<AuthButton type="submit" $text="Continue">
+					Continue
+				</AuthButton>
 			</Form>
 		),
 		legalese: (
@@ -36,7 +44,7 @@ export default function AuthPortal() {
 		),
 		help: (
 			<div className="need-help">
-				<ChevronIcon direction="right" />
+				<ArrowheadIcon fill="var(--signin-link)" direction="right" />
 				<span>Need Help?</span>
 			</div>
 		),
@@ -57,7 +65,7 @@ export default function AuthPortal() {
 	const register = {
 		heading: 'Create account',
 		form: (
-			<Form onSubmit={(e) => e.preventDefault()}>
+			<Form onSubmit={handleSubmit}>
 				<div className="name">
 					<label htmlFor="name">Your name</label>
 					<input
@@ -98,7 +106,9 @@ export default function AuthPortal() {
 						required
 					/>
 				</div>
-				<AuthButton onClick={() => {}} text="Continue" type="submit" />
+				<AuthButton $text="Continue" type="submit">
+					Continue
+				</AuthButton>
 			</Form>
 		),
 		legalese: (
@@ -127,7 +137,10 @@ export default function AuthPortal() {
 						type="button"
 					>
 						<span>Sign in</span>
-						<ChevronIcon direction="right" />
+						<ArrowheadIcon
+							fill="var(--signin-link)"
+							direction="right"
+						/>
 					</button>
 				</p>
 			</div>
@@ -160,13 +173,11 @@ export default function AuthPortal() {
 				{isSignIn && (
 					<AuthButton
 						onClick={() => setIsSignIn(!isSignIn)}
-						text={
-							isSignIn
-								? 'Create your Scamazon account'
-								: 'Sign in'
-						}
-						type={isSignIn ? 'register' : 'login'}
-					/>
+						$text="Create your Scamazon account"
+						type="submit"
+					>
+						Create your Scamazon account
+					</AuthButton>
 				)}
 			</InnerContainer>
 
@@ -250,7 +261,15 @@ const Container = styled.div`
 		}
 	}
 	div.existing {
+		p {
+			width: 100%;
+			display: flex;
+			align-items: center;
+			gap: var(--spacing-xs);
+		}
 		button {
+			display: flex;
+			align-items: center;
 			background: transparent;
 			border: none;
 			color: var(--signin-link);
@@ -357,6 +376,27 @@ const Form = styled.form`
 				background-color: var(--input-focus-bg);
 			}
 		}
+	}
+`
+
+const AuthButton = styled.button`
+	width: 100%;
+	background-color: ${({ $text }) =>
+		$text === 'Continue' ? 'var(--yellow)' : 'var(--white)'};
+	color: var(--black);
+	border: ${({ $login }) =>
+		$login ? 'none' : '1px solid var(--border-grey)'};
+	padding: var(--spacing-ms) var(--spacing-md);
+	border-radius: var(--br-md);
+	font-size: clamp(var(--font-xs), 2vw, var(--font-sm));
+	cursor: pointer;
+	transition: var(--tr-fast);
+
+	&:hover {
+		background-color: ${({ $text }) =>
+			$text === 'Continue'
+				? 'var(--yellow-hover)'
+				: 'var(--continue-grey)'};
 	}
 `
 

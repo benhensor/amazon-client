@@ -2,7 +2,6 @@ import React from 'react'
 import { BrowserRouter as Router, Routes, Navigate, Route } from 'react-router-dom'
 import ProtectedRoute from './components/protected/ProtectedRoute'
 import AuthPortal from './pages/AuthPortal'
-import Register from './pages/Register'
 import Header from './components/header/Header'
 import Home from './pages/Home'
 import Products from './pages/Products'
@@ -10,6 +9,7 @@ import Product from './pages/Product'
 import Department from './pages/Department'
 import Account from './pages/Account'
 import Basket from './pages/Basket'
+import Footer from './components/footer/Footer'
 
 const HeaderLayout = () => (
   <>
@@ -33,6 +33,7 @@ const HeaderLayout = () => (
         />
       </Routes>
     </main>
+    <Footer />
   </>
 )
 

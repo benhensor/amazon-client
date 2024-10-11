@@ -232,7 +232,7 @@ export default function Header() {
 	)
 
 	return (
-		<Container>
+		<Container id='header'>
 			{windowWidth >= BREAKPOINTS.DESKTOP && (
 				<DesktopLayout
 					handleSearch={handleSearch}

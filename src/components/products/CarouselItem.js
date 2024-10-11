@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import ProductRating from './ProductRating'
 import CrimeLogo from '../../icons/CrimeLogo'
 
-export default function CarouselItem({ product, BREAKPOINTS }) {
+export default function CarouselItem({ onClick, product, BREAKPOINTS }) {
 	const [isImageLoaded, setIsImageLoaded] = useState(false)
 
 	useEffect(() => {
@@ -13,7 +13,7 @@ export default function CarouselItem({ product, BREAKPOINTS }) {
 	}, [product.thumbnail])
 
 	return (
-		<ProductCard $BREAKPOINTS={BREAKPOINTS}>
+		<ProductCard onClick={onClick} $BREAKPOINTS={BREAKPOINTS}>
 			{isImageLoaded ? (
 				<ProductImage
 					src={product.thumbnail}
