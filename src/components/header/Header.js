@@ -3,9 +3,7 @@ import { Link } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom'
 import { useWindowWidth } from '../../utils/useWindowWidth'
 import { useSelector } from 'react-redux'
-import { 
-  selectBasketItemCount, 
-} from '../../redux/slices/basketSlice';
+import { selectBasketItemCount } from '../../redux/slices/basketSlice'
 import styled from 'styled-components'
 import Logo from '../../icons/Logo'
 import MenuIcon from '../../icons/MenuIcon'
@@ -43,21 +41,24 @@ const NAV_ITEMS = [
 export default function Header() {
 	const navigate = useNavigate()
 	const windowWidth = useWindowWidth()
+	const currentUser = useSelector((state) => state.user.currentUser)
 	const cartItemCount = useSelector(selectBasketItemCount)
 
 	const [categoryMenuOpen, setCategoryMenuOpen] = useState(false)
 	const [navMenuOpen, setNavMenuOpen] = useState(false)
 
 	const handleSearch = (searchTerm, category) => {
-    if (searchTerm.trim()) {
-        const searchUrl = category && category !== 'all'
-            ? `/category/${encodeURIComponent(category)}/search/${encodeURIComponent(searchTerm.trim())}`
-            : `/search/${encodeURIComponent(searchTerm.trim())}`
+		if (searchTerm.trim()) {
+			const searchUrl =
+				category && category !== 'all'
+					? `/category/${encodeURIComponent(
+							category
+					  )}/search/${encodeURIComponent(searchTerm.trim())}`
+					: `/search/${encodeURIComponent(searchTerm.trim())}`
 
-        navigate(searchUrl)
-    }
-}
-
+			navigate(searchUrl)
+		}
+	}
 
 	const handleSearchByCategory = (category) => {
 		const formattedCategory = category.toLowerCase().replace(/\s+/g, '-')
@@ -69,12 +70,17 @@ export default function Header() {
 		navigate('/basket')
 	}
 
+	const handleGoToAccount = () => {
+		console.log('Go to account', currentUser)
+		navigate('/account')
+	}
+
 	// Reusable components
 	const LogoSection = () => (
 		<HeaderItem>
 			<Link to="/">
 				<LogoContainer>
-					<Logo letterColor='var(--white)' />
+					<Logo letterColor="var(--white)" />
 					<p>.co.uk</p>
 				</LogoContainer>
 			</Link>
@@ -83,23 +89,23 @@ export default function Header() {
 
 	const LocationSection = () => (
 		<HeaderItem>
-			<div className="location">
-				<LocationIcon />
-				<div className="delivery">
-					<p>Delivering to...</p>
-					<span>Update location</span>
+			<button className="go-to-account" onClick={handleGoToAccount}>
+				<div className="location">
+					<LocationIcon />
+					<div className="delivery">
+						<p>Delivering to...</p>
+						<span>Update location</span>
+					</div>
 				</div>
-			</div>
+			</button>
 		</HeaderItem>
 	)
 
 	const BasketSection = () => (
 		<HeaderItem>
-			<BasketContainer
-				onClick={() => handleBasketClick()}
-			>
+			<BasketContainer onClick={() => handleBasketClick()}>
 				<BasketIcon />
-				{cartItemCount > 0 && <p className='total'>{cartItemCount}</p>}
+				{cartItemCount > 0 && <p className="total">{cartItemCount}</p>}
 				<span>Basket</span>
 			</BasketContainer>
 		</HeaderItem>
@@ -117,18 +123,27 @@ export default function Header() {
 				<LocationSection />
 				<SearchBar onSearch={handleSearch} />
 				<HeaderItem style={{ marginLeft: 'var(--spacing-md)' }}>
-					<UnionJackIcon />
+					<button className='got-to-account'>
+						<UnionJackIcon />
+					</button>
 				</HeaderItem>
 				<HeaderItem>
-					<p>Hello, Sign in</p>
-					<span>
-						Account & Lists
-						<ArrowheadIcon fill="var(--lt-grey)" />
-					</span>
+					<button className='go-to-account'>
+						<p>
+							Hello {currentUser.first_name}
+							{!currentUser ? ', Sign in' : ''}
+						</p>
+						<span>
+							Account & Lists
+							<ArrowheadIcon fill="var(--lt-grey)" />
+						</span>
+					</button>
 				</HeaderItem>
 				<HeaderItem>
-					<p>Returns</p>
-					<span>& Orders</span>
+					<button className='got-to-account'>
+						<p>Returns</p>
+						<span>& Orders</span>
+					</button>
 				</HeaderItem>
 				<BasketSection />
 			</Content>
@@ -234,7 +249,7 @@ export default function Header() {
 	)
 
 	return (
-		<Container id='header'>
+		<Container id="header">
 			{windowWidth >= BREAKPOINTS.DESKTOP && (
 				<DesktopLayout
 					handleSearch={handleSearch}
@@ -305,19 +320,25 @@ const HeaderItem = styled.div`
 	position: relative;
 	transition: var(--tr-fast);
 	margin-right: var(--spacing-md);
+	cursor: pointer;
 	&:last-child {
 		margin-right: 0;
 	}
-	.location {
+	div.location {
 		display: flex;
 		align-items: center;
 		gap: var(--spacing-xs);
 	}
-	.delivery {
+	div.delivery {
 		display: flex;
 		flex-direction: column;
 	}
-	> p {
+	button.go-to-account {
+		color: inherit;
+		font-size: inherit;
+		text-align: left;
+	}
+	p {
 		font-size: var(--font-xs);
 	}
 	&::after {

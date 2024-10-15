@@ -49,6 +49,9 @@ const GlobalStyles = createGlobalStyle`
     --input-focus-border: #75B1BB;
     --input-focus-bg: #E8F0FE;
     --signin-link: #0066C0;
+    --checkbox-bg: #007185;
+    --checkbox-hover: #1196AB;
+    --input-error: #CC0C39;
 
     // spacing
     --spacing-xxs: .2rem;

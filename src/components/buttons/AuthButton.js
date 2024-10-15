@@ -1,15 +1,11 @@
 import React from 'react'
 import styled from 'styled-components'
 
-export default function AuthButton({ onClick, text, type }) {
-	const login = text === 'Continue' ? true : false
-	const handleClick = () => {
-		onClick()
-	}
-
+export default function AuthButton({ type, onClick, text }) {
+	const login = text === 'Continue' || text === 'Sign-In' ? true : false
 	return (
 		<Container>
-			<Button type={type} onClick={handleClick} $text={text} $login={login} $type={type}>
+			<Button type={type} onClick={onClick} $login={login}>
 				{text}
 			</Button>
 		</Container>
@@ -24,8 +20,8 @@ const Container = styled.div`
 
 const Button = styled.button`
 	width: 100%;
-	background-color: ${({ $text }) =>
-		$text === 'Continue' ? 'var(--yellow)' : 'var(--white)'};
+	background-color: ${({ $login }) =>
+		($login ? 'var(--yellow)' : 'var(--white)')};
 	color: var(--black);
 	border: ${({ $login }) => ($login ? 'none' : '1px solid var(--border-grey)' )};
 	padding: var(--spacing-sm) var(--spacing-md);
@@ -35,7 +31,7 @@ const Button = styled.button`
 	transition: var(--tr-fast);
 
 	&:hover {
-		background-color: ${({ $text }) =>
-			$text === 'Continue' ? 'var(--yellow-hover)' : 'var(--continue-grey)'};
+		background-color: ${({ $login }) =>
+			($login ? 'var(--yellow-hover)' : 'var(--continue-grey)')};
 	}
 `

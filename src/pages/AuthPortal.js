@@ -1,34 +1,142 @@
 import React, { useState } from 'react'
+import { useFormik } from 'formik'
 import { useNavigate } from 'react-router-dom'
+import { registerSchema, loginSchema } from '../schemas/index'
+import { useDispatch, useSelector } from 'react-redux'
+import { registerUser, loginUser } from '../redux/slices/userSlice'
 import Logo from '../icons/Logo'
 import ArrowheadIcon from '../icons/ArrowheadIcon'
 import styled from 'styled-components'
 
-export default function AuthPortal({ setIsAuthenticated }) {
+export default function AuthPortal() {
+	const dispatch = useDispatch()
 	const navigate = useNavigate()
+
+	const [showPasswordField, setShowPasswordField] = useState(false)
 	const [isSignIn, setIsSignIn] = useState(true)
 
-	const handleSubmit = (e) => {
-		e.preventDefault()
-		setIsAuthenticated(true)
-		navigate('/')
-	}
+	const { loading, error } = useSelector((state) => state.user)
+
+	const handleAuth = async (values) => {
+		const { passwordConfirm, ...userData } = values;
+		console.log('Register Payload:', userData);
+		try {
+			let result;
+			if (isSignIn) {
+				if (showPasswordField) {
+					result = await dispatch(loginUser(userData));
+					if (loginUser.fulfilled.match(result)) {
+						navigate('/');
+					}
+				} else {
+					setShowPasswordField(true); // First, show password field
+				}
+			} else {
+				result = await dispatch(registerUser(userData));
+				if (registerUser.fulfilled.match(result)) {
+					setIsSignIn(true); // Switch to sign-in after successful registration
+				}
+			}
+		} catch (err) {
+			console.error('Authentication error:', err);
+		}
+	};
+
+	const handleToggle = () => {
+		formik.resetForm();  // Reset form when toggling
+		setIsSignIn(!isSignIn);
+	};
+
+	const handleEmailContinue = () => {
+		if (!showPasswordField) {
+			setShowPasswordField(true);
+		} else {
+			formik.handleSubmit();  // Only submit if the password is visible
+		}
+	};
+	
+	const formik = useFormik({
+		initialValues: {
+			fullname: '',
+			email: '',
+			password: '',
+			passwordConfirm: '',
+		},
+		validationSchema: isSignIn ? loginSchema : registerSchema,
+		onSubmit: handleAuth,
+	})
 
 	const signIn = {
 		heading: 'Sign-In',
 		form: (
-			<Form onSubmit={handleSubmit}>
-				<div className="email">
-					<label htmlFor="email">Email or mobile phone number</label>
-					<input
-						type="text"
-						name="email"
-						id="email"
-						onChange={() => {}}
-					/>
-				</div>
-				<AuthButton type="submit" $text="Continue">
-					Continue
+			<Form onSubmit={formik.handleSubmit}>
+				{!showPasswordField ? (
+					<div className="input-group">
+						<label htmlFor="email">
+							Email or mobile phone number
+						</label>
+						<input
+							type="text"
+							name="email"
+							id="email"
+							onChange={formik.handleChange}
+							onBlur={formik.handleBlur}
+							value={formik.values.email || ''}
+							className={
+								formik.touched.email && formik.errors.email
+									? 'error'
+									: ''
+							}
+						/>
+						{formik.touched.email && formik.errors.email && (
+							<div className="error">{formik.errors.email}</div>
+						)}
+					</div>
+				) : (
+					<>
+						<div>
+							<p>{formik.values.email}</p>
+							<button
+								type="button"
+								onClick={() => setShowPasswordField(false)}
+							>
+								Change
+							</button>
+						</div>
+						<div className="input-group">
+							<div className="label-and-button">
+								<label htmlFor="password">Password</label>
+								<button type="button">Forgot password?</button>
+							</div>
+							<input
+								type="password"
+								name="password"
+								id="password"
+								onChange={formik.handleChange}
+								onBlur={formik.handleBlur}
+								value={formik.values.password || ''}
+								className={
+									formik.touched.password &&
+									formik.errors.password
+										? 'error'
+										: ''
+								}
+							/>
+							{formik.touched.password &&
+								formik.errors.password && (
+									<div className="error">
+										{formik.errors.password}
+									</div>
+								)}
+						</div>
+					</>
+				)}
+				<AuthButton
+					type="submit"
+					onClick={handleEmailContinue}
+					$text={showPasswordField ? 'Sign-In' : 'Continue'}
+				>
+					{showPasswordField ? 'Sign-In' : 'Continue'}
 				</AuthButton>
 			</Form>
 		),
@@ -54,8 +162,8 @@ export default function AuthPortal({ setIsAuthenticated }) {
 				<span>Shop on Scamazon Schizzness</span>
 			</div>
 		),
-		newTo: (
-			<div className="new-to">
+		textOverLine: (
+			<div className="text-over-line">
 				<hr />
 				<p>New to Scamazon?</p>
 			</div>
@@ -65,48 +173,88 @@ export default function AuthPortal({ setIsAuthenticated }) {
 	const register = {
 		heading: 'Create account',
 		form: (
-			<Form onSubmit={handleSubmit}>
-				<div className="name">
-					<label htmlFor="name">Your name</label>
+			<Form onSubmit={formik.handleSubmit}>
+				<div className="input-group">
+					<label htmlFor="fullname">Your name</label>
 					<input
 						type="text"
-						name="name"
-						id="name"
-						onChange={() => {}}
-						required
+						name="fullname"
+						id="fullname"
+						onChange={formik.handleChange}
+						onBlur={formik.handleBlur}
+						value={formik.values.fullname || ''}
+						className={
+							formik.touched.fullname && formik.errors.fullname
+								? 'error'
+								: ''
+						}
 					/>
+					{formik.touched.fullname && formik.errors.fullname && (
+						<div className="error">{formik.errors.fullname}</div>
+					)}
 				</div>
-				<div className="email">
+				<div className="input-group">
 					<label htmlFor="email">Mobile number or email</label>
 					<input
 						type="text"
 						name="email"
 						id="email"
-						onChange={() => {}}
-						required
+						onChange={formik.handleChange}
+						onBlur={formik.handleBlur}
+						value={formik.values.email || ''}
+						className={
+							formik.touched.email && formik.errors.email
+								? 'error'
+								: ''
+						}
 					/>
+					{formik.touched.email && formik.errors.email && (
+						<div className="error">{formik.errors.email}</div>
+					)}
 				</div>
-				<div className="password">
+				<div className="input-group">
 					<label htmlFor="password">Password</label>
 					<input
 						type="password"
 						name="password"
 						id="password"
-						onChange={() => {}}
-						required
+						onChange={formik.handleChange}
+						onBlur={formik.handleBlur}
+						value={formik.values.password || ''}
+						className={
+							formik.touched.password && formik.errors.password
+								? 'error'
+								: ''
+						}
 					/>
+					{formik.touched.password && formik.errors.password && (
+						<div className="error">{formik.errors.password}</div>
+					)}
 				</div>
-				<div className="password">
-					<label htmlFor="password-confirm">Re-enter password</label>
+				<div className="input-group">
+					<label htmlFor="passwordConfirm">Re-enter password</label>
 					<input
 						type="password"
-						name="password-confirm"
-						id="password-confirm"
-						onChange={() => {}}
-						required
+						name="passwordConfirm"
+						id="passwordConfirm"
+						onChange={formik.handleChange}
+						onBlur={formik.handleBlur}
+						value={formik.values.passwordConfirm || ''}
+						className={
+							formik.touched.passwordConfirm &&
+							formik.errors.passwordConfirm
+								? 'error'
+								: ''
+						}
 					/>
+					{formik.touched.passwordConfirm &&
+						formik.errors.passwordConfirm && (
+							<div className="error">
+								{formik.errors.passwordConfirm}
+							</div>
+						)}
 				</div>
-				<AuthButton $text="Continue" type="submit">
+				<AuthButton type="submit" $text="Continue">
 					Continue
 				</AuthButton>
 			</Form>
@@ -133,7 +281,7 @@ export default function AuthPortal({ setIsAuthenticated }) {
 				<p>
 					Already have an account?{' '}
 					<button
-						onClick={() => setIsSignIn(!isSignIn)}
+						onClick={handleToggle}
 						type="button"
 					>
 						<span>Sign in</span>
@@ -149,6 +297,20 @@ export default function AuthPortal({ setIsAuthenticated }) {
 
 	const currentView = isSignIn ? signIn : register
 
+	if (loading)
+		return (
+			<Container>
+				<LogoContainer>
+					<Logo />
+				</LogoContainer>
+				<InnerContainer>
+					<p>Loading...</p>
+				</InnerContainer>
+			</Container>
+		)
+
+	
+
 	return (
 		<Container>
 			<LogoContainer>
@@ -159,6 +321,7 @@ export default function AuthPortal({ setIsAuthenticated }) {
 					<div className="header">
 						<p>{currentView.heading}</p>
 					</div>
+					{error && <div className="error">{error.message || JSON.stringify(error)}</div>}
 					{currentView.form}
 					{currentView.legalese}
 					{isSignIn && currentView.help}
@@ -169,12 +332,12 @@ export default function AuthPortal({ setIsAuthenticated }) {
 					{!isSignIn && register.divider}
 					{!isSignIn && register.existing}
 				</FormContainer>
-				{isSignIn && signIn.newTo}
+				{isSignIn && signIn.textOverLine}
 				{isSignIn && (
 					<AuthButton
 						onClick={() => setIsSignIn(!isSignIn)}
 						$text="Create your Scamazon account"
-						type="submit"
+						type="button"
 					>
 						Create your Scamazon account
 					</AuthButton>
@@ -187,7 +350,7 @@ export default function AuthPortal({ setIsAuthenticated }) {
 					<span>Conditions of Use</span>
 				</li>
 				<li>
-					<span>Provacy Notice</span>
+					<span>Privacy Notice</span>
 				</li>
 				<li>
 					<span>Help</span>
@@ -243,7 +406,12 @@ const Container = styled.div`
 			color: var(--lt-text);
 		}
 	}
-	div.new-to {
+	div.label-and-button {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+	}
+	div.text-over-line {
 		margin: 3rem 0 2rem 0;
 		position: relative;
 		hr {
@@ -353,9 +521,7 @@ const Form = styled.form`
 	flex-direction: column;
 	gap: var(--spacing-md);
 
-	div.email,
-	div.password,
-	div.name {
+	div.input-group {
 		display: flex;
 		flex-direction: column;
 		gap: var(--spacing-xs);

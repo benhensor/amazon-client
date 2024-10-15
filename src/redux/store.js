@@ -1,20 +1,31 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { persistStore, persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
+import userReducer from './slices/userSlice';
 import productsReducer from './slices/productsSlice';
 import basketReducer from './slices/basketSlice';
 
+// Config for redux-persist (user)
+const userPersistConfig = {
+  key: 'user',
+  storage,
+  whitelist: ['currentUser', 'isLoggedIn'],
+}
 // Config for redux-persist (products)
 const productsPersistConfig = {
   key: 'products',
   storage,
 };
 
-// Persist only the products reducer
+// Persist the user reducer
+const persistedUserReducer = persistReducer(userPersistConfig, userReducer);
+
+// Persist the products reducer
 const persistedProductsReducer = persistReducer(productsPersistConfig, productsReducer);
 
 export const store = configureStore({
   reducer: {
+    user: persistedUserReducer,
     products: persistedProductsReducer,
     basket: basketReducer,  // Keep basket separate, as it uses sessionStorage
   },
