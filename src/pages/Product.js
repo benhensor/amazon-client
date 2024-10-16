@@ -5,6 +5,7 @@ import {
 	fetchProductsByCategory,
 	fetchSingleProduct,
 } from '../redux/slices/productsSlice'
+import { addItem } from '../redux/slices/basketSlice'
 import { superCategories } from '../utils/superCategories'
 import { formatQuery } from '../utils/formatCategory'
 import { useWindowWidth } from '../utils/useWindowWidth'
@@ -98,7 +99,9 @@ export default function Product() {
 		setCurrentImage(currentProduct.images[i])
 	}
 
-
+	const handleAddToBasketClick = (currentProduct) => {
+		dispatch(addItem(currentProduct))
+	}
 
 	const renderProductImages = () => {
 		return (
@@ -198,7 +201,7 @@ export default function Product() {
 			<InfoBlock>
 				<div className="button-container">
 					<QuantityBtn>Quantity:</QuantityBtn>
-					<BuyButton onClick={() => {}} text="Add to Basket" type='large'/>
+					<BuyButton onClick={() => handleAddToBasketClick(currentProduct)} text="Add to Basket" type='large'/>
 					<BuyButton onClick={() => {}} text="Buy Now" type='large'/>
 				</div>
 			</InfoBlock>

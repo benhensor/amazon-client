@@ -28,7 +28,6 @@ export default function Products() {
 	const [sortType, setSortType] = useState(null)
 	const [sortDirection, setSortDirection] = useState(null)
 
-	console.log(slug, category, searchTerm)
 	useEffect(() => {
 		const loadData = async () => {
 			// If there's a slug, we're showing products by category

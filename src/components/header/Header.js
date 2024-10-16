@@ -123,12 +123,12 @@ export default function Header() {
 				<LocationSection />
 				<SearchBar onSearch={handleSearch} />
 				<HeaderItem style={{ marginLeft: 'var(--spacing-md)' }}>
-					<button className='got-to-account'>
+					<button className='got-to-account' onClick={handleGoToAccount}>
 						<UnionJackIcon />
 					</button>
 				</HeaderItem>
 				<HeaderItem>
-					<button className='go-to-account'>
+					<button className='go-to-account' onClick={handleGoToAccount}>
 						<p>
 							Hello {currentUser.first_name}
 							{!currentUser ? ', Sign in' : ''}

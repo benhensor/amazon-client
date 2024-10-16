@@ -38,7 +38,7 @@ export const accountOptions = [
   {
     id: 4,
     image: SchiznessImg,
-    title: 'Your Schizness Account',
+    title: 'Your Schizzness Account',
     text: 'Sign up for free to separate your work purchases and download VAT invoices easily'
   },
   {
@@ -84,7 +84,7 @@ export const accountLinks = [
     id: 1,
     title: 'Digital content and devices',
     links: [
-      'Amazon Drive',
+      'Scamazon Drive',
       'Apps and more',
       'Audible settings',
       'Content and devices',
@@ -111,12 +111,12 @@ export const accountLinks = [
     title: 'More ways to pay',
     links: [
       'Your purchase preferences',
-      'Amazon Pay',
-      'Amazon Coins',
+      'Scamazon Pay',
+      'Scamazon Coins',
       'Vouchers',
       'Shop with Points',
       'Product vouchers',
-      'Amazon Business Amex Card'
+      'Scamazon Business Scamex Card'
     ]
   },
   {
@@ -124,7 +124,7 @@ export const accountLinks = [
     title: 'Ordering and shopping preferences',
     links: [
       'Your transactions',
-      'Amazon Currency Converter',
+      'Scamazon Currency Converter',
       'Change Currency Settings',
       'Archived Orders',
       'Lists',
@@ -139,8 +139,8 @@ export const accountLinks = [
     title: 'Other accounts',
     links: [
       'Account linking',
-      'Sell on Amazon',
-      'Amazon Web Services',
+      'Sell on Scamazon',
+      'Scamazon Web Services',
       'Audible membership',
       'Twitch account settings'
     ]
@@ -149,8 +149,8 @@ export const accountLinks = [
     id: 6,
     title: 'Shopping programmes',
     links: [
-      'Manage Your Amazon Family',
-      'Amazon Household',
+      'Manage Your Scamazon Family',
+      'Scamazon Household',
       'Subscribe & Save',
       'Manage parent shopping preferences',
       'Your interests',
@@ -162,7 +162,7 @@ export const accountLinks = [
     title: 'Memberships and subscriptions',
     links: [
       'Email',
-      'Prime Video Channels',
+      'Crime Video Channels',
       'Memberships & Subscriptions'
     ]
   },
@@ -172,7 +172,7 @@ export const accountLinks = [
     links: [
       'Request your data',
       'Manage apps and services with data access',
-      'Close Your Amazon Account',
+      'Close Your Scamazon Account',
       'Privacy Notice'
     ]
   },

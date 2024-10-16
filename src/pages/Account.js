@@ -1,20 +1,54 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
 import { accountOptions, accountLinks } from '../utils/accountOptions'
 import styled from 'styled-components'
 
 export default function Account() {
+
+	const linkTo = (option) => {
+		switch (option) {
+			case 'Your Orders':
+				return '/account/orders'
+			case 'Login & Security':
+				return '/account/under-construction'
+			case 'Crime':
+				return '/account/under-construction'
+			case 'Your Addresses':
+				return '/account/addresses'
+			case 'Your Schizzness Account':
+				return '/account/under-construction'
+			case 'Your Payments':
+				return '/account/under-construction'
+			case 'Gift Cards & Top Up':
+				return '/account/under-construction'
+			case 'Your Messages':
+				return '/account/under-construction'
+			case 'Your Services':
+				return '/account/under-construction'
+			case 'Contact Us':
+				return '/account/under-construction'
+			case 'Our App':
+				return '/account/under-construction'
+			default:
+		}
+	}
+
 	const AccountOption = ({ option }) => {
 		return (
 			<Option>
-				<OptionContainer>
-					<OptionImage>
-						<img src={option.image} alt={option.title} />
-					</OptionImage>
-					<OptionDetails>
-						<h3>{option.title}</h3>
-						<p>{option.text}</p>
-					</OptionDetails>
-				</OptionContainer>
+				<Link
+					to={linkTo(option.title)}
+				>
+					<OptionContainer>
+						<OptionImage>
+							<img src={option.image} alt={option.title} />
+						</OptionImage>
+						<OptionDetails>
+							<h3>{option.title}</h3>
+							<p>{option.text}</p>
+						</OptionDetails>
+					</OptionContainer>
+				</Link>
 			</Option>
 		)
 	}
@@ -37,6 +71,7 @@ export default function Account() {
 	return (
 		<AccountPage>
 			<PageContainer>
+
 				<PageHeader>
 					<h1>Your Account</h1>
 				</PageHeader>
@@ -56,7 +91,7 @@ export default function Account() {
 	)
 }
 
-const AccountPage = styled.section`
+const AccountPage = styled.div`
 	background-color: var(--white);
   margin-bottom: 10rem;
 `
@@ -64,26 +99,69 @@ const AccountPage = styled.section`
 const PageContainer = styled.div`
 	max-width: 120rem;
 	margin: 0 auto;
+	@media only screen and (max-width: 1199px) {
+		padding: var(--spacing-md);
+	}
+	@media only screen and (max-width: 450px) {
+		padding: 0;
+	}
 `
 
 const PageHeader = styled.div`
 	padding: var(--spacing-sm) 0;
+	@media only screen and (max-width: 450px) {
+		padding: var(--spacing-sm);
+	}
 `
 
 const LayoutGrid = styled.div`
 	display: grid;
 	grid-template-columns: repeat(auto-fill, minmax(30rem, 1fr));
 	gap: var(--spacing-lg);
+	@media only screen and (max-width: 1199px) {
+		gap: var(--spacing-md);
+	}
+	@media only screen and (max-width: 768px) {
+		grid-template-columns: repeat(auto-fill, minmax(100%, 1fr));
+		gap: var(--spacing-md);
+	}
+	@media only screen and (max-width: 450px) {
+		gap: 0;
+	}
 `
 
 const Option = styled.div`
 	border: 1px solid var(--border-grey);
   border-radius: var(--br-lg);
+	transition: var(--tr-fast);
+	cursor: pointer;
+	&:hover {
+		background-color: var(--lt-grey);
+	}
+	@media only screen and (max-width: 450px) {
+		border-radius: 0;
+		border: none;
+		border-bottom: 1px solid var(--border-grey);
+		height: 9rem;
+		display: flex;
+		align-items: center;
+		&:hover {
+			background-color: transparent;
+		}
+	}
 `
 
 const OptionContainer = styled.div`
 	display: flex;
+	align-items: flex-start;
 	padding: var(--spacing-md);
+	width: 100%;
+	@media only screen and (max-width: 450px) {
+		padding: var(--spacing-sm);
+		&:hover {
+			background-color: transparent;
+		}
+	}
 `
 
 const OptionImage = styled.div`
@@ -93,19 +171,32 @@ const OptionImage = styled.div`
   max-width: 7rem;
   max-height: 7rem;
 	img {
+		background-color: var(--account-imgBG);
     width: 100%;
-  
-    object-fit: cover;
+    object-fit: contain;
 	}
 `
 
 const OptionDetails = styled.div`
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	width: 100%;
+	height: 100%;
 	h3 {
-		margin-bottom: var(--spacing-sm);
+		font-size: clamp(var(--font-md), 3vw, var(--font-lg));
 	}
   p {
     color: var(--grey);
   }
+	@media only screen and (max-width: 450px) {
+		h3 {
+			font-size: clamp(var(--font-sm), 3vw, var(--font-md));
+		}
+		p {
+			font-size: var(--font-xs);
+		}
+	}
 `
 
 const Divider = styled.div`
@@ -114,6 +205,12 @@ const Divider = styled.div`
     border: none;
     border-top: 1px solid var(--border-grey);
   }
+	@media only screen and (max-width: 768px) {
+		margin: var(--spacing-lg) 0;
+	}
+	@media only screen and (max-width: 450px) {
+		margin: var(--spacing-md) 0;
+	}
 `
 
 const List = styled.div`
@@ -133,6 +230,7 @@ const List = styled.div`
         cursor: pointer;
         transition: var(--tr-fast);
         &:hover {
+					color: var(--account-link-hover);
           text-decoration: underline;
         }
       }

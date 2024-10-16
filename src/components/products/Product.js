@@ -2,6 +2,7 @@ import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import { setCurrentProduct } from '../../redux/slices/productsSlice'
+import { addItem } from '../../redux/slices/basketSlice'
 import BuyButton from '../buttons/BuyButton'
 import ProductRating from './ProductRating'
 import styled from 'styled-components'
@@ -15,28 +16,44 @@ export default function CarouselItem({ product }) {
 		navigate(`/product/${product.id}`)
 	}
 
+	const handleAddToBasketClick = (product) => {
+		dispatch(addItem(product))
+	}
+
 	return (
-		<ProductCard onClick={handleProductClick}>
-			<img src={product.thumbnail} alt={product.name} />
-			<div className="block">
-				<h3>{product.title}</h3>
-				<p className="description">{product.description}</p>
-			</div>
-			<div className="block">
-				<ProductRating rating={product.rating} />
-				<div className="price-container">
-					<p className="discount">-{product.discountPercentage}%</p>
-					<p className="price">
-						£
-						<span className="whole">
-							{Math.floor(product.price)}
-						</span>
-						.{(product.price % 1).toFixed(2).slice(2)}
-					</p>
+		<>
+			<ProductCard>
+				<div onClick={handleProductClick}>
+					<img src={product.thumbnail} alt={product.name} />
+					<div className="block">
+						<h3>{product.title}</h3>
+						<p className="description primary-link">
+							{product.description}
+						</p>
+					</div>
+					<div className="block">
+						<ProductRating rating={product.rating} />
+						<div className="price-container">
+							<p className="discount">
+								-{product.discountPercentage}%
+							</p>
+							<p className="price">
+								£
+								<span className="whole">
+									{Math.floor(product.price)}
+								</span>
+								.{(product.price % 1).toFixed(2).slice(2)}
+							</p>
+						</div>
+					</div>
 				</div>
-				<BuyButton onClick={() => {}} text="Add to Basket" type='small'/>
-			</div>
-		</ProductCard>
+				<BuyButton
+					onClick={() => handleAddToBasketClick(product)}
+					text="Add to Basket"
+					type="small"
+				/>
+			</ProductCard>
+		</>
 	)
 }
 
@@ -67,7 +84,6 @@ const ProductCard = styled.div`
 		overflow: hidden; /* Hide overflow */
 		text-overflow: ellipsis; /* Add ellipsis for overflowed text */
 		font-size: var(--font-sm);
-		color: var(--link-blue);
 		line-height: 1.5; /* Adjust line height as needed */
 		height: calc(1.5em * 5);
 		max-height: calc(1.5em * 5);

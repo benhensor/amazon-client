@@ -8,8 +8,11 @@ import Products from './pages/Products'
 import Product from './pages/Product'
 import Department from './pages/Department'
 import Account from './pages/Account'
+import Orders from './pages/Orders'
 import Basket from './pages/Basket'
 import Footer from './components/footer/Footer'
+import Addresses from './pages/Addresses'
+import UnderConstruction from './pages/UnderConstruction'
 
 const HeaderLayout = () => (
   <>
@@ -28,6 +31,30 @@ const HeaderLayout = () => (
           element={
             <ProtectedRoute>
               <Account />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/account/orders"
+          element={
+            <ProtectedRoute>
+              <Orders />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/account/addresses"
+          element={
+            <ProtectedRoute>
+              <Addresses />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/account/under-construction"
+          element={
+            <ProtectedRoute>
+              <UnderConstruction />
             </ProtectedRoute>
           }
         />

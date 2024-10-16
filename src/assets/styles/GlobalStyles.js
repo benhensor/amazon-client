@@ -14,6 +14,7 @@ const GlobalStyles = createGlobalStyle`
     --background-grey: #E3E6E6;
     --continue-grey: #F7F7F7;
     --qty-select-grey: #F0F2F2;
+    --order-header-grey: #F0F2F2;
     --lt-grey: #E6E6E6;
     --lt-grey-hover: #D4D4D4;
     --border-grey: #D5D9D9;
@@ -32,7 +33,7 @@ const GlobalStyles = createGlobalStyle`
     --md-orange: #F08804;
     --bin-orange: #FFA41C;
     --bin-orange-hover: #FA8900; 
-    --dk-orange: #C45500;
+    --dk-orange: #C45500; 
     --price-red: #B12704;
     --link-blue: #007185;
     --link-hover: #C7511F;
@@ -52,6 +53,12 @@ const GlobalStyles = createGlobalStyle`
     --checkbox-bg: #007185;
     --checkbox-hover: #1196AB;
     --input-error: #CC0C39;
+    --account-link-hover: #CA5B2C;
+    --account-imgBG: #B8DDE1;
+    --order-breadcrumb: #C55804;
+    --order-search-btn-bg: #303333;
+    --order-search-btn-bg-hover: #0F1111;
+    --def-address-green: #067D62;
 
     // spacing
     --spacing-xxs: .2rem;
@@ -145,11 +152,22 @@ const GlobalStyles = createGlobalStyle`
     cursor: pointer;
     border: none;
     background-color: transparent;
+    transition: var(--tr-fast);
   }
 
   img {
     max-width: 100%;
     height: auto;
+  }
+
+  .primary-link {
+    color: var(--link-blue);
+    transition: var(--tr-fast);
+    cursor: pointer;
+    &:hover {
+      color: var(--link-hover);
+      text-decoration: underline;
+    }
   }
 
   @media only screen and (max-width: 450px) {
