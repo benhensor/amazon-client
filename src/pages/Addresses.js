@@ -1,137 +1,45 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import { useSelector, useDispatch } from 'react-redux'
+import { fetchAddresses, setDefaultAddress, updateAddress, deleteAddress } from '../redux/slices/addressSlice'
 import PlusIcon from '../icons/PlusIcon'
 import styled from 'styled-components'
-import { clear } from '@testing-library/user-event/dist/clear'
 
 export default function Addresses() {
-  const [defaultAddress, setDefaultAddress] = useState(1)
+	const dispatch = useDispatch()
+	const { addresses } = useSelector((state) => state.addresses)
   const [defaultAddressChanged, setDefaultAddressChanged] = useState(false)
-  const [addresses, setAddresses] = useState([
-		{
-			id: 1,
-			name: 'Customer Name',
-			address1: '123 Fake Street',
-			address2: 'Fakeville',
-			city: 'Faketown',
-			postcode: 'FA1 2KE',
-			country: 'United Kingdom',
-			phone: '01234 567890',
-			deliveryInstructions: 'Leave in porch',
-		},
-		{
-			id: 2,
-			name: 'Customer Name',
-			address1: '123 Fake Street',
-			address2: 'Fakeville',
-			city: 'Faketown',
-			postcode: 'FA1 2KE',
-			country: 'United Kingdom',
-			phone: '01234 567890',
-			deliveryInstructions: 'Leave in porch',
-		},
-		{
-			id: 3,
-			name: 'Customer Name',
-			address1: '123 Fake Street',
-			address2: 'Fakeville',
-			city: 'Faketown',
-			postcode: 'FA1 2KE',
-			country: 'United Kingdom',
-			phone: '01234 567890',
-			deliveryInstructions: 'Leave in porch',
-		},
-		{
-			id: 4,
-			name: 'Customer Name',
-			address1: '123 Fake Street',
-			address2: 'Fakeville',
-			city: 'Faketown',
-			postcode: 'FA1 2KE',
-			country: 'United Kingdom',
-			phone: '01234 567890',
-			deliveryInstructions: 'Leave in porch',
-		},
-		{
-			id: 5,
-			name: 'Customer Name',
-			address1: '123 Fake Street',
-			address2: 'Fakeville',
-			city: 'Faketown',
-			postcode: 'FA1 2KE',
-			country: 'United Kingdom',
-			phone: '01234 567890',
-			deliveryInstructions: 'Leave in porch',
-		},
-		{
-			id: 6,
-			name: 'Customer Name',
-			address1: '123 Fake Street',
-			address2: 'Fakeville',
-			city: 'Faketown',
-			postcode: 'FA1 2KE',
-			country: 'United Kingdom',
-			phone: '01234 567890',
-			deliveryInstructions: 'Leave in porch',
-		},
-		{
-			id: 7,
-			name: 'Customer Name',
-			address1: '123 Fake Street',
-			address2: 'Fakeville',
-			city: 'Faketown',
-			postcode: 'FA1 2KE',
-			country: 'United Kingdom',
-			phone: '01234 567890',
-			deliveryInstructions: 'Leave in porch',
-		},
-		{
-			id: 8,
-			name: 'Customer Name',
-			address1: '123 Fake Street',
-			address2: 'Fakeville',
-			city: 'Faketown',
-			postcode: 'FA1 2KE',
-			country: 'United Kingdom',
-			phone: '01234 567890',
-			deliveryInstructions: 'Leave in porch',
-		},
-		{
-			id: 9,
-			name: 'Customer Name',
-			address1: '123 Fake Street',
-			address2: 'Fakeville',
-			city: 'Faketown',
-			postcode: 'FA1 2KE',
-			country: 'United Kingdom',
-			phone: '01234 567890',
-			deliveryInstructions: 'Leave in porch',
-		},
-	])
+  const [currentDefaultAddress, setCurrentDefaultAddress] = useState(null);
   let timeoutId;
 
-  const addNewAddress = () => {}
+	useEffect(() => {
+		dispatch(fetchAddresses())
+	}, [dispatch])
 
-  const removeAddress = (id) => {
-    if (defaultAddress === id) {
-      return
-    }
-    // Remove address
+	useEffect(() => {
+    const defaultAddress = addresses.find((address) => address.is_default);
+    setCurrentDefaultAddress(defaultAddress?.address_id);
+  }, [addresses]);
 
+	useEffect(() => {
+		console.log(currentDefaultAddress);
+	}, [currentDefaultAddress]);
 
-  }
+	const handleEdit = (id, updatedData) => {
+    dispatch(updateAddress({ id, addressData: updatedData }));
+  };
+
+  const handleDelete = (id) => {
+    dispatch(deleteAddress(id));
+  };
 
   const changeDefaultAddress = (id) => {
-    if (defaultAddress === id) {
-      return
-    }
-    setDefaultAddress(id);
+		console.log('Setting default address', id);
+    dispatch(setDefaultAddress(id));
     setDefaultAddressChanged(true);
-  
     if (timeoutId) {
       clearTimeout(timeoutId);
     }
-  
     timeoutId = setTimeout(() => {
       setDefaultAddressChanged(false);
       timeoutId = null; 
@@ -149,9 +57,7 @@ export default function Addresses() {
 		return (
 			<Block>
 				{address.id === 0 ? (
-					<BlockContainer
-            onClick={addNewAddress}
-          >
+					<BlockContainer>
 						<div className="container border-dash">
 							<div className="add-address">
 								<div className="icon">{address.icon}</div>
@@ -164,29 +70,30 @@ export default function Addresses() {
 				) : (
 					<BlockContainer>
 						<div className="container border-solid">
-							{defaultAddress === address.id && (
+							{address.isDefault && (
 								<div className="default">Default</div>
 							)}
 							<div className="address">
-								<p className="name">{address.name}</p>
-								<p>{address.address1}</p>
-								<p>{address.address2}</p>
+								<p className="name">{address.full_name}</p>
+								<p>{address.address_line1}</p>
+								<p>{address.address_line2}</p>
 								<p>{address.city}</p>
 								<p>{address.postcode}</p>
+								<p>{address.county}</p>
 								<p>{address.country}</p>
-								<p>{address.phone}</p>
+								<p>{address.phone_number}</p>
 								<p>{address.deliveryInstructions}</p>
 								<p className="primary-link">
 									Add delivery instructions
 								</p>
 							</div>
 							<div className="address-controls">
-								<button className="primary-link">Edit</button>|
-								<button className="primary-link">Remove</button>
-								{!address.isDefault && (
+								<button className="primary-link" onClick={() => handleEdit(address.address.id)}>Edit</button>|
+								<button className="primary-link" onClick={() => handleDelete(address.address.id)}>Remove</button>
+								{!address.is_default && (
 									<>
 										|
-										<button className="primary-link" onClick={() => changeDefaultAddress(address.id)}>
+										<button className="primary-link" onClick={() => changeDefaultAddress(address.address_id)}>
 											Set as default
 										</button>
 									</>
@@ -218,9 +125,11 @@ export default function Addresses() {
 					<h1>Your Addresses</h1>
 				</PageHeader>
 				<LayoutGrid>
-					<AddressBlock address={addAddress} />
+					<Link to='/account/addresses/new-address'>
+						<AddressBlock address={addAddress} />
+					</Link>
 					{addresses.map((address) => (
-						<AddressBlock key={address.id} address={address} />
+						<AddressBlock key={address.address_id} address={address} />
 					))}
 				</LayoutGrid>
 			</Page>

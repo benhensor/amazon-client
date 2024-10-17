@@ -13,6 +13,7 @@ const GlobalStyles = createGlobalStyle`
     --black: #221F1F;
     --background-grey: #E3E6E6;
     --continue-grey: #F7F7F7;
+    --secondary-hover: #F7F7F7;
     --qty-select-grey: #F0F2F2;
     --order-header-grey: #F0F2F2;
     --lt-grey: #E6E6E6;
@@ -28,6 +29,8 @@ const GlobalStyles = createGlobalStyle`
     --dk-blue-50: #13192150;
     --yellow: #FFD814;
     --yellow-hover: #F7CA00;
+    --primary-yellow: #FFD814;
+    --primary-yellow-hover: #F7CA00;
     --lt-orange: #FEBD69;
     --lt-orange-hover: #F3A847;
     --md-orange: #F08804;
@@ -59,6 +62,8 @@ const GlobalStyles = createGlobalStyle`
     --order-search-btn-bg: #303333;
     --order-search-btn-bg-hover: #0F1111;
     --def-address-green: #067D62;
+    --autofill-border: #50C4D9;
+    --autofill-gradient: linear-gradient(90deg, #ECFDFF 0%, #C9F3FA 100%);
 
     // spacing
     --spacing-xxs: .2rem;
@@ -151,7 +156,7 @@ const GlobalStyles = createGlobalStyle`
   button {
     cursor: pointer;
     border: none;
-    background-color: transparent;
+    background: transparent;
     transition: var(--tr-fast);
   }
 
@@ -167,6 +172,22 @@ const GlobalStyles = createGlobalStyle`
     &:hover {
       color: var(--link-hover);
       text-decoration: underline;
+    }
+  }
+
+  .primary-btn {
+    background-color: var(--primary-yellow);
+    color: var(--black);
+    &:hover {
+      background-color: var(--primary-yellow-hover);
+    }
+  }
+
+  .secondary-btn {
+    background-color: var(--white);
+    color: var(--black);
+    &:hover {
+      background-color: var(--secondary-hover);
     }
   }
 

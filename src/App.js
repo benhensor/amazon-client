@@ -12,6 +12,7 @@ import Orders from './pages/Orders'
 import Basket from './pages/Basket'
 import Footer from './components/footer/Footer'
 import Addresses from './pages/Addresses'
+import AddNewAddress from './pages/AddNewAddress'
 import UnderConstruction from './pages/UnderConstruction'
 
 const HeaderLayout = () => (
@@ -47,6 +48,14 @@ const HeaderLayout = () => (
           element={
             <ProtectedRoute>
               <Addresses />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/account/addresses/new-address"
+          element={
+            <ProtectedRoute>
+              <AddNewAddress />
             </ProtectedRoute>
           }
         />

@@ -43,16 +43,15 @@ export default function AuthPortal() {
 	};
 
 	const handleToggle = () => {
-		formik.resetForm();  // Reset form when toggling
+		formik.resetForm({  
+			values: {
+				fullname: '',
+				email: '',
+				password: '',
+				passwordConfirm: '',
+			},
+		});
 		setIsSignIn(!isSignIn);
-	};
-
-	const handleEmailContinue = () => {
-		if (!showPasswordField) {
-			setShowPasswordField(true);
-		} else {
-			formik.handleSubmit();  // Only submit if the password is visible
-		}
 	};
 	
 	const formik = useFormik({
@@ -64,6 +63,7 @@ export default function AuthPortal() {
 		},
 		validationSchema: isSignIn ? loginSchema : registerSchema,
 		onSubmit: handleAuth,
+		enableReinitialize: true,
 	})
 
 	const signIn = {
@@ -133,7 +133,6 @@ export default function AuthPortal() {
 				)}
 				<AuthButton
 					type="submit"
-					onClick={handleEmailContinue}
 					$text={showPasswordField ? 'Sign-In' : 'Continue'}
 				>
 					{showPasswordField ? 'Sign-In' : 'Continue'}
