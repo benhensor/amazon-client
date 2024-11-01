@@ -4,6 +4,7 @@ import {
 	fetchAllProducts,
 	fetchCategoryList,
 } from '../redux/slices/productsSlice'
+import { fetchAddresses } from '../redux/slices/addressSlice'
 import { superCategories } from '../utils/superCategories'
 import Hero from '../components/hero/Hero'
 import Carousel from '../components/products/Carousel'
@@ -14,7 +15,6 @@ export default function Home() {
 	const { products, categoryList, status, error } = useSelector(
 		(state) => state.products
 	)
-
 	const [isDataReady, setIsDataReady] = useState(false)
 
 	useEffect(() => {
@@ -25,6 +25,7 @@ export default function Home() {
 					dispatch(fetchAllProducts()),
 					dispatch(fetchCategoryList()),
 				])
+				dispatch(fetchAddresses())
 				setIsDataReady(true)
 			} catch (err) {
 				console.error('Error fetching data', err)

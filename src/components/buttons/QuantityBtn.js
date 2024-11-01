@@ -1,8 +1,7 @@
-import React, { useState } from 'react'
+import React from 'react'
 import styled from 'styled-components'
 
-export default function QuantityBtn() {
-	const [quantity, setQuantity] = useState(1)
+export default function QuantityBtn({ quantity, setQuantity }) {
   const handleSubtract = () => {
     const min = 1
     if (quantity > min) {

@@ -5,7 +5,7 @@ import {
 	setProducts,
 	setCurrentProduct,
 } from '../../redux/slices/productsSlice'
-import { addItem } from '../../redux/slices/basketSlice'
+import { addItemToBasket } from '../../redux/slices/basketSlice'
 import styled from 'styled-components'
 import ChevronIcon from '../../icons/ChevronIcon'
 import CarouselItem from './CarouselItem'
@@ -62,8 +62,8 @@ export default function Carousel({ superCategory, products }) {
 		setCurrentPage((prev) => Math.max(prev - 1, 0))
 	}
 
-	const handleAddToBasketClick = (product) => {
-		dispatch(addItem(product))
+	const handleAddToBasket = (productId) => {
+		dispatch(addItemToBasket({productId, quantity: 1}))
 	}
 
 	return (
@@ -111,7 +111,7 @@ export default function Carousel({ superCategory, products }) {
 							<div className="btn-container">
 								<BuyButton
 									onClick={() =>
-										handleAddToBasketClick(product)
+										handleAddToBasket(product.id)
 									}
 									text="Add to Basket"
 									type="small"

@@ -61,6 +61,7 @@ export default function SearchBar({ onSearch }) {
 			></span>
 
 			<select
+				id="category"
 				name="category"
 				value={localCategory}
 				onChange={handleCategoryChange}
@@ -77,6 +78,8 @@ export default function SearchBar({ onSearch }) {
 			</select>
 
 			<input
+				id="search"
+				name="search"
 				type="text"
 				placeholder="Search Scamazon"
 				value={!error ? localSearchTerm : 'Error fetching categories'}

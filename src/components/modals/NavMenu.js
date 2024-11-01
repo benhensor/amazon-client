@@ -1,10 +1,16 @@
 import React, { useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { useDispatch } from 'react-redux'
+import { logoutUser } from '../../redux/slices/userSlice'
 import styled from 'styled-components'
 import ProfileIcon from '../../icons/ProfileIcon'
 import ChevronIcon from '../../icons/ChevronIcon'
 import CloseIcon from '../../icons/CloseIcon'
 
 export default function NavMenu({ menuOpen, closeMenu }) {
+	const dispatch = useDispatch()
+	const navigate = useNavigate()
+
 	useEffect(() => {
 		// Disable scroll when modal is open
 		if (menuOpen) {
@@ -19,6 +25,17 @@ export default function NavMenu({ menuOpen, closeMenu }) {
 		}
 	}, [menuOpen])
 
+	const handleMenuItemClick = (destination) => {
+		navigate(destination)
+		closeMenu()
+	}
+
+	const handleLogoutClick = () => {
+		dispatch(logoutUser())
+		navigate('/auth')
+		closeMenu()
+	}
+
 	return (
 		<>
 			<ModalBackground $menuOpen={menuOpen} onClick={closeMenu} />
@@ -28,38 +45,62 @@ export default function NavMenu({ menuOpen, closeMenu }) {
 						<ProfileIcon />
 					</div>
 					<p>Hello...</p>
-					<button onClick={closeMenu}>
+					<button className='close-btn' onClick={closeMenu}>
 						<CloseIcon />
 					</button>
 				</MenuHeader>
 
 				<MenuItem>
 					<ChevronIcon direction="left" />
-					<p>Account</p>
+					<button className='menu-btn' onClick={() => handleMenuItemClick('/account')}>
+						Account
+					</button>
 				</MenuItem>
 
 				<MenuItem>
 					<ChevronIcon direction="left" />
-					<p>Lists</p>
+					<button
+						className='menu-btn' onClick={() =>
+							handleMenuItemClick('/account/under-construction')
+						}
+					>
+						Lists
+					</button>
 				</MenuItem>
 
 				<MenuItem>
 					<ChevronIcon direction="left" />
-					<p>Currency</p>
+					<button
+						className='menu-btn' onClick={() =>
+							handleMenuItemClick('/account/under-construction')
+						}
+					>
+						Currency
+					</button>
 				</MenuItem>
 
 				<MenuItem>
 					<ChevronIcon direction="left" />
-					<p>Update location</p>
+					<button
+						className='menu-btn' onClick={() =>
+							handleMenuItemClick('/account/addresses')
+						}
+					>
+						Update location
+					</button>
 				</MenuItem>
 
 				<MenuItem>
 					<ChevronIcon direction="left" />
-					<p>Orders & Returns</p>
+					<button
+						className='menu-btn' onClick={() => handleMenuItemClick('/account/orders')}
+					>
+						Orders & Returns
+					</button>
 				</MenuItem>
 
 				<MenuItem>
-					<button>Sign Out</button>
+					<button className='signout-btn' onClick={handleLogoutClick}>Sign Out</button>
 				</MenuItem>
 			</MenuContainer>
 		</>
@@ -125,7 +166,8 @@ const MenuHeader = styled.div`
 		font-weight: bold;
 		margin-left: var(--spacing-sm);
 	}
-	button {
+	
+	.close-btn {
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -157,6 +199,9 @@ const MenuItem = styled.div`
 		float: right;
 		background-color: transparent;
 		border: none;
+		font-size: var(--font-sm);
+	}
+	.signout-btn {
 		&:hover {
 			color: var(--highlight-red);
 		}

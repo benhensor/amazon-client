@@ -9,6 +9,7 @@ import MessagesImg from '../assets/img/account/messages.png';
 import ServicesImg from '../assets/img/account/services.png';
 import ContactImg from '../assets/img/account/contact.png';
 import AppImg from '../assets/img/account/app.png';
+import SignOutImg from '../assets/img/account/signout.png';
 
 export const accountOptions = [
   {
@@ -76,6 +77,12 @@ export const accountOptions = [
     image: AppImg,
     title: 'Scamazon Mobile App',
     text: 'Download the Scamazon App'
+  },
+  {
+    id: 11,
+    image: SignOutImg,
+    title: 'Sign out',
+    text: 'Sign out of your account'
   }
 ];
 

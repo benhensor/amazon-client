@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom'
 import { useWindowWidth } from '../../utils/useWindowWidth'
@@ -42,10 +42,17 @@ export default function Header() {
 	const navigate = useNavigate()
 	const windowWidth = useWindowWidth()
 	const currentUser = useSelector((state) => state.user.currentUser)
+	const defaultAddress = useSelector((state) =>
+		state.addresses.addresses.find((address) => address.is_default)
+	)
 	const cartItemCount = useSelector(selectBasketItemCount)
 
 	const [categoryMenuOpen, setCategoryMenuOpen] = useState(false)
 	const [navMenuOpen, setNavMenuOpen] = useState(false)
+
+	useEffect(() => {
+		console.log('header', currentUser)
+	}, [currentUser])
 
 	const handleSearch = (searchTerm, category) => {
 		if (searchTerm.trim()) {
@@ -70,10 +77,11 @@ export default function Header() {
 		navigate('/basket')
 	}
 
-	const handleGoToAccount = () => {
-		console.log('Go to account', currentUser)
-		navigate('/account')
+	const handleHeaderItemClick = (destination) => {
+		navigate(destination)
 	}
+
+
 
 	// Reusable components
 	const LogoSection = () => (
@@ -89,15 +97,37 @@ export default function Header() {
 
 	const LocationSection = () => (
 		<HeaderItem>
-			<button className="go-to-account" onClick={handleGoToAccount}>
-				<div className="location">
-					<LocationIcon />
-					<div className="delivery">
-						<p>Delivering to...</p>
-						<span>Update location</span>
+			{currentUser ? (
+				<button
+					className="go-to-account"
+					onClick={() => handleHeaderItemClick('/account/addresses')}
+				>
+					<div className="location">
+						<LocationIcon />
+						<div className="delivery">
+							<p>Delivering to...</p>
+							<span>
+								{defaultAddress?.postcode || 'Add address'}
+							</span>
+						</div>
 					</div>
-				</div>
-			</button>
+				</button>
+			) : (
+				<button
+					className="go-to-account"
+					onClick={() => handleHeaderItemClick('/auth')}
+				>
+					<div className="location">
+						<LocationIcon />
+						<div className="delivery">
+							<p>Delivering to...</p>
+							<span>
+							  Change location
+							</span>
+						</div>
+					</div>
+				</button>
+			)}
 		</HeaderItem>
 	)
 
@@ -122,25 +152,41 @@ export default function Header() {
 				<LogoSection />
 				<LocationSection />
 				<SearchBar onSearch={handleSearch} />
-				<HeaderItem style={{ marginLeft: 'var(--spacing-md)' }}>
-					<button className='got-to-account' onClick={handleGoToAccount}>
+				<HeaderItem>
+					<button
+						className="got-to-account"
+						onClick={() => handleHeaderItemClick('/account')}
+					>
 						<UnionJackIcon />
 					</button>
 				</HeaderItem>
 				<HeaderItem>
-					<button className='go-to-account' onClick={handleGoToAccount}>
-						<p>
-							Hello {currentUser.first_name}
-							{!currentUser ? ', Sign in' : ''}
-						</p>
-						<span>
-							Account & Lists
-							<ArrowheadIcon fill="var(--lt-grey)" />
-						</span>
-					</button>
+					{currentUser ? (
+						<button
+							className="go-to-account"
+							onClick={() => handleHeaderItemClick('/account')}
+						>
+							<p>Hello {currentUser?.first_name}</p>
+							<span>
+								Account & Lists
+								<ArrowheadIcon fill="var(--lt-grey)" direction='down'/>
+							</span>
+						</button>
+					) : (
+						<button
+							className="go-to-account"
+							onClick={() => handleHeaderItemClick('/auth')}
+						>
+							<p>Hello, Sign in</p>
+							<span>
+								Account & Lists
+								<ArrowheadIcon fill="var(--lt-grey)" direction='down'/>
+							</span>
+						</button>
+					)}
 				</HeaderItem>
 				<HeaderItem>
-					<button className='got-to-account'>
+					<button className="got-to-account">
 						<p>Returns</p>
 						<span>& Orders</span>
 					</button>

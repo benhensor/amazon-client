@@ -58,13 +58,10 @@ const addressSlice = createSlice({
         state.error = null;
       })
       .addCase(setDefaultAddress.fulfilled, (state, action) => {
-        state.loading = false;
-        const index = state.addresses.findIndex(
-          (addr) => addr.id === action.payload.id
-        );
-        if (index !== -1) {
-          state.addresses[index] = action.payload;
-        }
+        state.addresses = state.addresses.map(address => ({
+          ...address,
+          is_default: address.id === action.payload.id
+        }))
       })
       .addCase(setDefaultAddress.rejected, (state, action) => {
         state.loading = false;
@@ -153,11 +150,11 @@ export const createNewAddress = createAsyncThunk(
 // Thunk to set an address as default
 export const setDefaultAddress = createAsyncThunk(
   'address/setDefaultAddress',
-  async (addressId, { rejectWithValue }) => {
+  async (id, { rejectWithValue }) => {
     try {
       const response = await axios.put(
-        `${API_URL}/api/addresses/default/${addressId}`,
-        {},
+        `${API_URL}/api/addresses/default/${id}`,
+				{},
         {
           withCredentials: true,
         }

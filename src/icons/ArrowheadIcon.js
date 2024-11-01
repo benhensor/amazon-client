@@ -16,7 +16,7 @@ export default function ArrowheadIcon({ fill, direction }) {
 			rotation = 'rotate: 180deg'
 			break;
 		case 'right':
-			rotation = 'rotate: 0deg'
+			rotation = 'rotate: 90deg'
 			break;
 		default:
 			return null

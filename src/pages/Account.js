@@ -1,9 +1,13 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
+import { useDispatch } from 'react-redux'
+import { logoutUser } from '../redux/slices/userSlice'
+import { Link, useNavigate } from 'react-router-dom'
 import { accountOptions, accountLinks } from '../utils/accountOptions'
 import styled from 'styled-components'
 
 export default function Account() {
+	const dispatch = useDispatch()
+	const navigate = useNavigate()
 
 	const linkTo = (option) => {
 		switch (option) {
@@ -33,22 +37,39 @@ export default function Account() {
 		}
 	}
 
+	const handleSignout = () => {
+		dispatch(logoutUser())
+		navigate('/auth')
+	}
+
 	const AccountOption = ({ option }) => {
 		return (
 			<Option>
-				<Link
-					to={linkTo(option.title)}
-				>
-					<OptionContainer>
-						<OptionImage>
-							<img src={option.image} alt={option.title} />
-						</OptionImage>
-						<OptionDetails>
-							<h3>{option.title}</h3>
-							<p>{option.text}</p>
-						</OptionDetails>
-					</OptionContainer>
-				</Link>
+				{option.title === 'Sign out' ? (
+					<button onClick={handleSignout}>
+						<OptionContainer>
+							<OptionImage>
+								<img src={option.image} alt={option.title} />
+							</OptionImage>
+							<OptionDetails>
+								<h3>{option.title}</h3>
+								<p>{option.text}</p>
+							</OptionDetails>
+						</OptionContainer>
+					</button>
+				) : (
+					<Link to={linkTo(option.title)}>
+						<OptionContainer>
+							<OptionImage>
+								<img src={option.image} alt={option.title} />
+							</OptionImage>
+							<OptionDetails>
+								<h3>{option.title}</h3>
+								<p>{option.text}</p>
+							</OptionDetails>
+						</OptionContainer>
+					</Link>
+				)}
 			</Option>
 		)
 	}
@@ -71,16 +92,17 @@ export default function Account() {
 	return (
 		<AccountPage>
 			<PageContainer>
-
 				<PageHeader>
 					<h1>Your Account</h1>
 				</PageHeader>
 				<LayoutGrid>
-					{accountOptions.map((option, i) => (
-						<AccountOption key={i} option={option} />
+					{accountOptions.map((option) => (
+						<AccountOption key={option.id} option={option} />
 					))}
 				</LayoutGrid>
-				<Divider><hr /></Divider>
+				<Divider>
+					<hr />
+				</Divider>
 				<LayoutGrid>
 					{accountLinks.map((list, i) => (
 						<AccountList key={i} list={list} />
@@ -93,7 +115,7 @@ export default function Account() {
 
 const AccountPage = styled.div`
 	background-color: var(--white);
-  margin-bottom: 10rem;
+	margin-bottom: 10rem;
 `
 
 const PageContainer = styled.div`
@@ -132,11 +154,15 @@ const LayoutGrid = styled.div`
 
 const Option = styled.div`
 	border: 1px solid var(--border-grey);
-  border-radius: var(--br-lg);
+	border-radius: var(--br-lg);
 	transition: var(--tr-fast);
 	cursor: pointer;
 	&:hover {
 		background-color: var(--lt-grey);
+	}
+	button {
+		width: 100%;
+		text-align: left;
 	}
 	@media only screen and (max-width: 450px) {
 		border-radius: 0;
@@ -158,6 +184,7 @@ const OptionContainer = styled.div`
 	width: 100%;
 	@media only screen and (max-width: 450px) {
 		padding: var(--spacing-sm);
+		align-items: center;
 		&:hover {
 			background-color: transparent;
 		}
@@ -168,12 +195,16 @@ const OptionImage = styled.div`
 	margin-right: var(--spacing-sm);
 	border-radius: var(--br-50);
 	overflow: hidden;
-  max-width: 7rem;
-  max-height: 7rem;
+	max-width: 7rem;
+	max-height: 7rem;
 	img {
 		background-color: var(--account-imgBG);
-    width: 100%;
-    object-fit: contain;
+		width: 100%;
+		object-fit: contain;
+	}
+	@media only screen and (max-width: 450px) {
+		max-width: 5rem;
+		max-height: 5rem;
 	}
 `
 
@@ -186,9 +217,9 @@ const OptionDetails = styled.div`
 	h3 {
 		font-size: clamp(var(--font-md), 3vw, var(--font-lg));
 	}
-  p {
-    color: var(--grey);
-  }
+	p {
+		color: var(--grey);
+	}
 	@media only screen and (max-width: 450px) {
 		h3 {
 			font-size: clamp(var(--font-sm), 3vw, var(--font-md));
@@ -200,11 +231,11 @@ const OptionDetails = styled.div`
 `
 
 const Divider = styled.div`
-  margin: var(--spacing-xl) 0;
-  hr {
-    border: none;
-    border-top: 1px solid var(--border-grey);
-  }
+	margin: var(--spacing-xl) 0;
+	hr {
+		border: none;
+		border-top: 1px solid var(--border-grey);
+	}
 	@media only screen and (max-width: 768px) {
 		margin: var(--spacing-lg) 0;
 	}
@@ -215,8 +246,8 @@ const Divider = styled.div`
 
 const List = styled.div`
 	padding: var(--spacing-md);
-  border: 1px solid var(--border-grey);
-  border-radius: var(--br-lg);
+	border: 1px solid var(--border-grey);
+	border-radius: var(--br-lg);
 	h3 {
 		margin-bottom: var(--spacing-sm);
 	}
@@ -224,16 +255,16 @@ const List = styled.div`
 		li {
 			display: flex;
 			justify-content: space-between;
-      font-size: var(--font-sm);
-      span {
-        color: var(--link-blue);
-        cursor: pointer;
-        transition: var(--tr-fast);
-        &:hover {
+			font-size: var(--font-sm);
+			span {
+				color: var(--link-blue);
+				cursor: pointer;
+				transition: var(--tr-fast);
+				&:hover {
 					color: var(--account-link-hover);
-          text-decoration: underline;
-        }
-      }
+					text-decoration: underline;
+				}
+			}
 		}
 	}
 `

@@ -2,7 +2,7 @@ import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import { setCurrentProduct } from '../../redux/slices/productsSlice'
-import { addItem } from '../../redux/slices/basketSlice'
+import { addItemToBasket } from '../../redux/slices/basketSlice'
 import BuyButton from '../buttons/BuyButton'
 import ProductRating from './ProductRating'
 import styled from 'styled-components'
@@ -16,8 +16,8 @@ export default function CarouselItem({ product }) {
 		navigate(`/product/${product.id}`)
 	}
 
-	const handleAddToBasketClick = (product) => {
-		dispatch(addItem(product))
+	const handleAddToBasket = (productId) => {
+		dispatch(addItemToBasket({productId, quantity: 1}))
 	}
 
 	return (
@@ -48,7 +48,7 @@ export default function CarouselItem({ product }) {
 					</div>
 				</div>
 				<BuyButton
-					onClick={() => handleAddToBasketClick(product)}
+					onClick={() => handleAddToBasket(product.id)}
 					text="Add to Basket"
 					type="small"
 				/>

@@ -5,7 +5,6 @@ import { registerSchema, loginSchema } from '../schemas/index'
 import { useDispatch, useSelector } from 'react-redux'
 import { registerUser, loginUser } from '../redux/slices/userSlice'
 import Logo from '../icons/Logo'
-import ArrowheadIcon from '../icons/ArrowheadIcon'
 import styled from 'styled-components'
 
 export default function AuthPortal() {
@@ -19,7 +18,7 @@ export default function AuthPortal() {
 
 	const handleAuth = async (values) => {
 		const { passwordConfirm, ...userData } = values;
-		console.log('Register Payload:', userData);
+		// console.log('Register Payload:', userData);
 		try {
 			let result;
 			if (isSignIn) {
@@ -94,9 +93,10 @@ export default function AuthPortal() {
 					</div>
 				) : (
 					<>
-						<div>
+						<div className='change-email'>
 							<p>{formik.values.email}</p>
 							<button
+								className='auth-link'
 								type="button"
 								onClick={() => setShowPasswordField(false)}
 							>
@@ -106,7 +106,7 @@ export default function AuthPortal() {
 						<div className="input-group">
 							<div className="label-and-button">
 								<label htmlFor="password">Password</label>
-								<button type="button">Forgot password?</button>
+								<button className='auth-link' type="button">Forgot password?</button>
 							</div>
 							<input
 								type="password"
@@ -131,34 +131,33 @@ export default function AuthPortal() {
 						</div>
 					</>
 				)}
-				<AuthButton
+				<button
+					className='primary-btn auth-btn'
 					type="submit"
-					$text={showPasswordField ? 'Sign-In' : 'Continue'}
 				>
 					{showPasswordField ? 'Sign-In' : 'Continue'}
-				</AuthButton>
+				</button>
 			</Form>
 		),
 		legalese: (
 			<div className="legalese">
 				<p>
 					By continuing, you agree to Scamazon's{' '}
-					<span>Conditions of Use and Sale</span>. Please see our{' '}
-					<span>Privacy Notice</span>, our <span>Cookies Notice</span>{' '}
-					and our <span>Interest-Based Ads Notice</span>.
+					<span className='auth-link'>Conditions of Use and Sale</span>. Please see our{' '}
+					<span className='auth-link'>Privacy Notice</span>, our <span className='auth-link'>Cookies Notice</span>{' '}
+					and our <span className='auth-link'>Interest-Based Ads Notice</span>.
 				</p>
 			</div>
 		),
 		help: (
 			<div className="need-help">
-				<ArrowheadIcon fill="var(--signin-link)" direction="right" />
-				<span>Need Help?</span>
+				<span className='auth-link'>▸ Need Help?</span>
 			</div>
 		),
 		buying: (
 			<div className="schizzness">
 				<p>Buying for work?</p>
-				<span>Shop on Scamazon Schizzness</span>
+				<span className='auth-link'>Shop on Scamazon Schizzness</span>
 			</div>
 		),
 		textOverLine: (
@@ -253,25 +252,25 @@ export default function AuthPortal() {
 							</div>
 						)}
 				</div>
-				<AuthButton type="submit" $text="Continue">
+				<button type="submit" className='primary-btn auth-btn'>
 					Continue
-				</AuthButton>
+				</button>
 			</Form>
 		),
 		legalese: (
 			<div className="legalese">
 				<p>
 					By creating an account, you agree to Scamazon's{' '}
-					<span>Conditions of Use and Sale</span>. Please see our{' '}
-					<span>Privacy Notice</span>, our <span>Cookies Notice</span>{' '}
-					and our <span>Interest-Based Ads Notice</span>.
+					<span className='auth-link'>Conditions of Use and Sale</span>. Please see our{' '}
+					<span className='auth-link'>Privacy Notice</span>, our <span className='auth-link'>Cookies Notice</span>{' '}
+					and our <span className='auth-link'>Interest-Based Ads Notice</span>.
 				</p>
 			</div>
 		),
 		buying: (
 			<div className="schizzness">
 				<p>Buying for work?</p>
-				<span>Create a free Schizzness account</span>
+				<span className='auth-link'>Create a free Schizzness account</span>
 			</div>
 		),
 		divider: <GradientDivider />,
@@ -280,14 +279,11 @@ export default function AuthPortal() {
 				<p>
 					Already have an account?{' '}
 					<button
-						onClick={handleToggle}
+						className='auth-link'
 						type="button"
+						onClick={handleToggle}
 					>
-						<span>Sign in</span>
-						<ArrowheadIcon
-							fill="var(--signin-link)"
-							direction="right"
-						/>
+						Sign in ▸
 					</button>
 				</p>
 			</div>
@@ -308,6 +304,17 @@ export default function AuthPortal() {
 			</Container>
 		)
 
+	if (error)
+		return (
+			<Container>
+				<LogoContainer>
+					<Logo />
+				</LogoContainer>
+				<InnerContainer>
+					<p>Oops! Something went wrong. Please try again later.</p>
+				</InnerContainer>
+			</Container>
+		)
 	
 
 	return (
@@ -320,7 +327,6 @@ export default function AuthPortal() {
 					<div className="header">
 						<p>{currentView.heading}</p>
 					</div>
-					{error && <div className="error">{error.message || JSON.stringify(error)}</div>}
 					{currentView.form}
 					{currentView.legalese}
 					{isSignIn && currentView.help}
@@ -333,32 +339,32 @@ export default function AuthPortal() {
 				</FormContainer>
 				{isSignIn && signIn.textOverLine}
 				{isSignIn && (
-					<AuthButton
+					<button
 						onClick={() => setIsSignIn(!isSignIn)}
-						$text="Create your Scamazon account"
+						className='secondary-btn auth-btn'
 						type="button"
 					>
 						Create your Scamazon account
-					</AuthButton>
+					</button>
 				)}
 			</InnerContainer>
 
 			<GradientDivider $marginTop="var(--spacing-lg)" />
 			<ul className="legalese">
 				<li>
-					<span>Conditions of Use</span>
+					<span className='auth-link'>Conditions of Use</span>
 				</li>
 				<li>
-					<span>Privacy Notice</span>
+					<span className='auth-link'>Privacy Notice</span>
 				</li>
 				<li>
-					<span>Help</span>
+					<span className='auth-link'>Help</span>
 				</li>
 				<li>
-					<span>Cookies Notice</span>
+					<span className='auth-link'>Cookies Notice</span>
 				</li>
 				<li>
-					<span>Interest-Based Ads Notice</span>
+					<span className='auth-link'>Interest-Based Ads Notice</span>
 				</li>
 			</ul>
 			<div className="copyright">
@@ -370,20 +376,9 @@ export default function AuthPortal() {
 
 const Container = styled.div`
 	padding: var(--spacing-md) var(--spacing-lg);
-	button {
-		box-shadow: 0 2px 5px 0 rgba(213, 217, 217, 0.5);
-	}
 	p {
 		color: var(--dk-blue);
 		font-size: var(--font-xs);
-	}
-	span {
-		font-size: var(--font-xs);
-		color: var(--signin-link);
-		cursor: pointer;
-		&:hover {
-			text-decoration: underline;
-		}
 	}
 	div.header {
 		p {
@@ -498,20 +493,6 @@ const FormContainer = styled.div`
 		p {
 			font-weight: bold;
 		}
-		span {
-		}
-	}
-	div.need-help {
-		display: flex;
-		align-items: center;
-		gap: var(--spacing-xs);
-		svg {
-			width: 0.5rem;
-			margin-top: 0.025rem;
-			path {
-				stroke: var(--dk-blue);
-			}
-		}
 	}
 `
 
@@ -519,6 +500,12 @@ const Form = styled.form`
 	display: flex;
 	flex-direction: column;
 	gap: var(--spacing-md);
+
+	div.change-email {
+		display: inline-flex;
+		gap: var(--spacing-ms);
+	
+	}
 
 	div.input-group {
 		display: flex;
@@ -541,27 +528,6 @@ const Form = styled.form`
 				background-color: var(--input-focus-bg);
 			}
 		}
-	}
-`
-
-const AuthButton = styled.button`
-	width: 100%;
-	background-color: ${({ $text }) =>
-		$text === 'Continue' ? 'var(--yellow)' : 'var(--white)'};
-	color: var(--black);
-	border: ${({ $login }) =>
-		$login ? 'none' : '1px solid var(--border-grey)'};
-	padding: var(--spacing-ms) var(--spacing-md);
-	border-radius: var(--br-md);
-	font-size: clamp(var(--font-xs), 2vw, var(--font-sm));
-	cursor: pointer;
-	transition: var(--tr-fast);
-
-	&:hover {
-		background-color: ${({ $text }) =>
-			$text === 'Continue'
-				? 'var(--yellow-hover)'
-				: 'var(--continue-grey)'};
 	}
 `
 

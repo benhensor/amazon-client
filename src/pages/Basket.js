@@ -1,11 +1,15 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { useWindowWidth } from '../utils/useWindowWidth'
+import { setCurrentProduct } from '../redux/slices/productsSlice'
 import {
+	fetchUserBasket,
 	selectBasketItems,
-	selectBasketTotal,
-	updateQuantity,
+	updateItemQuantity,
 	removeItem,
+	removeItemFromBasket,
+	clearBasket,
 } from '../redux/slices/basketSlice'
 import { formatQuery } from '../utils/formatCategory'
 import BuyButton from '../components/buttons/BuyButton'
@@ -15,29 +19,53 @@ import styled from 'styled-components'
 
 export default function Basket() {
 	const dispatch = useDispatch()
+	const navigate = useNavigate()
 	const windowWidth = useWindowWidth()
 	const basketItems = useSelector(selectBasketItems)
-	const basketTotal = useSelector(selectBasketTotal)
+	// const basketTotal = useSelector(selectBasketItemCount)
+
+	const [basketTotal, setBasketTotal] = useState(0)
+
+	useEffect(() => {
+		console.log('Basket items:', basketItems)
+		console.log('Basket total:', basketTotal)
+	}, [basketItems, basketTotal])
+
+	useEffect(() => {
+		dispatch(fetchUserBasket())
+	}, [dispatch])
+
+	useEffect(() => {
+		const total = basketItems.reduce((acc, item) => {
+			return acc + item.price * item.quantity
+		}, 0)
+		setBasketTotal(total)
+	}, [basketItems])
+
+	const handleProductClick = (product) => {
+		dispatch(setCurrentProduct(product))
+		navigate(`/product/${product.id}`)
+	}
 
 	const handleQuantityChange = (e, item) => {
 		const newQuantity = parseInt(e.target.value, 10)
-		dispatch(updateQuantity({ id: item.id, quantity: newQuantity }))
+		dispatch(updateItemQuantity({ id: item.basketItemId, quantity: newQuantity }))
 	}
 
 	const handleAddQuantity = (itemId) => {
-		const item = basketItems.find((item) => item.id === itemId)
+		const item = basketItems.find((item) => item.basketItemId === itemId)
 		if (item) {
 			dispatch(
-				updateQuantity({ id: itemId, quantity: item.quantity + 1 })
+				updateItemQuantity({ id: itemId, quantity: item.quantity + 1 })
 			)
 		}
 	}
 
 	const handleSubtractQuantity = (itemId) => {
-		const item = basketItems.find((item) => item.id === itemId)
+		const item = basketItems.find((item) => item.basketItemId === itemId)
 		if (item && item.quantity > 1) {
 			dispatch(
-				updateQuantity({ id: itemId, quantity: item.quantity - 1 })
+				updateItemQuantity({ id: itemId, quantity: item.quantity - 1 })
 			)
 		} else if (item && item.quantity === 1) {
 			dispatch(removeItem(itemId))
@@ -45,7 +73,12 @@ export default function Basket() {
 	}
 
 	const handleDelete = (itemId) => {
-		dispatch(removeItem(itemId))
+		console.log('Deleting item:', itemId)
+		dispatch(removeItemFromBasket(itemId))
+	}
+
+	const handleClearBasket = () => {
+		dispatch(clearBasket())
 	}
 
 	const BasketItemControls = ({
@@ -62,7 +95,7 @@ export default function Basket() {
 						value={item.quantity}
 						onChange={(e) => handleQuantityChange(e, item)}
 					>
-						{[...Array(10)].map((_, i) => (
+						{[...Array(5)].map((_, i) => (
 							<option key={i + 1} value={i + 1}>
 								Qty: {i + 1}
 							</option>
@@ -71,7 +104,7 @@ export default function Basket() {
 				)}
 				{windowWidth <= 768 && (
 					<BasketQuantityBtn
-						itemId={item.id}
+						itemId={item.basketItemId}
 						quantity={item.quantity}
 						add={handleAddQuantity}
 						subtract={handleSubtractQuantity}
@@ -80,7 +113,7 @@ export default function Basket() {
 				)}
 				<Buttons>
 					<Pipe>|</Pipe>
-					<Control onClick={() => handleDelete(item.id)}>
+					<Control onClick={() => handleDelete(item.basketItemId)}>
 						Delete
 					</Control>
 					<Pipe>|</Pipe>
@@ -101,11 +134,15 @@ export default function Basket() {
 					<Select>
 						<input type="checkbox" />
 					</Select>
-					<Image>
+					<Image
+						onClick={() => handleProductClick(item)}
+					>
 						<img src={item.thumbnail} alt={item.name} />
 					</Image>
 					<Details>
-						<h3>{item.title}</h3>
+						<h3
+							onClick={() => handleProductClick(item)}
+						>{item.title}</h3>
 						<div className="price">
 							£{(item.price * item.quantity).toFixed(2)}
 						</div>
@@ -157,11 +194,15 @@ export default function Basket() {
 					<Select>
 						<input type="checkbox" />
 					</Select>
-					<Image>
+					<Image
+						onClick={() => handleProductClick(item)}
+					>
 						<img src={item.thumbnail} alt={item.name} />
 					</Image>
 					<Details>
-						<h3>{item.title}</h3>
+						<h3
+							onClick={() => handleProductClick(item)}
+						>{item.title}</h3>
 						<p>
 							{item.brand
 								? `by ${item.brand}`
@@ -215,28 +256,31 @@ export default function Basket() {
 						)}
 						<div className="basket-subheader">
 							<p>No items selected. (Select all items)</p>
-							<p>Price</p>
+							{windowWidth > 769 && <p>Price</p>}
 						</div>
+						<button
+							onClick={handleClearBasket}
+						>Clear All</button>
 					</div>
 					<div className="basket-items">
-						{basketItems.map((item, i) =>
+						{basketItems.map((basketItem) =>
 							windowWidth <= 768 ? (
 								<BasketItemMobile
-									key={i}
-									item={item}
+									key={basketItem.basketItemId}
+									item={basketItem}
 									handleQuantityChange={(e) =>
-										handleQuantityChange(e, item)
+										handleQuantityChange(e, basketItem.basketItemId)
 									}
-									handleDelete={() => handleDelete(item.id)}
+									handleDelete={() => handleDelete(basketItem.basketItemId)}
 								/>
 							) : (
 								<BasketItemDesktop
-									key={i}
-									item={item}
+									key={basketItem.id}
+									item={basketItem}
 									handleQuantityChange={(e) =>
-										handleQuantityChange(e, item)
+										handleQuantityChange(e, basketItem.basketItemId)
 									}
-									handleDelete={() => handleDelete(item.id)}
+									handleDelete={() => handleDelete(basketItem.basketItemId)}
 								/>
 							)
 						)}
@@ -439,6 +483,12 @@ const Image = styled.div`
 	height: 18rem;
 	border-radius: var(--br-lg);
 	border: 1px solid var(--lt-grey);
+	transition: var(--tr-fast);
+	&:hover {
+		cursor: pointer;
+		border: 1px solid var(--lt-text);
+
+	}
 
 	@media only screen and (max-width: 768px) {
 		width: 15rem;

@@ -1,18 +1,31 @@
 import React from 'react'
 import { Navigate } from 'react-router-dom'
+import { useSelector } from 'react-redux'
+//import { fetchUserProfile } from '../../redux/slices/userSlice' // Adjust the import path as needed
+
+
 
 const ProtectedRoute = ({ children }) => {
-	// const { isLoading, isAuthenticated } = useAuth()
+    //const dispatch = useDispatch()
+    const { isLoggedIn, loading, currentUser } = useSelector((state) => state.user)
 
-	// if (isLoading) {
-	// 	return <div>Loading...</div> 
-	// }
+    console.log('protected route', { isLoggedIn, loading, currentUser })
 
-	// if (!isAuthenticated) {
-	// 	return <Navigate to="/" replace />
-	// }
+    // useEffect(() => {
+    //     if (authToken && !isLoggedIn && !currentUser) {
+    //         dispatch(fetchUserProfile())
+    //     }
+    // }, [dispatch, authToken, isLoggedIn, currentUser])
 
-	return children
+    if (loading) {
+        return <div>Loading...</div> // Consider using a proper loading component
+    }
+
+    if (!isLoggedIn && !currentUser) {
+        return <Navigate to="/auth" replace />
+    }
+
+    return children
 }
 
 export default ProtectedRoute

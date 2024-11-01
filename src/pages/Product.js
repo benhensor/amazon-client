@@ -5,7 +5,7 @@ import {
 	fetchProductsByCategory,
 	fetchSingleProduct,
 } from '../redux/slices/productsSlice'
-import { addItem } from '../redux/slices/basketSlice'
+import { addItemToBasket } from '../redux/slices/basketSlice'
 import { superCategories } from '../utils/superCategories'
 import { formatQuery } from '../utils/formatCategory'
 import { useWindowWidth } from '../utils/useWindowWidth'
@@ -30,6 +30,13 @@ export default function Product() {
 	const [currentImage, setCurrentImage] = useState(
 		currentProduct?.images[0] || null
 	)
+	const [itemQuantity, setItemQuantity] = useState(1)
+
+	// debugging
+	useEffect(() => {
+		console.log('currentProduct:', currentProduct)
+		console.log('updateItemQuantity:', itemQuantity)
+	}, [currentProduct, itemQuantity])
 
 	useEffect(() => {
 		const loadProduct = async () => {
@@ -99,8 +106,8 @@ export default function Product() {
 		setCurrentImage(currentProduct.images[i])
 	}
 
-	const handleAddToBasketClick = (currentProduct) => {
-		dispatch(addItem(currentProduct))
+	const handleAddToBasketClick = (productId) => {
+		dispatch(addItemToBasket({productId, quantity: itemQuantity}))
 	}
 
 	const renderProductImages = () => {
@@ -200,8 +207,11 @@ export default function Product() {
 		return (
 			<InfoBlock>
 				<div className="button-container">
-					<QuantityBtn>Quantity:</QuantityBtn>
-					<BuyButton onClick={() => handleAddToBasketClick(currentProduct)} text="Add to Basket" type='large'/>
+					<QuantityBtn
+						quantity={itemQuantity}
+						setQuantity={setItemQuantity}
+					>Quantity:</QuantityBtn>
+					<BuyButton onClick={() => handleAddToBasketClick(currentProduct.id)} text="Add to Basket" type='large'/>
 					<BuyButton onClick={() => {}} text="Buy Now" type='large'/>
 				</div>
 			</InfoBlock>

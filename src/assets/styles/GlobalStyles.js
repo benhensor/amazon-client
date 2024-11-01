@@ -1,4 +1,4 @@
-import { createGlobalStyle } from 'styled-components';
+import { createGlobalStyle } from 'styled-components'
 
 const GlobalStyles = createGlobalStyle`
 
@@ -124,6 +124,7 @@ const GlobalStyles = createGlobalStyle`
     font-size: 1.6rem;
     line-height: 1.5;
     color: var(--black);
+    user-select: none;
   }
 
   main {
@@ -165,6 +166,16 @@ const GlobalStyles = createGlobalStyle`
     height: auto;
   }
 
+  .auth-link {
+    font-size: var(--font-xs);
+    color: var(--signin-link);
+    transition: var(--tr-fast);
+    cursor: pointer;
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
   .primary-link {
     color: var(--link-blue);
     transition: var(--tr-fast);
@@ -173,6 +184,17 @@ const GlobalStyles = createGlobalStyle`
       color: var(--link-hover);
       text-decoration: underline;
     }
+  }
+
+  .auth-btn {
+    box-shadow: 0 2px 5px 0 rgba(213, 217, 217, 0.5);
+    width: 100%;
+  }
+
+  .primary-btn, .secondary-btn {
+    padding: var(--spacing-sm) var(--spacing-md);
+	  border-radius: var(--br-md);
+    font-size: clamp(var(--font-xs), 2vw, var(--font-sm));
   }
 
   .primary-btn {
@@ -184,6 +206,7 @@ const GlobalStyles = createGlobalStyle`
   }
 
   .secondary-btn {
+    border: 1px solid var(--border-grey);
     background-color: var(--white);
     color: var(--black);
     &:hover {
@@ -199,4 +222,4 @@ const GlobalStyles = createGlobalStyle`
 
 `
 
-export default GlobalStyles;
+export default GlobalStyles
