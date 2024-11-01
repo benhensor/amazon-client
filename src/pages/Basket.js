@@ -6,6 +6,8 @@ import { setCurrentProduct } from '../redux/slices/productsSlice'
 import {
 	fetchUserBasket,
 	selectBasketItems,
+	selectBasketItemCount,
+	selectBasketTotal,
 	updateItemQuantity,
 	removeItem,
 	removeItemFromBasket,
@@ -22,9 +24,10 @@ export default function Basket() {
 	const navigate = useNavigate()
 	const windowWidth = useWindowWidth()
 	const basketItems = useSelector(selectBasketItems)
-	// const basketTotal = useSelector(selectBasketItemCount)
+	const basketCount = useSelector(selectBasketItemCount)
+	const basketTotal = useSelector(selectBasketTotal)
 
-	const [basketTotal, setBasketTotal] = useState(0)
+	// const [basketTotal, setBasketTotal] = useState(0)
 
 	useEffect(() => {
 		console.log('Basket items:', basketItems)
@@ -35,12 +38,12 @@ export default function Basket() {
 		dispatch(fetchUserBasket())
 	}, [dispatch])
 
-	useEffect(() => {
-		const total = basketItems.reduce((acc, item) => {
-			return acc + item.price * item.quantity
-		}, 0)
-		setBasketTotal(total)
-	}, [basketItems])
+	// useEffect(() => {
+	// 	const total = basketItems.reduce((acc, item) => {
+	// 		return acc + item.price * item.quantity
+	// 	}, 0)
+	// 	setBasketTotal(total)
+	// }, [basketItems])
 
 	const handleProductClick = (product) => {
 		dispatch(setCurrentProduct(product))
@@ -297,7 +300,7 @@ export default function Basket() {
 					<p>
 						Subtotal
 						{windowWidth >= 768 && (
-							<span> ({basketItems.length} items)</span>
+							<span> ({basketCount} items)</span>
 						)}
 						:<span> £{basketTotal.toFixed(2)}</span>
 					</p>

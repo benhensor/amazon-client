@@ -129,6 +129,7 @@ const basketSlice = createSlice({
         // Ensure we're not overwriting existing items if the payload is empty
         if (action.payload.items?.length > 0) {
           state.items = action.payload.items;
+          state.total = calculateTotal(state.items);
         }
         state.error = null;
       })
@@ -143,6 +144,7 @@ const basketSlice = createSlice({
           const existingIds = new Set(state.items.map(item => item.id));
           const newItems = items.filter(item => !existingIds.has(item.id));
           state.items = [...state.items, ...newItems];
+          state.total = calculateTotal(state.items);
         }
       })
       .addCase(updateItemQuantity.fulfilled, (state, action) => {
@@ -159,6 +161,7 @@ const basketSlice = createSlice({
             }
           });
           state.items = updatedItems;
+          state.total = calculateTotal(state.items);
         }
       })
       .addCase(removeItemFromBasket.pending, (state) => {
@@ -170,9 +173,11 @@ const basketSlice = createSlice({
         if (action.payload.message) {
           // Remove specific item while keeping others
           state.items = state.items.filter(item => item.basketItemId !== action.meta.arg);
+          state.total = calculateTotal(state.items);
         } else if (action.payload.items) {
           // Update with new items list while preserving structure
           state.items = action.payload.items;
+          state.total = calculateTotal(state.items);
         }
         state.error = null;
       })
@@ -206,6 +211,11 @@ export const selectBasketItemCount = createSelector(
     console.log('Basket count calculated:', count, items);
     return count;
   }
+);
+
+export const selectBasketTotal = createSelector(
+  [selectBasketItems],
+  (items) => calculateTotal(items)
 );
 
 export const { addItem, removeItem, updateQuantity, clearBasket: clearGuestBasket } = basketSlice.actions;
