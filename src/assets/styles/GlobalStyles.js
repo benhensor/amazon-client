@@ -12,6 +12,7 @@ const GlobalStyles = createGlobalStyle`
     --white: #fff;
     --black: #221F1F;
     --background-grey: #E3E6E6;
+    --checkout-grey: #F8F8F8;
     --continue-grey: #F7F7F7;
     --secondary-hover: #F7F7F7;
     --qty-select-grey: #F0F2F2;
@@ -212,6 +213,11 @@ const GlobalStyles = createGlobalStyle`
     &:hover {
       background-color: var(--secondary-hover);
     }
+  }
+
+  .pill-btn {
+    border-radius: var(--br-25);
+    width: 100%;
   }
 
   @media only screen and (max-width: 450px) {

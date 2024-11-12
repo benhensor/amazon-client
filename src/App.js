@@ -21,6 +21,7 @@ import Footer from './components/footer/Footer'
 import Addresses from './pages/Addresses'
 import AddNewAddress from './pages/AddNewAddress'
 import UnderConstruction from './pages/UnderConstruction'
+import Checkout from './pages/Checkout'
 
 const HeaderLayout = () => (
 	<>
@@ -95,6 +96,9 @@ function App() {
 			<Routes>
 				{/* Auth routes without header */}
 				<Route path="/auth" element={<AuthPortal />} />
+
+				{/* Checkout route without header */}
+				<Route path="/checkout" element={<Checkout />} />
 
 				{/* All other routes with header */}
 				<Route path="/*" element={<HeaderLayout />} />

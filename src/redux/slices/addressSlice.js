@@ -60,7 +60,7 @@ const addressSlice = createSlice({
       .addCase(setDefaultAddress.fulfilled, (state, action) => {
         state.addresses = state.addresses.map(address => ({
           ...address,
-          is_default: address.id === action.payload.id
+          is_default: address.address_id === action.payload.id
         }))
       })
       .addCase(setDefaultAddress.rejected, (state, action) => {
@@ -77,7 +77,7 @@ const addressSlice = createSlice({
 			.addCase(updateAddress.fulfilled, (state, action) => {
 				state.loading = false
 				const index = state.addresses.findIndex(
-					(addr) => addr.id === action.payload.id
+					(address) => address.address_id === action.payload.id
 				)
 				if (index !== -1) {
 					state.addresses[index] = action.payload

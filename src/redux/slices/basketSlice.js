@@ -15,7 +15,7 @@ const normalizeBasketData = async (apiResponse) => {
       try {
         const product = await getProductById(item.product_id);
         return {
-          basketItemId: parseInt(item.id, 10),
+          basketItemId: parseInt(item.basket_item_id, 10),
           ...product,
           quantity: item.quantity,
           is_selected: item.is_selected,
@@ -31,12 +31,12 @@ const normalizeBasketData = async (apiResponse) => {
   }
   
   // Handle single item response
-  if (apiResponse.id && apiResponse.product_id) {
+  if (apiResponse.basket_item_id && apiResponse.product_id) {
     try {
       const product = await getProductById(apiResponse.product_id);
       return {
         items: [{
-          basketItemId: parseInt(apiResponse.id, 10),
+          basketItemId: parseInt(apiResponse.basket_item_id, 10),
           ...product,
           quantity: apiResponse.quantity,
         }]
@@ -88,7 +88,6 @@ const basketSlice = createSlice({
       } else {
         state.items.push({ ...product, quantity, basketItemId: `guest-${Date.now()}` });
       }
-      
       // Update session storage with entire basket state
       sessionStorage.setItem('guestBasket', JSON.stringify({
         items: state.items,
@@ -138,6 +137,8 @@ const basketSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
+
+    builder
       .addCase(toggleItemSelected.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -156,18 +157,30 @@ const basketSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
+
+    builder
       .addCase(toggleGuestItemSelected, (state, action) => {
         const { basketItemId } = action.payload;
         const itemIndex = state.items.findIndex(item => item.basketItemId === basketItemId);
         if (itemIndex !== -1) {
           state.items[itemIndex].is_selected = !state.items[itemIndex].is_selected;
         }
-      })      
+      })  
+      
+    builder
       .addCase(selectAllItems.fulfilled, (state) => {
         state.items.forEach(item => item.is_selected = true);
       })
+
+    builder
       .addCase(deselectAllItems.fulfilled, (state) => {
         state.items.forEach(item => item.is_selected = false);
+      })
+
+    builder
+      .addCase(updateItemQuantity.pending, (state) => {
+        state.loading = true;
+        state.error = null;
       })
       .addCase(updateItemQuantity.fulfilled, (state, action) => {
         const { items } = action.payload;
@@ -186,6 +199,12 @@ const basketSlice = createSlice({
           state.total = calculateTotal(state.items);
         }
       })
+      .addCase(updateItemQuantity.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+    builder
       .addCase(removeItemFromBasket.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -207,6 +226,8 @@ const basketSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
+
+    builder
       .addCase(clearBasket.fulfilled, (state) => {
         state.items = [];
         state.total = 0;
@@ -332,19 +353,19 @@ export const addItemToBasket = createAsyncThunk(
 
 export const updateItemQuantity = createAsyncThunk(
   'basket/updateItemQuantity',
-  async ({ id, quantity }, { getState, dispatch, rejectWithValue }) => {
+  async ({ basketItemId, quantity }, { getState, dispatch, rejectWithValue }) => {
     try {
       const { user } = getState();
       if (user.isLoggedIn) {
         const response = await axios.put(
-          `${API_URL}/api/basket/update/${id}`, 
+          `${API_URL}/api/basket/update/${basketItemId}`, 
           { quantity }, 
           { withCredentials: true }
         );
         return normalizeBasketData(response.data);
       } else {
-        dispatch(updateQuantity({ id, quantity }));
-        return { id, quantity };
+        dispatch(updateQuantity({ quantity }));
+        return { basketItemId, quantity };
       }
     } catch (error) {
       return rejectWithValue(error.response?.data || 'Failed to update quantity');
@@ -355,7 +376,6 @@ export const updateItemQuantity = createAsyncThunk(
 export const toggleItemSelected = createAsyncThunk(
   'basket/toggleItemSelected',
   async (id, { getState, dispatch, rejectWithValue }) => {
-    console.log('Toggling item selection:', id);
     try {
       const { user, basket } = getState();
       const currentItem = basket.items.find(item => item.basketItemId === id);

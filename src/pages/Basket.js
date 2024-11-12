@@ -7,7 +7,6 @@ import {
 	fetchUserBasket,
 	selectBasketItems,
 	selectBasketItemsSelected,
-	selectBasketItemCount,
 	selectBasketTotal,
 	toggleItemSelected,
 	selectAllItems,
@@ -29,15 +28,14 @@ export default function Basket() {
 	const windowWidth = useWindowWidth()
 	const basketItems = useSelector(selectBasketItems)
 	const basketItemsSelected = useSelector(selectBasketItemsSelected)
-	const basketCount = useSelector(selectBasketItemCount)
 	const basketTotal = useSelector(selectBasketTotal)
 
 	const [selectAll, setSelectAll] = useState(false)
 
-	useEffect(() => {
-		console.log('Basket items:', basketItems)
-		console.log('Basket total:', basketTotal)
-	}, [basketItems, basketTotal])
+	// useEffect(() => {
+	// 	console.log('Basket items:', basketItems)
+	// 	console.log('Basket total:', basketTotal)
+	// }, [basketItems, basketTotal])
 
 	useEffect(() => {
 		if (basketItems.length === 0) {
@@ -51,35 +49,38 @@ export default function Basket() {
 	}
 
 	const handleQuantityChange = (e, item) => {
+		console.log(item)
 		const newQuantity = parseInt(e.target.value, 10)
 		dispatch(
-			updateItemQuantity({ id: item.basketItemId, quantity: newQuantity })
+			updateItemQuantity({ basketItemId: item.basketItemId, quantity: newQuantity })
 		)
 	}
 
 	const handleAddQuantity = (itemId) => {
+		console.log('Adding quantity to:', itemId)
 		const item = basketItems.find((item) => item.basketItemId === itemId)
 		if (item) {
 			dispatch(
-				updateItemQuantity({ id: itemId, quantity: item.quantity + 1 })
+				updateItemQuantity({ basketItemId: itemId, quantity: item.quantity + 1 })
 			)
 		}
 	}
 
 	const handleSubtractQuantity = (itemId) => {
+		console.log('Adding quantity to:', itemId)
 		const item = basketItems.find((item) => item.basketItemId === itemId)
 		if (item && item.quantity > 1) {
 			dispatch(
-				updateItemQuantity({ id: itemId, quantity: item.quantity - 1 })
+				updateItemQuantity({ basketItemId: itemId, quantity: item.quantity - 1 })
 			)
 		} else if (item && item.quantity === 1) {
 			dispatch(removeItem(itemId))
 		}
 	}
 
-	const handleDelete = (itemId) => {
-		console.log('Deleting item:', itemId)
-		dispatch(removeItemFromBasket(itemId))
+	const handleDelete = (basketItemId) => {
+		console.log('Deleting item:', basketItemId)
+		dispatch(removeItemFromBasket(basketItemId))
 	}
 
 	const handleClearBasket = () => {
@@ -98,6 +99,14 @@ export default function Basket() {
 	const handleToggleItemSelected = (basketItemId) => {
 		console.log('Toggling item:', basketItemId)
 		dispatch(toggleItemSelected(basketItemId))
+	}
+
+	const handleCheckoutClick = () => {
+		if (basketItemsSelected.length > 1) {
+			navigate('/checkout')
+		} else {
+			return
+		}
 	}
 
 	const ItemSelect = (item) => {
@@ -278,12 +287,17 @@ export default function Basket() {
 						) : (
 							<h1>Your Scamazon Basket is empty</h1>
 						)}
-						<div className="basket-subheader">
-							<button className="primary-link" onClick={handleToggleSelectAll}>
-								{selectAll ? 'Deselect all items' : 'No items selected. Select All'}
-							</button>
-							{windowWidth > 769 && <p>Price</p>}
-						</div>
+						{basketItems.length > 0 && (
+							<div className="basket-subheader">
+								<div>
+									{!selectAll && <p>No items selected.</p>}
+									<button className="primary-link" onClick={handleToggleSelectAll}>
+										{selectAll ? 'Deselect all items' : 'Select all items'}
+									</button>
+								</div>
+								{windowWidth > 769 && <p>Price</p>}
+							</div>
+						)}
 					</div>
 					<div className="basket-items">
 						{basketItems.map((basketItem) =>
@@ -318,13 +332,15 @@ export default function Basket() {
 							)
 						)}
 					</div>
-					<div className="subtotal">
-						<button className="primary-link" onClick={handleClearBasket}>Remove all items</button>
-						<p>
-							Subtotal ({basketItems.length} items):{' '}
-							<span>£{basketTotal.toFixed(2)}</span>
-						</p>
-					</div>
+					{basketItems.length > 0 && (
+						<div className="subtotal">
+							<button className="primary-link" onClick={handleClearBasket}>Remove all items</button>
+							<p>
+								Subtotal ({basketItems.length} items):{' '}
+								<span>£{basketTotal.toFixed(2)}</span>
+							</p>
+						</div>
+					)}
 				</ShoppingBasketItems>
 
 				<Subtotal>
@@ -360,6 +376,7 @@ export default function Basket() {
 									? `Proceed to Checkout`
 									: `Proceed to Checkout (${basketItemsSelected.length} item${basketItemsSelected.length > 1 ? 's' : ''})`
 							}
+							onClick={handleCheckoutClick}
 						/>
 					</div>
 				</Subtotal>
@@ -412,8 +429,18 @@ const ShoppingBasketItems = styled.div`
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
+		div {
+			display: flex;
+			align-items: center;
+			gap: var(--spacing-xs);
+		}
+		p, button {
+			font-size: clamp(var(--font-sm), 2vw, var(--font-md));
+		}
 		button {
-			font-size: var(--font-md);
+			margin: 0;
+			padding: 0;
+			line-height: 1;
 		}
 	}
 	div.subtotal {

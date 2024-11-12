@@ -68,10 +68,10 @@ export default function Addresses() {
 				<BlockContainer>
 					<div
 						className={`container ${
-							address.id ? 'border-solid' : 'border-dash'
+							address.address_id ? 'border-solid' : 'border-dash'
 						}`}
 					>
-						{address.id ? (
+						{address.address_id ? (
 							<>
 								{address.is_default && (
 									<div className="default">
@@ -100,7 +100,7 @@ export default function Addresses() {
 										<button
 											className="primary-link"
 											onClick={() =>
-												handleEdit(address.id)
+												handleEdit(address.address_id)
 											}
 										>
 											Edit
@@ -109,7 +109,7 @@ export default function Addresses() {
 										<button
 											className="primary-link"
 											onClick={() =>
-												handleDelete(address.id)
+												handleDelete(address.address_id)
 											}
 										>
 											Remove
@@ -121,7 +121,7 @@ export default function Addresses() {
 													className="primary-link"
 													onClick={() =>
 														changeDefaultAddress(
-															address.id
+															address.address_id
 														)
 													}
 												>
@@ -173,7 +173,7 @@ export default function Addresses() {
 						<AddressBlock address={{}} />
 					</Link>
 					{sortedAddresses.map((address) => (
-						<AddressBlock key={address.id} address={address} />
+						<AddressBlock key={address.address_id} address={address} />
 					))}
 				</LayoutGrid>
 			</Page>

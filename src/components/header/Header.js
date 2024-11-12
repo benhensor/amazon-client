@@ -45,14 +45,14 @@ export default function Header() {
 	const defaultAddress = useSelector((state) =>
 		state.addresses.addresses.find((address) => address.is_default)
 	)
-	const cartItemCount = useSelector(selectBasketItemCount)
+	const basketCount = useSelector(selectBasketItemCount)
 
 	const [categoryMenuOpen, setCategoryMenuOpen] = useState(false)
 	const [navMenuOpen, setNavMenuOpen] = useState(false)
 
 	useEffect(() => {
-		console.log('header', currentUser)
-	}, [currentUser])
+		console.log('header', basketCount)
+	}, [basketCount])
 
 	const handleSearch = (searchTerm, category) => {
 		if (searchTerm.trim()) {
@@ -80,8 +80,6 @@ export default function Header() {
 	const handleHeaderItemClick = (destination) => {
 		navigate(destination)
 	}
-
-
 
 	// Reusable components
 	const LogoSection = () => (
@@ -121,9 +119,7 @@ export default function Header() {
 						<LocationIcon />
 						<div className="delivery">
 							<p>Delivering to...</p>
-							<span>
-							  Change location
-							</span>
+							<span>Change location</span>
 						</div>
 					</div>
 				</button>
@@ -135,7 +131,15 @@ export default function Header() {
 		<HeaderItem>
 			<BasketContainer onClick={() => handleBasketClick()}>
 				<BasketIcon />
-				{cartItemCount > 0 && <p className="total">{cartItemCount}</p>}
+				{basketCount > 0 && (
+					<p
+						className={`total ${
+							basketCount >= 10 ? 'over-ten' : ''
+						}`}
+					>
+						{basketCount}
+					</p>
+				)}
 				<span>Basket</span>
 			</BasketContainer>
 		</HeaderItem>
@@ -169,7 +173,10 @@ export default function Header() {
 							<p>Hello {currentUser?.first_name}</p>
 							<span>
 								Account & Lists
-								<ArrowheadIcon fill="var(--lt-grey)" direction='down'/>
+								<ArrowheadIcon
+									fill="var(--lt-grey)"
+									direction="down"
+								/>
 							</span>
 						</button>
 					) : (
@@ -180,7 +187,10 @@ export default function Header() {
 							<p>Hello, Sign in</p>
 							<span>
 								Account & Lists
-								<ArrowheadIcon fill="var(--lt-grey)" direction='down'/>
+								<ArrowheadIcon
+									fill="var(--lt-grey)"
+									direction="down"
+								/>
 							</span>
 						</button>
 					)}
@@ -428,6 +438,9 @@ const BasketContainer = styled.div`
 		border-radius: 50%;
 		font-size: var(--font-md);
 		font-weight: bold;
+	}
+	p.total.over-ten {
+		left: 1.3rem;
 	}
 	span {
 		font-size: var(--font-sm);
