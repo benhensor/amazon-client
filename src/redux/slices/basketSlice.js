@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk, createSelector } from '@reduxjs/toolkit';
+import { createSlice, createAction, createAsyncThunk, createSelector } from '@reduxjs/toolkit';
 import { getProductById } from '../../api/productsAPI';
 import axios from 'axios';
 
@@ -15,9 +15,10 @@ const normalizeBasketData = async (apiResponse) => {
       try {
         const product = await getProductById(item.product_id);
         return {
-          basketItemId: item.id,
-          ...product, // Spread all product details
+          basketItemId: parseInt(item.id, 10),
+          ...product,
           quantity: item.quantity,
+          is_selected: item.is_selected,
         };
       } catch (error) {
         console.error(`Error fetching product ${item.product_id}:`, error);
@@ -35,7 +36,7 @@ const normalizeBasketData = async (apiResponse) => {
       const product = await getProductById(apiResponse.product_id);
       return {
         items: [{
-          basketItemId: apiResponse.id,
+          basketItemId: parseInt(apiResponse.id, 10),
           ...product,
           quantity: apiResponse.quantity,
         }]
@@ -137,15 +138,36 @@ const basketSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-      .addCase(addItemToBasket.fulfilled, (state, action) => {
-        const { items } = action.payload;
-        if (items?.length > 0) {
-          // Merge new items with existing ones
-          const existingIds = new Set(state.items.map(item => item.id));
-          const newItems = items.filter(item => !existingIds.has(item.id));
-          state.items = [...state.items, ...newItems];
-          state.total = calculateTotal(state.items);
+      .addCase(toggleItemSelected.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(toggleItemSelected.fulfilled, (state, action) => {
+        state.loading = false;
+        const { basketItemId, is_selected } = action.payload;
+      
+        // Find and update the is_selected for the item
+        const itemIndex = state.items.findIndex(item => item.basketItemId === basketItemId);
+        if (itemIndex !== -1) {
+          state.items[itemIndex].is_selected = is_selected;
         }
+      })
+      .addCase(toggleItemSelected.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(toggleGuestItemSelected, (state, action) => {
+        const { basketItemId } = action.payload;
+        const itemIndex = state.items.findIndex(item => item.basketItemId === basketItemId);
+        if (itemIndex !== -1) {
+          state.items[itemIndex].is_selected = !state.items[itemIndex].is_selected;
+        }
+      })      
+      .addCase(selectAllItems.fulfilled, (state) => {
+        state.items.forEach(item => item.is_selected = true);
+      })
+      .addCase(deselectAllItems.fulfilled, (state) => {
+        state.items.forEach(item => item.is_selected = false);
       })
       .addCase(updateItemQuantity.fulfilled, (state, action) => {
         const { items } = action.payload;
@@ -211,6 +233,11 @@ export const selectBasketItemCount = createSelector(
     console.log('Basket count calculated:', count, items);
     return count;
   }
+);
+
+export const selectBasketItemsSelected = createSelector(
+  [selectBasketItems],
+  items => items.filter(item => item.is_selected)
 );
 
 export const selectBasketTotal = createSelector(
@@ -323,6 +350,79 @@ export const updateItemQuantity = createAsyncThunk(
       return rejectWithValue(error.response?.data || 'Failed to update quantity');
     }
   }
+);
+
+export const toggleItemSelected = createAsyncThunk(
+  'basket/toggleItemSelected',
+  async (id, { getState, dispatch, rejectWithValue }) => {
+    console.log('Toggling item selection:', id);
+    try {
+      const { user, basket } = getState();
+      const currentItem = basket.items.find(item => item.basketItemId === id);
+      const newIsSelected = !currentItem.is_selected;
+
+      if (user.isLoggedIn) {
+        await axios.put(
+          `${API_URL}/api/basket/select/${id}`,
+          { is_selected: newIsSelected },
+          { withCredentials: true }
+        );
+        return { basketItemId: id, is_selected: newIsSelected };
+      } else {
+        // For guest users, update the local state directly
+        dispatch(toggleGuestItemSelected(id));
+        return { basketItemId: id, is_selected: newIsSelected };
+      }
+    } catch (error) {
+      return rejectWithValue(error.response?.data || 'Failed to update selection');
+    }
+  }
+);
+
+export const selectAllItems = createAsyncThunk(
+  'basket/selectAllItems',
+  async (_, { getState, dispatch }) => {
+    try {
+      const { user } = getState();
+      if (user.isLoggedIn) {
+        const response = await axios.put(`${API_URL}/api/basket/select-all`, {}, { withCredentials: true });
+        return response.data;
+      } else {
+        // For guest users, update all items in the basket
+        dispatch(toggleGuestItemSelected('all'));
+        return { message: 'All items selected' };
+      }
+    } catch (error) {
+      return error.response?.data || 'Failed to select all items';
+    }
+  }
+);
+
+export const deselectAllItems = createAsyncThunk(
+  'basket/deselectAllItems',
+  async (_, { getState, dispatch }) => {
+    try {
+      const { user } = getState();
+      if (user.isLoggedIn) {
+        const response = await axios.put(`${API_URL}/api/basket/deselect-all`, {}, { withCredentials: true });
+        return response.data;
+      } else {
+        // For guest users, deselect all items in the basket
+        dispatch(toggleGuestItemSelected('none'));
+        return { message: 'All items deselected' };
+      }
+    } catch (error) {
+      return error.response?.data || 'Failed to deselect all items';
+    }
+  }
+);
+
+// New action creator for guest users
+export const toggleGuestItemSelected = createAction(
+  'basket/toggleGuestItemSelected',
+  (basketItemId) => ({
+    payload: { basketItemId }
+  })
 );
 
 export const removeItemFromBasket = createAsyncThunk(

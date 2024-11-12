@@ -6,8 +6,12 @@ import { setCurrentProduct } from '../redux/slices/productsSlice'
 import {
 	fetchUserBasket,
 	selectBasketItems,
+	selectBasketItemsSelected,
 	selectBasketItemCount,
 	selectBasketTotal,
+	toggleItemSelected,
+	selectAllItems,
+	deselectAllItems,
 	updateItemQuantity,
 	removeItem,
 	removeItemFromBasket,
@@ -24,10 +28,11 @@ export default function Basket() {
 	const navigate = useNavigate()
 	const windowWidth = useWindowWidth()
 	const basketItems = useSelector(selectBasketItems)
+	const basketItemsSelected = useSelector(selectBasketItemsSelected)
 	const basketCount = useSelector(selectBasketItemCount)
 	const basketTotal = useSelector(selectBasketTotal)
 
-	// const [basketTotal, setBasketTotal] = useState(0)
+	const [selectAll, setSelectAll] = useState(false)
 
 	useEffect(() => {
 		console.log('Basket items:', basketItems)
@@ -35,15 +40,10 @@ export default function Basket() {
 	}, [basketItems, basketTotal])
 
 	useEffect(() => {
-		dispatch(fetchUserBasket())
-	}, [dispatch])
-
-	// useEffect(() => {
-	// 	const total = basketItems.reduce((acc, item) => {
-	// 		return acc + item.price * item.quantity
-	// 	}, 0)
-	// 	setBasketTotal(total)
-	// }, [basketItems])
+		if (basketItems.length === 0) {
+			dispatch(fetchUserBasket());
+		}
+	}, [dispatch, basketItems.length]);	
 
 	const handleProductClick = (product) => {
 		dispatch(setCurrentProduct(product))
@@ -52,7 +52,9 @@ export default function Basket() {
 
 	const handleQuantityChange = (e, item) => {
 		const newQuantity = parseInt(e.target.value, 10)
-		dispatch(updateItemQuantity({ id: item.basketItemId, quantity: newQuantity }))
+		dispatch(
+			updateItemQuantity({ id: item.basketItemId, quantity: newQuantity })
+		)
 	}
 
 	const handleAddQuantity = (itemId) => {
@@ -82,6 +84,33 @@ export default function Basket() {
 
 	const handleClearBasket = () => {
 		dispatch(clearBasket())
+	}
+
+	const handleToggleSelectAll = () => {
+		setSelectAll(!selectAll)
+		if (!selectAll) {
+			dispatch(selectAllItems())
+		} else {
+			dispatch(deselectAllItems())
+		}
+	}
+
+	const handleToggleItemSelected = (basketItemId) => {
+		console.log('Toggling item:', basketItemId)
+		dispatch(toggleItemSelected(basketItemId))
+	}
+
+	const ItemSelect = (item) => {
+		return (
+			<Select>
+				<input
+					type="checkbox"
+					checked={item.is_selected}
+					onChange={() => handleToggleItemSelected(item.basketItemId)}
+
+				/>
+			</Select>
+		)
 	}
 
 	const BasketItemControls = ({
@@ -134,18 +163,14 @@ export default function Basket() {
 		return (
 			<BasketItemContainer>
 				<Content>
-					<Select>
-						<input type="checkbox" />
-					</Select>
-					<Image
-						onClick={() => handleProductClick(item)}
-					>
+					{ItemSelect(item)}
+					<Image onClick={() => handleProductClick(item)}>
 						<img src={item.thumbnail} alt={item.name} />
 					</Image>
 					<Details>
-						<h3
-							onClick={() => handleProductClick(item)}
-						>{item.title}</h3>
+						<h3 onClick={() => handleProductClick(item)}>
+							{item.title}
+						</h3>
 						<div className="price">
 							£{(item.price * item.quantity).toFixed(2)}
 						</div>
@@ -194,18 +219,14 @@ export default function Basket() {
 		return (
 			<BasketItemContainer>
 				<Content>
-					<Select>
-						<input type="checkbox" />
-					</Select>
-					<Image
-						onClick={() => handleProductClick(item)}
-					>
+					{ItemSelect(item)}
+					<Image onClick={() => handleProductClick(item)}>
 						<img src={item.thumbnail} alt={item.name} />
 					</Image>
 					<Details>
-						<h3
-							onClick={() => handleProductClick(item)}
-						>{item.title}</h3>
+						<h3 onClick={() => handleProductClick(item)}>
+							{item.title}
+						</h3>
 						<p>
 							{item.brand
 								? `by ${item.brand}`
@@ -258,12 +279,11 @@ export default function Basket() {
 							<h1>Your Scamazon Basket is empty</h1>
 						)}
 						<div className="basket-subheader">
-							<p>No items selected. (Select all items)</p>
+							<button className="primary-link" onClick={handleToggleSelectAll}>
+								{selectAll ? 'Deselect all items' : 'No items selected. Select All'}
+							</button>
 							{windowWidth > 769 && <p>Price</p>}
 						</div>
-						<button
-							onClick={handleClearBasket}
-						>Clear All</button>
 					</div>
 					<div className="basket-items">
 						{basketItems.map((basketItem) =>
@@ -272,23 +292,34 @@ export default function Basket() {
 									key={basketItem.basketItemId}
 									item={basketItem}
 									handleQuantityChange={(e) =>
-										handleQuantityChange(e, basketItem.basketItemId)
+										handleQuantityChange(
+											e,
+											basketItem.basketItemId
+										)
 									}
-									handleDelete={() => handleDelete(basketItem.basketItemId)}
+									handleDelete={() =>
+										handleDelete(basketItem.basketItemId)
+									}
 								/>
 							) : (
 								<BasketItemDesktop
-									key={basketItem.id}
+									key={basketItem.basketItemId}
 									item={basketItem}
 									handleQuantityChange={(e) =>
-										handleQuantityChange(e, basketItem.basketItemId)
+										handleQuantityChange(
+											e,
+											basketItem.basketItemId
+										)
 									}
-									handleDelete={() => handleDelete(basketItem.basketItemId)}
+									handleDelete={() =>
+										handleDelete(basketItem.basketItemId)
+									}
 								/>
 							)
 						)}
 					</div>
 					<div className="subtotal">
+						<button className="primary-link" onClick={handleClearBasket}>Remove all items</button>
 						<p>
 							Subtotal ({basketItems.length} items):{' '}
 							<span>£{basketTotal.toFixed(2)}</span>
@@ -297,25 +328,37 @@ export default function Basket() {
 				</ShoppingBasketItems>
 
 				<Subtotal>
-					<p>
-						Subtotal
+					{basketItemsSelected.length > 0 ? (
+						<>
+						<p>
+							Subtotal
+							{windowWidth >= 768 && (
+								<span> ({basketItemsSelected.length + ' '} 
+
+								item
+								{basketItemsSelected.length > 1 ? 's' : ''}
+								)</span>
+							)}
+							:<span> £{basketTotal.toFixed(2)}</span>
+						</p>
 						{windowWidth >= 768 && (
-							<span> ({basketCount} items)</span>
+							<div className="order-gift">
+								<input type="checkbox" />
+								<p>This order contains a gift</p>
+							</div>
 						)}
-						:<span> £{basketTotal.toFixed(2)}</span>
-					</p>
-					{windowWidth >= 768 && (
-						<div className="order-gift">
-							<input type="checkbox" />
-							<p>This order contains a gift</p>
-						</div>
+						</>
+					) : (
+						<p className="none-selected">
+							No items selected
+						</p>
 					)}
 					<div className="checkout-btn">
 						<BuyButton
 							text={
-								windowWidth >= 768
+								windowWidth >= 768 && basketItemsSelected.length === 0
 									? `Proceed to Checkout`
-									: `Proceed to Checkout (${basketItems.length} items)`
+									: `Proceed to Checkout (${basketItemsSelected.length} item${basketItemsSelected.length > 1 ? 's' : ''})`
 							}
 						/>
 					</div>
@@ -369,10 +412,17 @@ const ShoppingBasketItems = styled.div`
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
+		button {
+			font-size: var(--font-md);
+		}
 	}
 	div.subtotal {
 		margin: var(--spacing-md) 0;
-		text-align: right;
+		display: flex;
+		justify-content: space-between;
+		button {
+			font-size: var(--font-lg);
+		}
 		p {
 			font-size: var(--font-lg);
 			span {
@@ -466,11 +516,13 @@ const Content = styled.div`
 `
 
 const Select = styled.div`
-	align-self: center;
+	margin: auto 0;
 	input {
+		cursor: pointer;
 		width: 2rem;
 		height: 2rem;
 		accent-color: var(--checkbox-bg);
+		display: flex;
 	}
 
 	@media only screen and (max-width: 768px) {
@@ -490,7 +542,6 @@ const Image = styled.div`
 	&:hover {
 		cursor: pointer;
 		border: 1px solid var(--lt-text);
-
 	}
 
 	@media only screen and (max-width: 768px) {
@@ -580,6 +631,9 @@ const Subtotal = styled.div`
 	height: fit-content;
 	padding: var(--spacing-md);
 	background-color: var(--white);
+	.none-selected {
+		font-weight: bold;
+	}
 	p {
 		font-size: var(--font-md);
 		span {
@@ -595,7 +649,7 @@ const Subtotal = styled.div`
 		}
 	}
 	div.checkout-btn {
-		margin-top: var(--spacing-md);
+		margin-top: var(--spacing-sm);
 	}
 
 	@media only screen and (max-width: 1199px) {
