@@ -117,6 +117,7 @@ export const checkLoggedIn = createAsyncThunk(
       const response = await axios.get(`${API_URL}/api/user/current`, {
         withCredentials: true,
       })
+			console.log(response.data.user)
       return response.data
     } catch (error) {
       // If it's a 401 (Unauthorized) or 403 (Forbidden), treat it as a non-error case
