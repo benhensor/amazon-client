@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom'
 import { useWindowWidth } from '../../utils/useWindowWidth'
@@ -49,10 +49,6 @@ export default function Header() {
 
 	const [categoryMenuOpen, setCategoryMenuOpen] = useState(false)
 	const [navMenuOpen, setNavMenuOpen] = useState(false)
-
-	useEffect(() => {
-		console.log('header', basketCount)
-	}, [basketCount])
 
 	const handleSearch = (searchTerm, category) => {
 		if (searchTerm.trim()) {

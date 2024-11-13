@@ -38,10 +38,8 @@ export default function Basket() {
 	// }, [basketItems, basketTotal])
 
 	useEffect(() => {
-		if (basketItems.length === 0) {
-			dispatch(fetchUserBasket());
-		}
-	}, [dispatch, basketItems.length]);	
+		dispatch(fetchUserBasket());
+	}, [dispatch]);	
 
 	const handleProductClick = (product) => {
 		dispatch(setCurrentProduct(product))

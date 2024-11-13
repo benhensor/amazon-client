@@ -1,613 +1,759 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
+import { format, addBusinessDays } from 'date-fns'
 import Logo from '../icons/Logo'
 import BasketIcon from '../icons/BasketIcon'
 import GiftCard from '../assets/img/checkout/gift-card.png'
 import Footer from '../components/footer/Footer'
 import styled from 'styled-components'
 
-export default function Checkout() {
-	const navigate = useNavigate()
-	const currentUser = useSelector((state) => state.user.currentUser)
-	const defaultAddress = useSelector((state) =>
-		state.addresses.addresses.find((address) => address.is_default)
-	)
-	const basketItems = useSelector((state) => state.basket.items)
-	const itemsTotal = useSelector((state) => state.basket.total)
-	const orderTotal = itemsTotal + 3.99
-	const { address_line1, address_line2, city, postcode, county, country } =
-		defaultAddress
+// Separate components for better organization
+const HeaderLogo = () => (
+	<Link to="/">
+		<StyledLogo>
+			<Logo letterColor="var(--white)" />
+			<p>.co.uk</p>
+		</StyledLogo>
+	</Link>
+)
 
-	console.log(basketItems)
+const BasketButton = ({ onClick }) => (
+	<StyledBasket onClick={onClick}>
+		<BasketIcon />
+		<span>Basket</span>
+	</StyledBasket>
+)
 
-	const handleBasketClick = () => {
-		navigate('/basket')
-	}
+const GiftCardOffer = () => (
+	<StyledGiftCard>
+		<div className="image">
+			<img src={GiftCard} alt="Scamazon gift card" />
+		</div>
+		<div className="details">
+			Get a{' '}
+			<strike>
+				<strong className="old-price">£20</strong>
+			</strike>{' '}
+			<span className="new-price">
+				<strong>£30</strong>
+			</span>{' '}
+			<strong>Gift Card</strong> if approved for{' '}
+			<strong>The Scamazon Gnarlaycard</strong>.{' '}
+			<span className="primary-link">
+				<strong>Apply now</strong>
+			</span>
+			. <strong>Representative 28.9% APR variable</strong>. Credit broker:
+			Scamazon EU S.A.R.L. Lender: Gnarlays. T&Cs apply.
+		</div>
+	</StyledGiftCard>
+)
 
-	const handleChangeAddress = () => {
-		navigate('/addresses')
-	}
+const PrivacyNotice = () => (
+	<p className="small">
+		By placing your order you agree to Scamazon's{' '}
+		<span className="primary-link">Conditions of Use & Sale</span>. Please
+		see our <span className="primary-link">Privacy Notice</span>, our{' '}
+		<span className="primary-link">Cookies Notice</span> and our{' '}
+		<span className="primary-link">Interest-Based Ads Notice</span>.
+	</p>
+)
+
+const ReturnPolicy = () => (
+	<section className="return-policy">
+		<p>
+			Need help? Check our{' '}
+			<span className="primary-link">help pages</span> or{' '}
+			<span className="primary-link">contact us</span>
+		</p>
+		<p>
+			When you click the "Buy now" button, we'll send you an e-mail
+			message acknowledging receipt of your order. Your contract to
+			purchase an item will not be complete until we send you an e-mail to
+			indicate that the item has been dispatched.
+		</p>
+		<p>
+			Within 30 days of delivery, you may return new, unopened physical
+			merchandise in its original condition. Exceptions and restrictions
+			apply. See Scamazon's{' '}
+			<span className="primary-link">Return Policy</span>.
+		</p>
+		<Link to="/basket" className="primary-link">
+			Back to basket
+		</Link>
+	</section>
+)
+
+const PaymentSection = () => (
+	<section className="payment">
+		<div>
+			<h3>Payment method</h3>
+			<button className="primary-link">
+				Use a gift card, voucher or promo code
+			</button>
+		</div>
+		<button className="primary-link">Change</button>
+	</section>
+)
+
+const DeliveryOption = ({ option, selected, onChange, shippingOption }) => {
+	if (!shippingOption) return null
 
 	return (
-		<CheckoutPage>
-			<Header id="header">
-				<HeaderContent>
-					<HeaderItem>
-						<Link to="/">
-							<LogoContainer>
-								<Logo letterColor="var(--white)" />
-								<p>.co.uk</p>
-							</LogoContainer>
-						</Link>
-					</HeaderItem>
-					<div>
-						<h1>Secure checkout</h1>
+		<StyledDeliveryOption>
+			<input
+				type="radio"
+				checked={selected === option}
+				onChange={() => onChange(option)}
+				name="shipping"
+			/>
+			<div>
+				<p>
+					<strong>{shippingOption.dates}</strong>
+				</p>
+				<p className="small">
+					£{shippingOption.price.toFixed(2)} - {shippingOption.label}
+				</p>
+				<p className="small description">
+					{shippingOption.description}
+				</p>
+			</div>
+		</StyledDeliveryOption>
+	)
+}
+
+const OrderItem = ({ item }) => {
+	return (
+		<StyledOrderItem>
+			<div className="details">
+				<div className="row">
+					<div className="image">
+						<img src={item.thumbnail} alt={item.title} />
 					</div>
-					<HeaderItem>
-						<BasketContainer onClick={() => handleBasketClick()}>
-							<BasketIcon />
-							<span>Basket</span>
-						</BasketContainer>
-					</HeaderItem>
-				</HeaderContent>
-			</Header>
-			<StyledCheckout>
-				<CheckoutContainer>
-					<CheckoutItems>
-						<div className="checkout-block address">
+					<div className="info">
+						<h4>{item.title}</h4>
+						<p className="description">{item.description}</p>
+						<p className="small">
+							<strong>£{item.price}</strong>
+						</p>
+						<p className="small">{item.shippingInformation}</p>
+						<p className="small">Sold by {item.brand}</p>
+						<div className="quantity">
+							<p>
+								<strong>Quantity:</strong> {item.quantity}{' '}
+								<button className="primary-link">Change</button>
+							</p>
+							<p className="small">Gift options not available</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</StyledOrderItem>
+	)
+}
+
+const OrderSummary = ({
+	itemsTotal,
+	shippingMethod,
+	shippingOptions,
+	showPrivacyNotice,
+}) => {
+	const shippingCost = shippingOptions[shippingMethod]?.price || 0
+	const orderTotal = itemsTotal + shippingCost
+	return (
+		<StyledOrderSummary>
+			<button className="primary-btn pill-btn">Buy now</button>
+			{showPrivacyNotice && <PrivacyNotice />}
+			<hr />
+			<div className="subtotals">
+				<div className="order-summary">
+					<div className="order-subtotal">
+						<p className="small">Items:</p>
+						<p className="small">£{itemsTotal.toFixed(2)}</p>
+					</div>
+					<div className="order-subtotal">
+						<p className="small">Postage & Packing:</p>
+						<p className="small">£{shippingCost.toFixed(2)}</p>
+					</div>
+					<div className="order-subtotal total">
+						<h3>Order Total:</h3>
+						<h3>£{orderTotal.toFixed(2)}</h3>
+					</div>
+					<p className="small">
+						Order totals include VAT.{' '}
+						<span className="primary-link">See details</span>
+					</p>
+				</div>
+			</div>
+		</StyledOrderSummary>
+	)
+}
+
+export default function Checkout() {
+	const navigate = useNavigate()
+	const [selectedShipping, setSelectedShipping] = useState('standard')
+	const currentUser = useSelector((state) => state.user.currentUser) || { first_name: '', last_name: '' };
+	const defaultAddress = useSelector((state) =>
+		state.addresses.addresses.find((address) => address.is_default)
+	) || { address_line1: '', address_line2: '', city: '', postcode: '', county: '', country: '' };
+	const basketItems = useSelector((state) => state.basket.items)
+	const itemsTotal = useSelector((state) => state.basket.total)
+
+	const onShippingChange = (option) => {
+		setSelectedShipping(option)
+	}
+
+	const formattedAddress = {
+		address1: defaultAddress.address_line1,
+		address2: defaultAddress.address_line2,
+		city: defaultAddress.city,
+		postcode: defaultAddress.postcode,
+		county: defaultAddress.county,
+		country: defaultAddress.country,
+	}
+
+	// Date utility functions
+	const formatDeliveryDate = (date) => {
+		return format(date, 'EEEE do MMM')
+	}
+
+	const getDeliveryDates = () => {
+		const today = new Date()
+		const currentHour = today.getHours()
+
+		// If order placed after 2pm, start counting from next business day
+		const startDate = currentHour >= 14 ? addBusinessDays(today, 1) : today
+
+		// Calculate delivery dates for each shipping option
+		const nextWorkingDay = addBusinessDays(startDate, 1)
+		const expressMin = addBusinessDays(startDate, 2)
+		const expressMax = addBusinessDays(startDate, 3)
+		const standardMin = addBusinessDays(startDate, 5)
+		const standardMax = addBusinessDays(startDate, 7)
+
+		return {
+			premium: {
+				dates: formatDeliveryDate(nextWorkingDay),
+				cutoffText:
+					'Order within ' +
+					(14 - currentHour) +
+					' hours for next-day delivery',
+			},
+			express: {
+				dates: `${formatDeliveryDate(
+					expressMin
+				)} - ${formatDeliveryDate(expressMax)}`,
+			},
+			standard: {
+				dates: `${formatDeliveryDate(
+					standardMin
+				)} - ${formatDeliveryDate(standardMax)}`,
+			},
+		}
+	}
+
+	// Shipping options configuration with dynamic date calculation
+	const useShippingOptions = () => {
+		const [shippingOptions, setShippingOptions] = useState(null)
+
+		useEffect(() => {
+			const deliveryDates = getDeliveryDates()
+
+			setShippingOptions({
+				standard: {
+					label: 'Standard Delivery',
+					price: 3.99,
+					dates: deliveryDates.standard.dates,
+					description: 'Delivery within 5-7 working days',
+				},
+				express: {
+					label: 'Express Delivery',
+					price: 7.99,
+					dates: deliveryDates.express.dates,
+					description: 'Delivery within 2-3 working days',
+				},
+				premium: {
+					label: 'Premium Next-Day',
+					price: 12.99,
+					dates: deliveryDates.premium.dates,
+					description: `Next working day delivery when ordered before 2pm. ${deliveryDates.premium.cutoffText}`,
+				},
+			})
+		}, []) // Run once on component mount
+
+		return shippingOptions
+	}
+
+	const shippingOptions = useShippingOptions()
+
+	if (!shippingOptions)
+		return (
+			<StyledPage>
+				<StyledMain>
+					<div className="container">
+						<div className="content">
+							<h3>Loading...</h3>
+						</div>
+					</div>
+				</StyledMain>
+			</StyledPage>
+		)
+
+	return (
+		<StyledPage>
+			<StyledHeader>
+				<nav>
+					<HeaderLogo />
+					<h1>Secure checkout</h1>
+					<BasketButton onClick={() => navigate('/basket')} />
+				</nav>
+			</StyledHeader>
+
+			<StyledMain>
+				<div className="container">
+					<div className="content">
+						<section className="address">
 							<div>
 								<h3>
 									Delivering to {currentUser.first_name}{' '}
 									{currentUser.last_name}
 								</h3>
-								<p className="user-address">{`${address_line1}, ${address_line2}, ${city}, ${postcode}, ${county}, ${country}`}</p>
-								<p className="primary-link">
-									Add delivery instructions
+								<p>
+									{Object.values(formattedAddress).join(', ')}
 								</p>
-							</div>
-							<div>
-								<button
-									className="primary-link"
-									onClick={handleChangeAddress}
-								>
-									Change
+								<button className="primary-link">
+									Add delivery instructions
 								</button>
 							</div>
-						</div>
-						<div className="checkout-block payment">
-							<div>
-								<h3>Payment method</h3>
-								<p className="primary-link">
-									Use a gift card, voucher or promo code
-								</p>
-							</div>
-							<div>
-								<button className="primary-link">Change</button>
-							</div>
-						</div>
+							<button
+								className="primary-link"
+								onClick={() => navigate('/account/addresses')}
+							>
+								Change
+							</button>
+						</section>
 
-						<div className="checkout-block">
-							<div className="giftcard">
-								<div className="giftcard-img-container">
-									<img
-										src={GiftCard}
-										alt="Scamazon gift card"
-									/>
-								</div>
-								<div className="giftcard-details">
-									Get a{' '}
-									<strike>
-										<strong className="twenty">£20</strong>
-									</strike>{' '}
-									<span className="thirty">
-										<strong>£30</strong>
-									</span>{' '}
-									<strong>Gift Card</strong> if approved for{' '}
-									<strong>The Scamazon Gnarlaycard</strong>.{' '}
-									<span className="primary-link">
-										<strong>Apply now</strong>
-									</span>
-									.{' '}
-									<strong>
-										Representative 28.9% APR variable
-									</strong>
-									. Credit broker: Scamazon EU S.A.R.L.
-									Lender: Gnarlays. T&Cs apply.
-								</div>
-							</div>
+						<PaymentSection />
+
+						<section>
+							<GiftCardOffer />
+
 							<div className="delivery-date">
-								<h3>Arriving on Thursday, 1st July</h3>
+								<h3>
+									Arriving{' '}
+									{shippingOptions[selectedShipping].dates}
+								</h3>
 							</div>
-							<div className="order-items">
+
+							<div className="items">
 								{basketItems.map((item) => (
-									<div className="order-item">
-										<div
-											key={item.basketItemId}
-											className="order-item-details"
-										>
-											<div className="row">
-												<div className="order-item-img">
-													<img
-														src={item.thumbnail}
-														alt={item.title}
-													/>
-												</div>
-												<div className="order-item-info">
-													<h4>{item.title}</h4>
-													<p>{item.description}</p>
-													<p>
-														<strong>
-															£{item.price}
-														</strong>
-													</p>
-													<p>
-														{
-															item.shippingInformation
-														}
-													</p>
-													<p>Sold by {item.brand}</p>
-												</div>
-											</div>
-											<div className="order-item-quantity">
-												<p>
-													<strong>Quantity:</strong>{' '}
-													{item.quantity}{' '}
-													<button className="primary-link">
-														Change
-													</button>
-												</p>
-												<p className="small-print">
-													Gift options not available
-												</p>
-											</div>
-										</div>
-										<div className="delivery-options">
-											<div className="delivery-option">
-												<input type="radio" />
-												<div className="delivery-option-input">
-													<p>
-														<strong>
-															Monday 25 Nov -
-															Saturday 30 Nov
-														</strong>
-													</p>
-													<p>
-														£3.99 Standard Delivery
-													</p>
-												</div>
-											</div>
-											<div className="delivery-option">
-												<input type="radio" />
-												<div className="delivery-option-input">
-													<p>
-														<strong>
-															Monday 25 Nov -
-															Saturday 30 Nov
-														</strong>
-													</p>
-													<p>
-														£3.99 Standard Delivery
-													</p>
-												</div>
-											</div>
-											<div className="delivery-option">
-												<input type="radio" />
-												<div className="delivery-option-input">
-													<p>
-														<strong>
-															Monday 25 Nov -
-															Saturday 30 Nov
-														</strong>
-													</p>
-													<p>
-														£3.99 Standard Delivery
-													</p>
-												</div>
-											</div>
-										</div>
-									</div>
+									<OrderItem
+										key={item.basketItemId}
+										item={item}
+										selectedShipping={selectedShipping}
+										shippingOptions={shippingOptions}
+										onShippingChange={setSelectedShipping}
+									/>
 								))}
 							</div>
-						</div>
+						</section>
 
-						<div className="checkout-block order-controls">
+						<section className="delivery">
+							{Object.keys(shippingOptions).map((option) => (
+								<DeliveryOption
+									key={option}
+									option={option}
+									selected={selectedShipping}
+									onChange={onShippingChange}
+									shippingOption={shippingOptions[option]}
+								/>
+							))}
+						</section>
+
+						<section className="order-controls">
 							<div className="btn-container">
 								<button className="primary-btn pill-btn">
 									Buy Now
 								</button>
 							</div>
 							<div className="order-total">
-								<h3>Order Total: £</h3>
-								<p className="small-print">
-									By placing your order you agree to
-									Scamazon's
-									<span className="primary-link">
-										Conditions of Use & Sale
-									</span>
-									. Please see our{' '}
-									<span className="primary-link">
-										Privacy Notice
-									</span>
-									, our{' '}
-									<span className="primary-link">
-										Cookies Notice
-									</span>{' '}
-									and our
-									<span className="primary-link">
-										{' '}
-										Interest-Based Ads Notice
-									</span>
-									.
-								</p>
+								<h3>
+									Order Total: £
+									{(
+										itemsTotal +
+										shippingOptions[selectedShipping]?.price
+									).toFixed(2)}
+								</h3>
+								<PrivacyNotice />
 							</div>
-						</div>
+						</section>
 
-						<div className="checkout-block small-print">
-							<p>
-								Need help? Check our{' '}
-								<span className="primary-link">help pages</span>{' '}
-								or{' '}
-								<span className="primary-link">contact us</span>
-							</p>
-							<p>
-								When you click the "Buy now" button, we'll send
-								you an e-mail message acknowledging receipt of
-								your order. Your contract to purchase an item
-								will not be complete until we send you an e-mail
-								to indicate that the item has been dispatched.
-							</p>
-							<p>
-								Within 30 days of delivery, you may return new,
-								unopened physical merchandise in its original
-								condition. Exceptions and restrictions apply.
-								See Scamazon's{' '}
-								<span className="primary-link">
-									Return Policy
-								</span>
-								.
-							</p>
-							<Link to="/basket" className="primary-link">
-								Back to basket
-							</Link>
-						</div>
-					</CheckoutItems>
+						<ReturnPolicy />
+					</div>
 
-					<OrderTotal>
-						<div className="order-summary">
-							<button className="primary-btn pill-btn">
-								Buy now
-							</button>
-							<p className="small-print">
-								By placing your order you agree to Scamazon's
-								<span className="primary-link">
-									{' '}
-									Conditions of Use & Sale
-								</span>
-								. Please see our{' '}
-								<span className="primary-link">
-									Privacy Notice
-								</span>
-								, our{' '}
-								<span className="primary-link">
-									Cookies Notice
-								</span>{' '}
-								and our
-								<span className="primary-link">
-									{' '}
-									Interest-Based Ads Notice
-								</span>
-								.
-							</p>
-						</div>
-						<hr />
-						<div className="order-summary">
-							<div className="order-subtotal">
-								<p className="small-print">Items:</p>
-								<p className="small-print">
-									£{itemsTotal.toFixed(2)}
-								</p>
-							</div>
-							<div className="order-subtotal">
-								<p className="small-print">
-									Postage & Packing:
-								</p>
-								<p className="small-print">£3.99</p>
-							</div>
-							<div className="order-subtotal total">
-								<h3>Order Total:</h3>
-								<h3>£{orderTotal}</h3>
-							</div>
-							<p className="small-print">
-								Order totals include VAT.{' '}
-								<span className="primary-link">
-									See details
-								</span>
-							</p>
-						</div>
-					</OrderTotal>
-				</CheckoutContainer>
-			</StyledCheckout>
+					<aside>
+						<OrderSummary
+							itemsTotal={itemsTotal}
+							shippingMethod={selectedShipping}
+							shippingOptions={shippingOptions}
+							showPrivacyNotice
+						/>
+					</aside>
+				</div>
+			</StyledMain>
+
 			<Footer />
-		</CheckoutPage>
+		</StyledPage>
 	)
 }
 
-const CheckoutPage = styled.div`
-	height: 100svh;
-`
-
-const Header = styled.header`
-	width: 100%;
+// Styled components with simplified and organized CSS
+const StyledPage = styled.div`
+	min-height: 100svh;
 	display: flex;
 	flex-direction: column;
-	z-index: 1000000;
 `
 
-const HeaderContent = styled.div`
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
+const StyledHeader = styled.header`
 	background-color: var(--dk-blue);
 	color: var(--white);
-	padding: var(--spacing-sm) var(--spacing-md);
-	height: 6rem;
-	line-height: var(--lh-sm);
-	@media only screen and (min-width: 1199px) {
-	}
+	padding: var(--spacing-xs) var(--spacing-md);
+
 	@media only screen and (max-width: 450px) {
-		padding: var(--spacing-sm) var(--spacing-sm);
+		padding: var(--spacing-sm);
 	}
-`
 
-const HeaderItem = styled.div`
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	height: 100%;
-	border: 1px solid transparent;
-	position: relative;
-	transition: var(--tr-fast);
-`
-
-const LogoContainer = styled.div`
-	display: flex;
-	width: 15rem;
-	height: auto;
-	color: var(--white);
-	p {
-		position: relative;
-		top: 0.5rem;
-	}
-`
-
-const BasketContainer = styled.div`
-	display: flex;
-	align-items: flex-end;
-	position: relative;
-	flex-shrink: 0;
-	cursor: pointer;
-	p.total {
-		position: absolute;
-		top: -0.2rem;
-		left: 1.8rem;
-		color: var(--md-orange);
-		border-radius: 50%;
-		font-size: var(--font-md);
-		font-weight: bold;
-	}
-	p.total.over-ten {
-		left: 1.3rem;
-	}
-	span {
-		font-size: var(--font-sm);
-		font-weight: bold;
+	nav {
+		max-width: 120rem;
+		margin: 0 auto;
 		display: flex;
+		justify-content: space-between;
 		align-items: center;
+	}
+`
+
+const StyledLogo = styled.div`
+	display: flex;
+	align-items: center;
+	width: 15rem;
+
+	p {
+		margin-top: var(--spacing-sm);
 		color: var(--white);
 	}
-	path {
-		fill: var(--white);
-	}
+`
 
-	@media only screen and (max-width: 768px) {
-		span {
+const StyledBasket = styled.button`
+	display: flex;
+	align-items: center;
+	gap: var(--spacing-sm);
+	color: var(--white);
+	background: none;
+	border: none;
+	cursor: pointer;
+
+	span {
+		font-weight: bold;
+		@media (max-width: 768px) {
 			display: none;
 		}
 	}
+
+	path {
+		fill: var(--white);
+	}
 `
 
-const StyledCheckout = styled.div`
+const StyledMain = styled.main`
+	flex: 1;
 	background-color: var(--checkout-grey);
-	span {
-		cursor: pointer;
-		&:hover {
-			text-decoration: underline;
-		}
-	}
-	@media only screen and (max-width: 768px) {
-		padding: 0;
-	}
-`
+	padding: var(--spacing-md) 0;
 
-const CheckoutContainer = styled.div`
-	width: 100%;
-	max-width: 120rem;
-	margin: 0 auto;
-	display: flex;
-	justify-content: space-between;
-	gap: var(--spacing-md);
-	.checkout-block {
-		background-color: var(--white);
+	@media only screen and (max-width: 1199px) {
 		padding: var(--spacing-md);
 	}
-	.address,
+	@media only screen and (max-width: 450px) {
+		padding: var(--spacing-sm) 0;
+	}
+
+	.container {
+		max-width: 120rem;
+		margin: 0 auto;
+		display: grid;
+		grid-template-columns: 1fr 30rem;
+		gap: var(--spacing-md);
+
+		@media only screen and (max-width: 1024px) {
+			grid-template-columns: 1fr;
+			grid-template-areas:
+				'summary'
+				'content';
+
+			aside {
+				grid-area: summary;
+			}
+
+			.content {
+				grid-area: content;
+			}
+		}
+	}
+
+	.content {
+		display: flex;
+		flex-direction: column;
+		gap: var(--spacing-md);
+
+		section {
+			background: white;
+			padding: var(--spacing-md);
+			margin: 0;
+		}
+
+		.return-policy {
+			display: flex;
+			flex-direction: column;
+			gap: var(--spacing-sm);
+		}
+
+		@media only screen and (max-width: 450px) {
+			gap: var(--spacing-sm);
+			section {
+				padding: var(--spacing-sm);
+			}
+		}
+	}
+
+	h3 {
+		font-size: clamp(var(--font-sm), 2vw, var(--font-md));
+	}
+
+	p {
+		font-size: clamp(var(--font-xs), 2vw, var(--font-sm));
+	}
+
+	.delivery {
+		margin: var(--spacing-md) 0;
+	}
+
+	.address {
+		display: flex;
+		justify-content: space-between;
+		align-items: flex-start;
+	}
+
+	.small {
+		font-size: clamp(var(--font-xxs), 2vw, var(--font-xs));
+	}
+
 	.payment {
 		display: flex;
 		justify-content: space-between;
-	}
-	.payment {
-		h3 {
-			margin-bottom: var(--spacing-md);
-		}
-	}
-	.giftcard {
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		border: 1px solid var(--border-grey);
-		padding: var(--spacing-md);
-	}
-	.giftcard-img-container {
-		flex: 1;
-		display: flex;
-		img {
-			max-width: 100%;
-			height: auto;
-		}
-	}
-	.giftcard-details {
-		flex: 5;
-		font-size: clamp(var(--font-xs), 2vw, var(--font-sm));
-	}
-	.twenty {
-		color: var(--lt-text);
-	}
-	.thirty {
-		color: var(--discount-red);
-	}
-	.small-print {
-		font-size: clamp(var(--font-xxs), 2vw, var(--font-xs));
-		p {
-			margin-bottom: var(--spacing-sm);
-		}
-	}
-	.order-items {
-		display: flex;
-		flex-direction: column;
-		gap: var(--spacing-md);
-	}
-	.order-item {
-		display: flex;
-		gap: var(--spacing-md);
-		padding: var(--spacing-md);
-	}
-	.order-item-details {
-		flex: 3;
-		display: flex;
-		flex-direction: column;
-		gap: var(--spacing-md);
-		background-color: var(--continue-grey);
-		border-radius: var(--br-md);
-		padding: var(--spacing-md);
-	}
-	.order-item-img {
-		min-width: 15rem;
-		img {
-			max-width: 100%;
-			height: auto;
-		}
-	}
-	.row {
-		display: flex;
-		gap: var(--spacing-md);
-	}
-	.order-items-info {
-		display: flex;
-		flex-direction: column;
-		gap: var(--spacing-md);
-	}
-	.delivery-options {
-		flex: 2;
-		display: flex;
-		flex-direction: column;
-		gap: var(--spacing-md);
-	}
-	.delivery-option {
-		display: flex;
 		align-items: flex-start;
-		gap: var(--spacing-xs);
-		input {
-			margin-top: 0.5rem;
-		}
 	}
-	.delivery-option-input {
+
+	.delivery-date {
+		padding: var(--spacing-sm) 0;
+	}
+
+	.items {
 		display: flex;
 		flex-direction: column;
-		line-height: 1.5;
+		gap: var(--spacing-md);
 	}
+
 	.order-controls {
 		display: flex;
 		gap: var(--spacing-md);
 	}
+
 	.btn-container {
-		flex: 1;
 		margin: auto 0;
-	}
-	.order-total {
-		flex: 5;
+		width: 20rem;
 	}
 
-	@media only screen and (max-width: 1199px) {
-		flex-direction: column-reverse;
-	}
-	@media only screen and (max-width: 768px) {
-		gap: 0;
-	}
-`
-
-const CheckoutItems = styled.div`
-	width: 100%;
-	display: flex;
-	flex-direction: column;
-	gap: var(--spacing-md);
-	padding: var(--spacing-md);
-	.user-address {
-		margin-bottom: var(--spacing-md);
-	}
-
-	@media only screen and (max-width: 768px) {
-		div.basket-header {
-			padding: 0 0 var(--spacing-md) 0;
-		}
-	}
-	@media only screen and (max-width: 450px) {
-		padding: var(--spacing-md) var(--spacing-sm);
-	}
-`
-
-const OrderTotal = styled.div`
-	width: 35rem;
-	height: fit-content;
-	padding: var(--spacing-md);
-	background-color: var(--white);
-	display: flex;
-	flex-direction: column;
-	justify-content: space-between;
-	gap: var(--spacing-md);
-	margin-top: var(--spacing-md);
-	.order-summary {
-		&:first-of-type {
-			button {
-				margin-bottom: var(--spacing-sm);
-			}
-		}
-	}
 	.order-subtotal {
 		display: flex;
 		justify-content: space-between;
 	}
-	.total {
-		font-weight: bold;
+
+	.order-total {
+		background: white;
+		padding: var(--spacing-md) 0;
 	}
 
-	@media only screen and (max-width: 1199px) {
-		width: 100%;
+	aside {
+		height: fit-content;
+		background: white;
+		padding: var(--spacing-md);
 	}
+
 	@media only screen and (max-width: 768px) {
-		border-bottom: 1px solid var(--lt-grey);
+		.order-controls {
+			flex-direction: column;
+		}
+
+		.btn-container {
+			width: 100%;
+		}
 	}
+`
+
+const StyledOrderItem = styled.article`
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: var(--spacing-md);
+
+	.details {
+		background: var(--continue-grey);
+		border-radius: var(--br-md);
+		padding: var(--spacing-md);
+	}
+
+	.row {
+		display: flex;
+		gap: var(--spacing-md);
+	}
+
+	.image {
+		width: 12rem; /* Set fixed width for consistency */
+		flex-shrink: 0; /* Prevent image from shrinking */
+		img {
+			width: 100%;
+			height: auto;
+			object-fit: cover;
+		}
+	}
+
+	.info {
+		display: flex;
+		flex-direction: column;
+		gap: var(--spacing-xs);
+		min-width: 0; /* Enable text truncation in child elements */
+	}
+
+	h4 {
+		font-size: clamp(var(--font-sm), 2vw, var(--font-md));
+	}
+
+	.description {
+		display: -webkit-box;
+		-webkit-line-clamp: 5; /* Show 3 lines of text */
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+		line-height: 1.5;
+		//max-height: 4.5em; /* 3 lines * 1.5 line height */
+	}
+
+	.quantity {
+		margin-top: auto; /* Push quantity to bottom */
+	}
+
+	.delivery {
+		display: flex;
+		flex-direction: column;
+		gap: var(--spacing-md);
+	}
+
+	@media only screen and (max-width: 768px) {
+		grid-template-columns: 1fr;
+	}
+
 	@media only screen and (max-width: 450px) {
-		padding: var(--spacing-md) var(--spacing-sm);
+		.details {
+			padding: var(--spacing-sm);
+		}
+		.image {
+			width: 100px; /* Smaller image on mobile */
+			img {
+				width: 100%;
+				height: auto;
+			}
+		}
+	}
+`
+
+const StyledGiftCard = styled.div`
+	display: flex;
+	align-items: center;
+	gap: var(--spacing-md);
+	border: 1px solid var(--border-grey);
+	padding: var(--spacing-md);
+
+	.image {
+		img {
+			max-width: 100%;
+			height: auto;
+			object-fit: cover;
+		}
+	}
+
+	.details {
+		flex: 5;
+		font-size: clamp(var(--font-xs), 2vw, var(--font-sm));
+	}
+
+	.old-price {
+		color: var(--lt-text);
+	}
+
+	.new-price {
+		color: var(--discount-red);
+	}
+
+	@media only screen and (max-width: 450px) {
+		padding: var(--spacing-sm);
+		.image {
+			width: 8.6rem;
+		}
+	}
+`
+
+const StyledDeliveryOption = styled.label`
+	display: flex;
+	align-items: flex-start;
+	gap: var(--spacing-sm);
+	font-size: clamp(var(--font-xs), 2vw, var(--font-sm));
+	cursor: pointer;
+
+	input {
+		margin-top: var(--spacing-xs);
+	}
+
+	div {
+		display: flex;
+		flex-direction: column;
+		margin-bottom: var(--spacing-sm);
+	}
+`
+
+const StyledOrderSummary = styled.div`
+	background: white;
+
+	.subtotals {
+		display: flex;
+		flex-direction: column;
+		gap: var(--spacing-sm);
+	}
+
+	.row {
+		display: flex;
+		justify-content: space-between;
+	}
+
+	.total {
+		font-weight: bold;
+		margin-top: var(--spacing-sm);
+	}
+
+	hr {
+		margin: var(--spacing-md) 0;
+		border: none;
+		border-top: 1px solid var(--lt-grey);
+	}
+
+	button {
+		width: 100%;
+		margin-bottom: var(--spacing-md);
 	}
 `

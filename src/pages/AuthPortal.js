@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { useFormik } from 'formik'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import { registerSchema, loginSchema } from '../schemas/index'
 import { useDispatch, useSelector } from 'react-redux'
 import { registerUser, loginUser } from '../redux/slices/userSlice'
@@ -15,6 +15,11 @@ export default function AuthPortal() {
 	const [isSignIn, setIsSignIn] = useState(true)
 
 	const { loading, error } = useSelector((state) => state.user)
+
+	const handleHomeClick = () => {
+		console.log('Home clicked')
+		navigate('/')
+	}
 
 	const handleAuth = async (values) => {
 		const { passwordConfirm, ...userData } = values;
@@ -295,7 +300,9 @@ export default function AuthPortal() {
 	if (loading)
 		return (
 			<Container>
-				<LogoContainer>
+				<LogoContainer
+					onClick={handleHomeClick}
+				>
 					<Logo />
 				</LogoContainer>
 				<InnerContainer>
@@ -307,7 +314,9 @@ export default function AuthPortal() {
 	if (error)
 		return (
 			<Container>
-				<LogoContainer>
+				<LogoContainer
+					onClick={handleHomeClick}
+				>
 					<Logo />
 				</LogoContainer>
 				<InnerContainer>
@@ -319,7 +328,9 @@ export default function AuthPortal() {
 
 	return (
 		<Container>
-			<LogoContainer>
+			<LogoContainer
+					onClick={handleHomeClick}
+				>
 				<Logo />
 			</LogoContainer>
 			<InnerContainer>
@@ -470,6 +481,9 @@ const LogoContainer = styled.div`
 	display: flex;
 	justify-content: center;
 	margin-bottom: var(--spacing-lg);
+	&:hover {
+		cursor: pointer;
+	}
 	svg {
 		width: 15rem;
 	}

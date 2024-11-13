@@ -301,7 +301,7 @@ export const syncGuestBasket = createAsyncThunk(
     try {
       const { basket } = getState();
       
-      console.log('Basket state:', basket); // Debug the basket state here
+      // console.log('Basket state:', basket); // Debug the basket state here
 
       // Ensure you're sending only necessary fields from the basket
       const basketItems = basket?.items?.map(item => ({
@@ -331,7 +331,7 @@ export const syncGuestBasket = createAsyncThunk(
 export const addItemToBasket = createAsyncThunk(
   'basket/addItemToBasket',
   async ({productId, quantity = 1}, { getState, dispatch, rejectWithValue }) => {
-    console.log('Adding item to basket:', productId, quantity);
+    // console.log('Adding item to basket:', productId, quantity);
     try {
       const { user } = getState();
       if (user.isLoggedIn) {
