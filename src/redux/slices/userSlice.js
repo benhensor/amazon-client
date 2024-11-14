@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
+import { fetchUserBasket } from './basketSlice'
 import axios from 'axios'
 
 const API_URL = process.env.REACT_APP_API_URL
@@ -163,7 +164,7 @@ export const loginUser = createAsyncThunk(
 					withCredentials: true,
 				}
 			)
-
+			dispatch(fetchUserBasket())
 			return response.data
 		} catch (error) {
 			return rejectWithValue(

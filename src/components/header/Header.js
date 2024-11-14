@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom'
 import { useWindowWidth } from '../../utils/useWindowWidth'
-import { useSelector } from 'react-redux'
-import { selectBasketItems, selectBasketItemCount } from '../../redux/slices/basketSlice'
+import { useDispatch, useSelector } from 'react-redux'
+import { fetchUserBasket, selectBasketItemCount } from '../../redux/slices/basketSlice'
 import styled from 'styled-components'
 import Logo from '../../icons/Logo'
 import MenuIcon from '../../icons/MenuIcon'
@@ -39,16 +39,23 @@ const NAV_ITEMS = [
 ]
 
 export default function Header() {
+	const dispatch = useDispatch()
 	const navigate = useNavigate()
 	const windowWidth = useWindowWidth()
 	const currentUser = useSelector((state) => state.user.currentUser)
 	const defaultAddress = useSelector((state) =>
 		state.addresses.addresses.find((address) => address.is_default)
 	)
-	//const basketCount = useSelector((state) => state.basket.count)
 	const basketCount = useSelector(selectBasketItemCount)
+	const basketLoading = useSelector((state) => state.basket.loading)
 	const [categoryMenuOpen, setCategoryMenuOpen] = useState(false)
 	const [navMenuOpen, setNavMenuOpen] = useState(false)
+
+	useEffect(() => {
+		if (currentUser && !basketLoading) {
+			dispatch(fetchUserBasket())
+		}
+	}, [currentUser])
 
 	useEffect(() => {
 		console.log('basketCount', basketCount)
