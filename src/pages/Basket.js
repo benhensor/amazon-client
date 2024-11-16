@@ -17,6 +17,7 @@ import {
 	clearBasket,
 } from '../redux/slices/basketSlice'
 import { formatQuery } from '../utils/formatCategory'
+import { checkIsAllSelected } from '../utils/checkIsAllSelected'
 import BuyButton from '../components/buttons/BuyButton'
 import BasketQuantityBtn from '../components/buttons/BasketQuantityBtn'
 import CrimeLogo from '../icons/CrimeLogo'
@@ -26,16 +27,16 @@ export default function Basket() {
 	const dispatch = useDispatch()
 	const navigate = useNavigate()
 	const windowWidth = useWindowWidth()
+	const basketState = useSelector((state) => state.basket)
 	const basketItems = useSelector(selectBasketItems)
 	const basketItemsSelected = useSelector(selectBasketItemsSelected)
 	const basketTotal = useSelector(selectBasketTotal)
+	const [selectAll, setSelectAll] = useState(checkIsAllSelected(basketItemsSelected, basketItems))
 
-	const [selectAll, setSelectAll] = useState(false)
-
-	// useEffect(() => {
-	// 	console.log('Basket items:', basketItems)
-	// 	console.log('Basket total:', basketTotal)
-	// }, [basketItems, basketTotal])
+	useEffect(() => {
+		console.log('Basket state:', basketState)
+		console.log('Basket total:', basketTotal)
+	}, [basketState, basketTotal])
 
 	useEffect(() => {
 		dispatch(fetchUserBasket());
@@ -49,6 +50,7 @@ export default function Basket() {
 	const handleQuantityChange = (e, item) => {
 		console.log(item)
 		const newQuantity = parseInt(e.target.value, 10)
+		console.log(newQuantity)
 		dispatch(
 			updateItemQuantity({ basketItemId: item.basketItemId, quantity: newQuantity })
 		)
@@ -298,10 +300,10 @@ export default function Basket() {
 						)}
 					</div>
 					<div className="basket-items">
-						{basketItems.map((basketItem) =>
+						{basketItems.map((basketItem, i) =>
 							windowWidth <= 768 ? (
 								<BasketItemMobile
-									key={basketItem.basketItemId}
+									key={i}
 									item={basketItem}
 									handleQuantityChange={(e) =>
 										handleQuantityChange(

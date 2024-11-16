@@ -1,8 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
+import { userAPI } from '../../api/userAPI'
 import { fetchUserBasket } from './basketSlice'
-import axios from 'axios'
-
-const API_URL = process.env.REACT_APP_API_URL
 
 const userSlice = createSlice({
 	name: 'user',
@@ -113,13 +111,11 @@ export const { setUser, logout, initializeUser } = userSlice.actions
 // Thunk to check if a user is logged in
 export const checkLoggedIn = createAsyncThunk(
   'user/checkLoggedIn',
-  async (_, { rejectWithValue }) => {
+  async (_, { dispatch, rejectWithValue }) => {
     try {
-      const response = await axios.get(`${API_URL}/api/user/current`, {
-        withCredentials: true,
-      })
-			console.log(response.data.user)
-      return response.data
+      const response = await userAPI.checkAuth()
+			dispatch(fetchUserBasket())
+      return response
     } catch (error) {
       // If it's a 401 (Unauthorized) or 403 (Forbidden), treat it as a non-error case
       if (error.response?.status === 401 || error.response?.status === 403) {
@@ -139,14 +135,11 @@ export const registerUser = createAsyncThunk(
 	'user/registerUser',
 	async (userData, { rejectWithValue }) => {
 		try {
-			const response = await axios.post(
-				`${API_URL}/api/user/register`,
-				userData
-			)
-			return response.data
+			const response = await userAPI.registerUser(userData)
+			return response
 		} catch (error) {
 			return rejectWithValue(
-				error.response.data.message || 'An error occurred'
+				error.response?.data?.message || 'An error occurred'
 			)
 		}
 	}
@@ -157,18 +150,12 @@ export const loginUser = createAsyncThunk(
 	'user/loginUser',
 	async (credentials, { dispatch, rejectWithValue }) => {
 		try {
-			const response = await axios.post(
-				`${API_URL}/api/user/login`,
-				credentials,
-				{
-					withCredentials: true,
-				}
-			)
+			const response = await userAPI.loginUser(credentials)
 			dispatch(fetchUserBasket())
-			return response.data
+			return response
 		} catch (error) {
 			return rejectWithValue(
-				error.response.data.message || 'An error occurred'
+				error.response?.data?.message || 'An error occurred'
 			)
 		}
 	}
@@ -179,15 +166,11 @@ export const logoutUser = createAsyncThunk(
 	'user/logoutUser',
 	async (_, { rejectWithValue }) => {
 		try {
-			await axios.post(
-				`${API_URL}/api/user/logout`,
-				{},
-				{ withCredentials: true }
-			)
+			await userAPI.logoutUser()
 			return true
 		} catch (error) {
 			return rejectWithValue(
-				error.response.data.message || 'An error occurred'
+				error.response?.data?.message || 'An error occurred'
 			)
 		}
 	}
@@ -198,13 +181,11 @@ export const fetchUserProfile = createAsyncThunk(
 	'user/fetchUserProfile',
 	async (_, { rejectWithValue }) => {
 		try {
-			const response = await axios.get(`${API_URL}/api/user/profile`, {
-				withCredentials: true,
-			})
-			return response.data
+			const response = await userAPI.fetchProfile()
+			return response
 		} catch (error) {
 			return rejectWithValue(
-				error.response.data.message || 'An error occurred'
+				error.response?.data?.message || 'An error occurred'
 			)
 		}
 	}
