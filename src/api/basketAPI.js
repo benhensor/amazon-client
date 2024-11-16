@@ -94,52 +94,150 @@ export const basketAPI = {
 	// Helper function to normalize basket data
 	normalizeBasketData: async (apiResponse) => {
 		if (!apiResponse) return { items: [], total: 0 }
-		console.log('normalizeBasketData', apiResponse)
-		if (apiResponse.BasketItems) {
-				const productPromises = apiResponse.BasketItems.map(async (item) => {
-						try {
-								const product = await getProductById(item.product_id)
-								return {
-										basketItemId: parseInt(item.basket_item_id, 10),
-										...product,
-										quantity: item.quantity,
-										is_selected: item.is_selected,
-								}
-						} catch (error) {
-								console.error(`Error fetching product ${item.product_id}:`, error)
-								return null
-						}
-				})
 
-				const items = (await Promise.all(productPromises)).filter(
-						(item) => item !== null
-				)
-				return { items }
+		// Utility function to normalize IDs to numbers where possible
+		const normalizeIds = (data) => {
+			if (Array.isArray(data)) {
+				return data.map(normalizeIds)
+			} else if (typeof data === 'object' && data !== null) {
+				return Object.keys(data).reduce((normalized, key) => {
+					if (
+						key.toLowerCase().includes('id') &&
+						typeof data[key] === 'string'
+					) {
+						const converted = Number(data[key])
+						normalized[key] = isNaN(converted)
+							? data[key]
+							: converted
+					} else {
+						normalized[key] = normalizeIds(data[key])
+					}
+					return normalized
+				}, {})
+			}
+			return data
 		}
 
-		if (apiResponse.basket_item_id && apiResponse.product_id) {
+		apiResponse = normalizeIds(apiResponse)
+		console.log('Normalizing response:', apiResponse)
+
+		// Handle guest basket
+		if (apiResponse.is_guest) {
+			console.log('Processing guest basket:', apiResponse)
+			const items = apiResponse.BasketItems.map((item) => ({
+				basketItemId: item.basketItemId || item.basket_item_id, // Handle both formats
+				product_id: item.product_id,
+				quantity: item.quantity,
+				is_selected: item.is_selected ?? true, // Default to true if not specified
+			}))
+
+			const productPromises = items.map(async (item) => {
 				try {
-						const product = await getProductById(apiResponse.product_id)
-						return {
-								items: [
-										{
-												basketItemId: parseInt(apiResponse.basket_item_id, 10),
-												...product,
-												quantity: apiResponse.quantity,
-										},
-								],
-						}
+					const product = await getProductById(item.product_id)
+					return {
+						basketItemId: item.basketItemId,
+						...product,
+						quantity: item.quantity,
+						is_selected: item.is_selected,
+					}
 				} catch (error) {
-						console.error(`Error fetching product ${apiResponse.product_id}:`, error)
-						return { items: [] }
+					console.error(
+						`Error fetching product ${item.product_id}:`,
+						error
+					)
+					return null
 				}
+			})
+
+			const normalizedItems = (await Promise.all(productPromises)).filter(
+				(item) => item !== null
+			)
+			return {
+				items: normalizedItems,
+				total: calculateTotal(normalizedItems),
+				count: calculateCount(normalizedItems),
+			}
+		}
+
+		// Handle logged-in user basket
+		if (apiResponse.BasketItems && !apiResponse.is_guest) {
+			const productPromises = apiResponse.BasketItems.map(
+				async (item) => {
+					try {
+						const product = await getProductById(item.product_id)
+						return {
+							basketItemId: item.basket_item_id,
+							...product,
+							quantity: item.quantity,
+							is_selected: item.is_selected ?? true,
+						}
+					} catch (error) {
+						console.error(
+							`Error fetching product ${item.product_id}:`,
+							error
+						)
+						return null
+					}
+				}
+			)
+
+			const items = (await Promise.all(productPromises)).filter(
+				(item) => item !== null
+			)
+			return {
+				items,
+				total: calculateTotal(items),
+				count: calculateCount(items),
+			}
+		}
+
+		// Handle single item response
+		if (apiResponse.basket_item_id && apiResponse.product_id) {
+			try {
+				const product = await getProductById(apiResponse.product_id)
+				const items = [
+					{
+						basketItemId: apiResponse.basket_item_id,
+						...product,
+						quantity: apiResponse.quantity,
+						is_selected: apiResponse.is_selected ?? true,
+					},
+				]
+				return {
+					items,
+					total: calculateTotal(items),
+					count: calculateCount(items),
+				}
+			} catch (error) {
+				console.error(
+					`Error fetching product ${apiResponse.product_id}:`,
+					error
+				)
+				return { items: [], total: 0, count: 0 }
+			}
 		}
 
 		if (apiResponse.message) {
-				return { message: apiResponse.message }
+			return { message: apiResponse.message }
 		}
 
 		console.warn('Unexpected API response format:', apiResponse)
-		return { items: [] }
+		return { items: [], total: 0, count: 0 }
+	},
 }
+
+// Helper functions
+const calculateTotal = (items = []) => {
+	return items.reduce((sum, item) => {
+		const price = Number(item.price) || 0
+		const quantity = Number(item.quantity) || 0
+		return sum + price * quantity
+	}, 0)
+}
+
+const calculateCount = (items = []) => {
+	return items.reduce(
+		(total, item) => total + (Number(item.quantity) || 0),
+		0
+	)
 }

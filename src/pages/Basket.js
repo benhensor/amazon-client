@@ -34,9 +34,9 @@ export default function Basket() {
 	const [selectAll, setSelectAll] = useState(checkIsAllSelected(basketItemsSelected, basketItems))
 
 	useEffect(() => {
+		console.log('Basket items:', basketItems)
 		console.log('Basket state:', basketState)
-		console.log('Basket total:', basketTotal)
-	}, [basketState, basketTotal])
+	}, [basketItems, basketState])
 
 	useEffect(() => {
 		dispatch(fetchUserBasket());
@@ -48,16 +48,16 @@ export default function Basket() {
 	}
 
 	const handleQuantityChange = (e, item) => {
-		console.log(item)
+		console.log('Changing quantity:', item)
 		const newQuantity = parseInt(e.target.value, 10)
-		console.log(newQuantity)
+		// console.log(newQuantity)
 		dispatch(
 			updateItemQuantity({ basketItemId: item.basketItemId, quantity: newQuantity })
 		)
 	}
 
 	const handleAddQuantity = (itemId) => {
-		console.log('Adding quantity to:', itemId)
+		// console.log('Adding quantity to:', itemId)
 		const item = basketItems.find((item) => item.basketItemId === itemId)
 		if (item) {
 			dispatch(
@@ -67,7 +67,7 @@ export default function Basket() {
 	}
 
 	const handleSubtractQuantity = (itemId) => {
-		console.log('Adding quantity to:', itemId)
+		// console.log('Adding quantity to:', itemId)
 		const item = basketItems.find((item) => item.basketItemId === itemId)
 		if (item && item.quantity > 1) {
 			dispatch(
@@ -300,10 +300,10 @@ export default function Basket() {
 						)}
 					</div>
 					<div className="basket-items">
-						{basketItems.map((basketItem, i) =>
+						{basketItems.map((basketItem) =>
 							windowWidth <= 768 ? (
 								<BasketItemMobile
-									key={i}
+									key={basketItem.basketItemId}
 									item={basketItem}
 									handleQuantityChange={(e) =>
 										handleQuantityChange(

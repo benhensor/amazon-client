@@ -86,17 +86,17 @@ const HeaderLayout = () => (
 )
 
 function App() {
-	// const dispatch = useDispatch()
+	const dispatch = useDispatch()
 
-	// useEffect(() => {
-	// 	console.log('check logged in')
-	// 	dispatch(checkLoggedIn())
-	// }, [dispatch])
+	useEffect(() => {
+		// console.log('check logged in')
+		dispatch(checkLoggedIn())
+	}, [dispatch])
 
-	// useEffect(() => {
-	// 	console.log('fetch user basket')
-	// 	dispatch(fetchUserBasket())
-	// }, [dispatch])
+	useEffect(() => {
+		// console.log('fetch user basket')
+		dispatch(fetchUserBasket())
+	}, [dispatch])
 	
 	return (
 		<Router>
