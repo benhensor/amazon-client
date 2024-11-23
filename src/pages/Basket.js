@@ -4,15 +4,14 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useWindowWidth } from '../utils/useWindowWidth'
 import { setCurrentProduct } from '../redux/slices/productsSlice'
 import {
-	fetchUserBasket,
 	selectBasketItems,
+	selectBasketItemCount,
 	selectBasketItemsSelected,
 	selectBasketTotal,
 	toggleItemSelected,
 	selectAllItems,
 	deselectAllItems,
 	updateItemQuantity,
-	removeItem,
 	removeItemFromBasket,
 	clearBasket,
 } from '../redux/slices/basketSlice'
@@ -31,16 +30,19 @@ export default function Basket() {
 	const basketItems = useSelector(selectBasketItems)
 	const basketItemsSelected = useSelector(selectBasketItemsSelected)
 	const basketTotal = useSelector(selectBasketTotal)
-	const [selectAll, setSelectAll] = useState(checkIsAllSelected(basketItemsSelected, basketItems))
+	const basketCount = useSelector(selectBasketItemCount)
+	const [selectAll, setSelectAll] = useState(
+		checkIsAllSelected(basketItemsSelected, basketItems)
+	)
 
 	useEffect(() => {
 		console.log('Basket items:', basketItems)
 		console.log('Basket state:', basketState)
 	}, [basketItems, basketState])
 
-	useEffect(() => {
-		dispatch(fetchUserBasket());
-	}, [dispatch]);	
+	// useEffect(() => {
+	// 	dispatch(fetchUserBasket())
+	// }, [dispatch])
 
 	const handleProductClick = (product) => {
 		dispatch(setCurrentProduct(product))
@@ -48,40 +50,55 @@ export default function Basket() {
 	}
 
 	const handleQuantityChange = (e, item) => {
-		console.log('Changing quantity:', item)
+		// console.log('Changing quantity:', item)
 		const newQuantity = parseInt(e.target.value, 10)
 		// console.log(newQuantity)
 		dispatch(
-			updateItemQuantity({ basketItemId: item.basketItemId, quantity: newQuantity })
+			updateItemQuantity({
+				basket_item_id: item.basket_item_id,
+				quantity: newQuantity,
+			})
 		)
 	}
 
 	const handleAddQuantity = (itemId) => {
 		// console.log('Adding quantity to:', itemId)
-		const item = basketItems.find((item) => item.basketItemId === itemId)
+		const item = basketItems.find((item) => item.basket_item_id === itemId)
 		if (item) {
 			dispatch(
-				updateItemQuantity({ basketItemId: itemId, quantity: item.quantity + 1 })
+				updateItemQuantity({
+					basket_item_id: itemId,
+					quantity: item.quantity + 1,
+				})
 			)
 		}
 	}
 
 	const handleSubtractQuantity = (itemId) => {
 		// console.log('Adding quantity to:', itemId)
-		const item = basketItems.find((item) => item.basketItemId === itemId)
+		const item = basketItems.find((item) => item.basket_item_id === itemId)
 		if (item && item.quantity > 1) {
 			dispatch(
-				updateItemQuantity({ basketItemId: itemId, quantity: item.quantity - 1 })
+				updateItemQuantity({
+					basket_item_id: itemId,
+					quantity: item.quantity - 1,
+				})
 			)
 		} else if (item && item.quantity === 1) {
-			dispatch(removeItem(itemId))
+			dispatch(clearBasket())
 		}
 	}
 
-	const handleDelete = (basketItemId) => {
-		console.log('Deleting item:', basketItemId)
-		dispatch(removeItemFromBasket(basketItemId))
-	}
+	const handleDelete = (basket_item_id) => {
+		console.log('Deleting item:', basket_item_id);
+		dispatch(removeItemFromBasket(basket_item_id));
+	
+		// Check if the basket is empty after removing the item
+		if (basketItems.length === 1) {
+			dispatch(clearBasket());
+		}
+	};
+	
 
 	const handleClearBasket = () => {
 		dispatch(clearBasket())
@@ -96,9 +113,9 @@ export default function Basket() {
 		}
 	}
 
-	const handleToggleItemSelected = (basketItemId) => {
-		console.log('Toggling item:', basketItemId)
-		dispatch(toggleItemSelected(basketItemId))
+	const handleToggleItemSelected = (basket_item_id) => {
+		console.log('Toggling item:', basket_item_id)
+		dispatch(toggleItemSelected(basket_item_id))
 	}
 
 	const handleCheckoutClick = () => {
@@ -110,13 +127,14 @@ export default function Basket() {
 	}
 
 	const ItemSelect = (item) => {
+		console.log('Item:', item)
 		return (
 			<Select>
 				<input
+					id={item.basket_item_id}
 					type="checkbox"
 					checked={item.is_selected}
-					onChange={() => handleToggleItemSelected(item.basketItemId)}
-
+					onChange={() => handleToggleItemSelected(item.basket_item_id)}
 				/>
 			</Select>
 		)
@@ -132,12 +150,16 @@ export default function Basket() {
 				{windowWidth >= 768 && (
 					<select
 						name="quantity"
-						id="quantity"
+						id={item.basket_item_id}
 						value={item.quantity}
 						onChange={(e) => handleQuantityChange(e, item)}
 					>
 						{[...Array(5)].map((_, i) => (
-							<option key={i + 1} value={i + 1}>
+							<option
+								key={i + 1}
+								value={i + 1}
+								id={item.basket_item_id}
+							>
 								Qty: {i + 1}
 							</option>
 						))}
@@ -145,8 +167,7 @@ export default function Basket() {
 				)}
 				{windowWidth <= 768 && (
 					<BasketQuantityBtn
-						itemId={item.basketItemId}
-						quantity={item.quantity}
+						itemId={item.basket_item_id}
 						add={handleAddQuantity}
 						subtract={handleSubtractQuantity}
 						deleteItem={handleDelete}
@@ -154,15 +175,15 @@ export default function Basket() {
 				)}
 				<Buttons>
 					<Pipe>|</Pipe>
-					<Control onClick={() => handleDelete(item.basketItemId)}>
+					<button onClick={() => handleDelete(item.basket_item_id)}>
 						Delete
-					</Control>
+					</button>
 					<Pipe>|</Pipe>
-					<Control>Save for later</Control>
+					<button>Save for later</button>
 					<Pipe>|</Pipe>
-					<Control>See more like this</Control>
+					<button>See more like this</button>
 					<Pipe>|</Pipe>
-					<Control>Share</Control>
+					<button>Share</button>
 				</Buttons>
 			</ItemControls>
 		)
@@ -174,38 +195,38 @@ export default function Basket() {
 				<Content>
 					{ItemSelect(item)}
 					<Image onClick={() => handleProductClick(item)}>
-						<img src={item.thumbnail} alt={item.name} />
+						<img src={item.product_data.thumbnail} alt={item.product_data.name} />
 					</Image>
 					<Details>
 						<h3 onClick={() => handleProductClick(item)}>
-							{item.title}
+							{item.product_data.title}
 						</h3>
 						<div className="price">
-							£{(item.price * item.quantity).toFixed(2)}
+							£{(item.product_data.price * item.quantity).toFixed(2)}
 						</div>
 						<div className="crime">
 							<CrimeLogo />
 						</div>
 						<div className="discount">
-							-{item.discountPercentage}%
+							-{item.product_data.discountPercentage}%
 						</div>
 						<div className="link">
 							<span>Save more with Subscribe & Save</span>
 						</div>
 						<p
 							className={
-								item.availabilityStatus === 'In Stock'
+								item.product_data.availabilityStatus === 'In Stock'
 									? 'in'
 									: 'out'
 							}
 						>
-							{item.availabilityStatus}
+							{item.product_data.availabilityStatus}
 						</p>
 
 						<p>
-							{item.brand
-								? `by ${item.brand}`
-								: `from ${formatQuery(item.category)}`}
+							{item.product_data.brand
+								? `by ${item.product_data.brand}`
+								: `from ${formatQuery(item.product_data.category)}`}
 						</p>
 					</Details>
 				</Content>
@@ -216,7 +237,7 @@ export default function Basket() {
 				/>
 				<div className="send-as-gift">
 					<div className="select">
-						<input type="checkbox" />
+						<input type="checkbox" id={item.basket_item_id} />
 					</div>
 					<p>Send as gift. Include custom message</p>
 				</div>
@@ -230,25 +251,25 @@ export default function Basket() {
 				<Content>
 					{ItemSelect(item)}
 					<Image onClick={() => handleProductClick(item)}>
-						<img src={item.thumbnail} alt={item.name} />
+						<img src={item.product_data.thumbnail} alt={item.product_data.name} />
 					</Image>
 					<Details>
 						<h3 onClick={() => handleProductClick(item)}>
-							{item.title}
+							{item.product_data.title}
 						</h3>
 						<p>
-							{item.brand
-								? `by ${item.brand}`
-								: `from ${formatQuery(item.category)}`}
+							{item.product_data.brand
+								? `by ${item.product_data.brand}`
+								: `from ${formatQuery(item.product_data.category)}`}
 						</p>
 						<p
 							className={
-								item.availabilityStatus === 'In Stock'
+								item.product_data.availabilityStatus === 'In Stock'
 									? 'in'
 									: 'out'
 							}
 						>
-							{item.availabilityStatus}
+							{item.product_data.availabilityStatus}
 						</p>
 						<div className="crime">
 							<CrimeLogo />
@@ -266,9 +287,9 @@ export default function Basket() {
 
 				<div className="price-column">
 					<div className="price">
-						£{(item.price * item.quantity).toFixed(2)}
+						£{(item.product_data.price * item.quantity).toFixed(2)}
 					</div>
-					<div className="discount">-{item.discountPercentage}%</div>
+					<div className="discount">-{item.product_data.discountPercentage}%</div>
 					<div className="link">
 						<span>Save more with Subscribe & Save</span>
 					</div>
@@ -291,8 +312,13 @@ export default function Basket() {
 							<div className="basket-subheader">
 								<div>
 									{!selectAll && <p>No items selected.</p>}
-									<button className="primary-link" onClick={handleToggleSelectAll}>
-										{selectAll ? 'Deselect all items' : 'Select all items'}
+									<button
+										className="primary-link"
+										onClick={handleToggleSelectAll}
+									>
+										{selectAll
+											? 'Deselect all items'
+											: 'Select all items'}
 									</button>
 								</div>
 								{windowWidth > 769 && <p>Price</p>}
@@ -303,30 +329,30 @@ export default function Basket() {
 						{basketItems.map((basketItem) =>
 							windowWidth <= 768 ? (
 								<BasketItemMobile
-									key={basketItem.basketItemId}
+									key={basketItem.basket_item_id}
 									item={basketItem}
 									handleQuantityChange={(e) =>
 										handleQuantityChange(
 											e,
-											basketItem.basketItemId
+											basketItem.basket_item_id
 										)
 									}
 									handleDelete={() =>
-										handleDelete(basketItem.basketItemId)
+										handleDelete(basketItem.basket_item_id)
 									}
 								/>
 							) : (
 								<BasketItemDesktop
-									key={basketItem.basketItemId}
+									key={basketItem.basket_item_id}
 									item={basketItem}
 									handleQuantityChange={(e) =>
 										handleQuantityChange(
 											e,
-											basketItem.basketItemId
+											basketItem.basket_item_id
 										)
 									}
 									handleDelete={() =>
-										handleDelete(basketItem.basketItemId)
+										handleDelete(basketItem.basket_item_id)
 									}
 								/>
 							)
@@ -334,9 +360,14 @@ export default function Basket() {
 					</div>
 					{basketItems.length > 0 && (
 						<div className="subtotal">
-							<button className="primary-link" onClick={handleClearBasket}>Remove all items</button>
+							<button
+								className="primary-link"
+								onClick={handleClearBasket}
+							>
+								Remove all items
+							</button>
 							<p>
-								Subtotal ({basketItems.length} items):{' '}
+								Subtotal ({basketCount} items):{' '}
 								<span>£{basketTotal.toFixed(2)}</span>
 							</p>
 						</div>
@@ -349,7 +380,7 @@ export default function Basket() {
 						<p>
 							Subtotal
 							{windowWidth >= 768 && (
-								<span> ({basketItemsSelected.length + ' '} 
+								<span> ({basketCount + ' '} 
 
 								item
 								{basketItemsSelected.length > 1 ? 's' : ''}
@@ -365,9 +396,7 @@ export default function Basket() {
 						)}
 						</>
 					) : (
-						<p className="none-selected">
-							No items selected
-						</p>
+						<p className="none-selected">No items selected</p>
 					)}
 					<div className="checkout-btn">
 						<BuyButton
@@ -434,7 +463,8 @@ const ShoppingBasketItems = styled.div`
 			align-items: center;
 			gap: var(--spacing-xs);
 		}
-		p, button {
+		p,
+		button {
 			font-size: clamp(var(--font-sm), 2vw, var(--font-md));
 		}
 		button {
@@ -627,22 +657,22 @@ const Buttons = styled.div`
 	align-items: flex-end;
 	flex-wrap: wrap;
 	gap: var(--spacing-ms);
-	@media only screen and (max-width: 768px) {
-	}
-`
 
-const Control = styled.button`
-	border: none;
-	border-radius: 0;
-	color: var(--link-blue);
-	&:hover {
-		text-decoration: none;
+	button {
+		border: none;
+		border-radius: 0;
+		color: var(--link-blue);
+		&:hover {
+			text-decoration: none;
+		}
+		@media only screen and (max-width: 768px) {
+			color: var(--md-blue);
+			border: 1px solid var(--md-blue);
+			border-radius: var(--br-25);
+			padding: var(--spacing-sm);
+		}
 	}
 	@media only screen and (max-width: 768px) {
-		color: var(--md-blue);
-		border: 1px solid var(--md-blue);
-		border-radius: var(--br-25);
-		padding: var(--spacing-sm);
 	}
 `
 

@@ -106,8 +106,8 @@ export default function Product() {
 		setCurrentImage(currentProduct.images[i])
 	}
 
-	const handleAddToBasketClick = (productId) => {
-		dispatch(addItemToBasket({productId, quantity: itemQuantity}))
+	const handleAddToBasketClick = (product) => {
+		dispatch(addItemToBasket({product, quantity: itemQuantity}))
 	}
 
 	const renderProductImages = () => {
@@ -211,7 +211,7 @@ export default function Product() {
 						quantity={itemQuantity}
 						setQuantity={setItemQuantity}
 					>Quantity:</QuantityBtn>
-					<BuyButton onClick={() => handleAddToBasketClick(currentProduct.id)} text="Add to Basket" type='large'/>
+					<BuyButton onClick={() => handleAddToBasketClick(currentProduct)} text="Add to Basket" type='large'/>
 					<BuyButton onClick={() => {}} text="Buy Now" type='large'/>
 				</div>
 			</InfoBlock>

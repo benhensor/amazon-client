@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom'
+import { selectBasketItemCount } from '../../redux/slices/basketSlice'
 import { useWindowWidth } from '../../utils/useWindowWidth'
 import { useSelector } from 'react-redux'
-import { selectBasketItemCount } from '../../redux/slices/basketSlice'
 import styled from 'styled-components'
 import Logo from '../../icons/Logo'
 import MenuIcon from '../../icons/MenuIcon'
@@ -45,10 +45,9 @@ export default function Header() {
 	const defaultAddress = useSelector((state) =>
 		state.addresses.addresses.find((address) => address.is_default)
 	)
-	const basketCount = useSelector((state) => state.basket.count)
+	const basketCount = useSelector(selectBasketItemCount)
 	const [categoryMenuOpen, setCategoryMenuOpen] = useState(false)
 	const [navMenuOpen, setNavMenuOpen] = useState(false)
-
 
 	const handleSearch = (searchTerm, category) => {
 		if (searchTerm.trim()) {

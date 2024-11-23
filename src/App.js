@@ -7,7 +7,7 @@ import {
 } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import { checkLoggedIn } from './redux/slices/userSlice'
-import { fetchUserBasket } from './redux/slices/basketSlice'
+import { hydrateBasket } from './redux/slices/basketSlice'
 import ProtectedRoute from './components/protected/ProtectedRoute'
 import AuthPortal from './pages/AuthPortal'
 import Header from './components/header/Header'
@@ -95,7 +95,7 @@ function App() {
 
 	useEffect(() => {
 		// console.log('fetch user basket')
-		dispatch(fetchUserBasket())
+		dispatch(hydrateBasket())
 	}, [dispatch])
 	
 	return (

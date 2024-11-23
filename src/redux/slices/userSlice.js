@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import { userAPI } from '../../api/userAPI'
-import { fetchUserBasket } from './basketSlice'
+// import { fetchUserBasket } from './basketSlice'
 
 const userSlice = createSlice({
 	name: 'user',
@@ -114,7 +114,7 @@ export const checkLoggedIn = createAsyncThunk(
   async (_, { dispatch, rejectWithValue }) => {
     try {
       const response = await userAPI.checkAuth()
-			dispatch(fetchUserBasket())
+			//dispatch(fetchUserBasket())
       return response
     } catch (error) {
       // If it's a 401 (Unauthorized) or 403 (Forbidden), treat it as a non-error case
@@ -151,7 +151,7 @@ export const loginUser = createAsyncThunk(
 	async (credentials, { dispatch, rejectWithValue }) => {
 		try {
 			const response = await userAPI.loginUser(credentials)
-			dispatch(fetchUserBasket())
+			//dispatch(fetchUserBasket())
 			return response
 		} catch (error) {
 			return rejectWithValue(

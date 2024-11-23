@@ -62,8 +62,9 @@ export default function Carousel({ superCategory, products }) {
 		setCurrentPage((prev) => Math.max(prev - 1, 0))
 	}
 
-	const handleAddToBasket = (productId) => {
-		dispatch(addItemToBasket({productId, quantity: 1}))
+	const handleAddToBasket = (product) => {
+		dispatch(addItemToBasket({product, quantity: 1}))
+		// console.log('Added to basket:', product)
 	}
 
 	return (
@@ -111,7 +112,7 @@ export default function Carousel({ superCategory, products }) {
 							<div className="btn-container">
 								<BuyButton
 									onClick={() =>
-										handleAddToBasket(product.id)
+										handleAddToBasket(product)
 									}
 									text="Add to Basket"
 									type="small"

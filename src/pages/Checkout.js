@@ -349,7 +349,7 @@ export default function Checkout() {
 								{basketItems.map((item) => (
 									<OrderItem
 										key={item.basketItemId}
-										item={item}
+										item={item.product_data}
 										selectedShipping={selectedShipping}
 										shippingOptions={shippingOptions}
 										onShippingChange={setSelectedShipping}

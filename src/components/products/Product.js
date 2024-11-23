@@ -16,8 +16,8 @@ export default function CarouselItem({ product }) {
 		navigate(`/product/${product.id}`)
 	}
 
-	const handleAddToBasket = (productId) => {
-		dispatch(addItemToBasket({productId, quantity: 1}))
+	const handleAddToBasket = (product) => {
+		dispatch(addItemToBasket({product, quantity: 1}))
 	}
 
 	return (
@@ -48,7 +48,7 @@ export default function CarouselItem({ product }) {
 					</div>
 				</div>
 				<BuyButton
-					onClick={() => handleAddToBasket(product.id)}
+					onClick={() => handleAddToBasket(product)}
 					text="Add to Basket"
 					type="small"
 				/>
