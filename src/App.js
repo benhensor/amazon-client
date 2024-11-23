@@ -7,7 +7,7 @@ import {
 } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import { checkLoggedIn } from './redux/slices/userSlice'
-import { hydrateBasket } from './redux/slices/basketSlice'
+import { hydrateBasket, loadBasket } from './redux/slices/basketSlice'
 import ProtectedRoute from './components/protected/ProtectedRoute'
 import AuthPortal from './pages/AuthPortal'
 import Header from './components/header/Header'
@@ -86,17 +86,18 @@ const HeaderLayout = () => (
 )
 
 function App() {
-	const dispatch = useDispatch()
+	// const dispatch = useDispatch()
 
-	useEffect(() => {
-		// console.log('check logged in')
-		dispatch(checkLoggedIn())
-	}, [dispatch])
+	// useEffect(() => {
+	// 	// console.log('check logged in')
+	// 	dispatch(checkLoggedIn())
+	// }, [dispatch])
 
-	useEffect(() => {
-		// console.log('fetch user basket')
-		dispatch(hydrateBasket())
-	}, [dispatch])
+	// useEffect(() => {
+	// 	// console.log('fetch user basket')
+	// 	dispatch(hydrateBasket())
+	// 	dispatch(loadBasket())
+	// }, [dispatch])
 	
 	return (
 		<Router>

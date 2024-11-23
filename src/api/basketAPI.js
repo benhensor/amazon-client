@@ -9,7 +9,47 @@ export const basketAPI = {
 		const response = await axios.get(`${API_URL}/api/basket`, {
 			withCredentials: true,
 		})
-		console.log('fetchBasket', response.data)
+		console.log('fetchBasket', response)
+		return response.data
+	},
+	updateBasket: async (basketData) => {
+		const response = await axios.put(
+			`${API_URL}/api/basket/updatebasket`,
+			basketData,
+			{ withCredentials: true,
+				headers: {
+					'Content-Type': 'application/json',
+				},
+			 }
+		)
+		console.log('updateBasket', response.data)
+		return response.data
+	},
+  toggleItemSelected: async (basketItemId, isSelected) => {
+		const response = await axios.patch(
+			`/api/basket/items/${basketItemId}/toggle`, 
+			{ is_selected: isSelected },
+			{ withCredentials: true }
+		)
+		console.log('toggleItemSelected', response.data)
+		return response.data
+	},
+  updateItemsSelection: async (isSelected) => {
+		const response = await axios.patch(
+			'/api/basket/items/selection', 
+			{ is_selected: isSelected },
+			{ withCredentials: true }
+		)
+		console.log('updateItemsSelection', response.data)
+		return response.data
+	},
+  updateItemQuantity: async (basketItemId, quantity) => {
+		const response = await axios.patch(
+			`/api/basket/items/${basketItemId}/quantity`,
+			{ quantity },
+			{ withCredentials: true }
+		)
+		console.log('updateItemQuantity', response.data)
 		return response.data
 	},
 

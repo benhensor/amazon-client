@@ -35,10 +35,10 @@ export default function Basket() {
 		checkIsAllSelected(basketItemsSelected, basketItems)
 	)
 
-	useEffect(() => {
-		console.log('Basket items:', basketItems)
-		console.log('Basket state:', basketState)
-	}, [basketItems, basketState])
+	// useEffect(() => {
+	// 	console.log('Basket items:', basketItems)
+	// 	console.log('Basket state:', basketState)
+	// }, [basketItems, basketState])
 
 	// useEffect(() => {
 	// 	dispatch(fetchUserBasket())
@@ -168,6 +168,7 @@ export default function Basket() {
 				{windowWidth <= 768 && (
 					<BasketQuantityBtn
 						itemId={item.basket_item_id}
+						quantity={item.quantity}
 						add={handleAddQuantity}
 						subtract={handleSubtractQuantity}
 						deleteItem={handleDelete}

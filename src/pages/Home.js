@@ -4,6 +4,8 @@ import {
 	fetchAllProducts,
 	fetchCategoryList,
 } from '../redux/slices/productsSlice'
+import { checkLoggedIn } from '../redux/slices/userSlice'
+import { hydrateBasket, loadBasket } from '../redux/slices/basketSlice'
 import { fetchAddresses } from '../redux/slices/addressSlice'
 import { superCategories } from '../utils/superCategories'
 import Hero from '../components/hero/Hero'
@@ -33,6 +35,17 @@ export default function Home() {
 		}
 
 		fetchData()
+	}, [dispatch])
+
+	useEffect(() => {
+		// console.log('check logged in')
+		dispatch(checkLoggedIn())
+	}, [dispatch])
+
+	useEffect(() => {
+		// console.log('fetch user basket')
+		dispatch(hydrateBasket())
+		dispatch(loadBasket())
 	}, [dispatch])
 
 	const DepartmentCarousel = ({ superCategory }) => {

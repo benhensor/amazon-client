@@ -3,6 +3,7 @@ import TrashIcon from '../../icons/TrashIcon'
 import styled from 'styled-components'
 
 export default function BasketQuantityBtn({ itemId, quantity, add, subtract, deleteItem }) {
+	console.log('q btn:',  itemId, quantity)
 	const handleSubtract = () => {
 		if (quantity > 1) {
 			subtract(itemId); // Call the subtract function with the itemId

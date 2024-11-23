@@ -348,7 +348,7 @@ export default function Checkout() {
 							<div className="items">
 								{basketItems.map((item) => (
 									<OrderItem
-										key={item.basketItemId}
+										key={item.basket_item_id}
 										item={item.product_data}
 										selectedShipping={selectedShipping}
 										shippingOptions={shippingOptions}
@@ -359,9 +359,9 @@ export default function Checkout() {
 						</section>
 
 						<section className="delivery">
-							{Object.keys(shippingOptions).map((option) => (
+							{Object.keys(shippingOptions).map((option, i) => (
 								<DeliveryOption
-									key={option}
+									key={i}
 									option={option}
 									selected={selectedShipping}
 									onChange={onShippingChange}
