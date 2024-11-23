@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { format, addBusinessDays } from 'date-fns'
 import Logo from '../icons/Logo'
-import BasketIcon from '../icons/BasketIcon'
+import BasketFullIcon from '../icons/BasketFullIcon'
 import GiftCard from '../assets/img/checkout/gift-card.png'
 import Footer from '../components/footer/Footer'
 import styled from 'styled-components'
+import { updateItemQuantity, clearBasket, clearBasketItems } from '../redux/slices/basketSlice'
+import { fetchAddresses } from '../redux/slices/addressSlice'
+import { addOrder } from '../redux/slices/orderSlice'
 
 // Separate components for better organization
 const HeaderLogo = () => (
@@ -20,7 +23,7 @@ const HeaderLogo = () => (
 
 const BasketButton = ({ onClick }) => (
 	<StyledBasket onClick={onClick}>
-		<BasketIcon />
+		<BasketFullIcon />
 		<span>Basket</span>
 	</StyledBasket>
 )
@@ -122,26 +125,42 @@ const DeliveryOption = ({ option, selected, onChange, shippingOption }) => {
 	)
 }
 
-const OrderItem = ({ item }) => {
+const OrderItem = ({ item, quantity, handleQuantityChange }) => {
 	return (
 		<StyledOrderItem>
 			<div className="details">
 				<div className="row">
 					<div className="image">
-						<img src={item.thumbnail} alt={item.title} />
+						<img src={item.product_data.thumbnail} alt={item.product_data.title} />
 					</div>
 					<div className="info">
 						<h4>{item.title}</h4>
-						<p className="description">{item.description}</p>
+						<p className="description">{item.product_data.description}</p>
 						<p className="small">
-							<strong>£{item.price}</strong>
+							<strong>£{item.product_data.price}</strong>
 						</p>
-						<p className="small">{item.shippingInformation}</p>
-						<p className="small">Sold by {item.brand}</p>
+						<p className="small">{item.product_data.shippingInformation}</p>
+						<p className="small">Sold by {item.product_data.brand}</p>
 						<div className="quantity">
 							<p>
-								<strong>Quantity:</strong> {item.quantity}{' '}
-								<button className="primary-link">Change</button>
+								<strong>Quantity:</strong> {quantity}{' '}
+								<select
+                  name="quantity"
+                  id={item.basket_item_id}
+                  onChange={(e) => handleQuantityChange(e, item)}
+                  value=""
+									className='primary-link'
+                >
+                  <option value="">Change</option>
+                  {[...Array(5)].map((_, i) => (
+                    <option
+                      key={i + 1}
+                      value={i + 1}
+                    >
+                      {i + 1}
+                    </option>
+                  ))}
+                </select>
 							</p>
 							<p className="small">Gift options not available</p>
 						</div>
@@ -157,12 +176,13 @@ const OrderSummary = ({
 	shippingMethod,
 	shippingOptions,
 	showPrivacyNotice,
+	handleOrderClick,
 }) => {
 	const shippingCost = shippingOptions[shippingMethod]?.price || 0
 	const orderTotal = itemsTotal + shippingCost
 	return (
 		<StyledOrderSummary>
-			<button className="primary-btn pill-btn">Buy now</button>
+			<button className="primary-btn pill-btn" onClick={handleOrderClick}>Buy now</button>
 			{showPrivacyNotice && <PrivacyNotice />}
 			<hr />
 			<div className="subtotals">
@@ -190,6 +210,7 @@ const OrderSummary = ({
 }
 
 export default function Checkout() {
+	const dispatch = useDispatch()
 	const navigate = useNavigate()
 	const [selectedShipping, setSelectedShipping] = useState('standard')
 	const currentUser = useSelector((state) => state.user.currentUser) || { first_name: '', last_name: '' };
@@ -198,6 +219,15 @@ export default function Checkout() {
 	) || { address_line1: '', address_line2: '', city: '', postcode: '', county: '', country: '' };
 	const basketItems = useSelector((state) => state.basket.items)
 	const itemsTotal = useSelector((state) => state.basket.total)
+	const [orderData, setOrderData] = useState({
+		shipping: selectedShipping,
+		items: basketItems,
+		total: itemsTotal,
+	})
+
+	useEffect(() => {
+		dispatch(fetchAddresses())
+	}, [dispatch])
 
 	const onShippingChange = (option) => {
 		setSelectedShipping(option)
@@ -284,6 +314,25 @@ export default function Checkout() {
 		return shippingOptions
 	}
 
+	const handleOrderClick = () => {
+		dispatch(addOrder(orderData))
+		dispatch(clearBasket())
+		dispatch(clearBasketItems())
+		navigate('/order-confirmation')
+	}
+
+	const handleQuantityChange = (e, item) => {
+		// console.log('Changing quantity:', item)
+		const newQuantity = parseInt(e.target.value, 10)
+		// console.log(newQuantity)
+		dispatch(
+			updateItemQuantity({
+				basket_item_id: item.basket_item_id,
+				quantity: newQuantity,
+			})
+		)
+	}
+
 	const shippingOptions = useShippingOptions()
 
 	if (!shippingOptions)
@@ -349,10 +398,12 @@ export default function Checkout() {
 								{basketItems.map((item) => (
 									<OrderItem
 										key={item.basket_item_id}
-										item={item.product_data}
+										item={item}
+										quantity={item.quantity}
 										selectedShipping={selectedShipping}
 										shippingOptions={shippingOptions}
 										onShippingChange={setSelectedShipping}
+										handleQuantityChange={handleQuantityChange}
 									/>
 								))}
 							</div>
@@ -372,7 +423,7 @@ export default function Checkout() {
 
 						<section className="order-controls">
 							<div className="btn-container">
-								<button className="primary-btn pill-btn">
+								<button className="primary-btn pill-btn" onClick={handleOrderClick}>
 									Buy Now
 								</button>
 							</div>
@@ -396,6 +447,7 @@ export default function Checkout() {
 							itemsTotal={itemsTotal}
 							shippingMethod={selectedShipping}
 							shippingOptions={shippingOptions}
+							handleOrderClick={handleOrderClick}
 							showPrivacyNotice
 						/>
 					</aside>
@@ -647,12 +699,29 @@ const StyledOrderItem = styled.article`
 
 	.quantity {
 		margin-top: auto; /* Push quantity to bottom */
+		p {
+			display: flex;
+			gap: var(--spacing-sm);
+		}
 	}
 
 	.delivery {
 		display: flex;
 		flex-direction: column;
 		gap: var(--spacing-md);
+	}
+
+	select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+		border: none;
+		background: none;
+
+		&:focus {
+			outline: none;
+		}
+
 	}
 
 	@media only screen and (max-width: 768px) {

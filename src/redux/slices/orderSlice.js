@@ -1,10 +1,26 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import axios from 'axios';
+
+const API_URL = process.env.REACT_APP_API_URL;
 
 const initialState = {
   orders: [],
   status: 'idle',
   error: null,
 };
+
+export const fetchOrders = createAsyncThunk('orders/fetchOrders', async () => {
+
+})
+
+export const createOrder = createAsyncThunk('orders/createOrder', async (orderData) => {
+  const response = await axios.post(`${API_URL}/api/orders`, orderData, {
+    withCredentials: true,
+  });
+  return response.data;
+});
+
+
 
 const orderSlice = createSlice({
   name: 'orders',

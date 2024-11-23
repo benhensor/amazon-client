@@ -247,6 +247,18 @@ export const removeItemFromBasket = createAsyncThunk(
 	}
 )
 
+export const clearBasketItems = createAsyncThunk(
+  'basket/clearBasketItems',
+  async (_, { getState, rejectWithValue }) => {
+    try {
+      const { basket, user } = getState();
+      return { items: [], user };
+    } catch (error) {
+      return rejectWithValue('Failed to clear basket items');
+    }
+  }
+);
+
 // Basket Slice
 const basketSlice = createSlice({
 	name: 'basket',
@@ -357,6 +369,20 @@ const basketSlice = createSlice({
 					user
 				)
 			})
+      .addCase(clearBasketItems.fulfilled, (state, action) => {
+        const { items, user } = action.payload;
+        state.items = items;
+        state.count = calculateCount(items);
+        state.total = calculateTotal(items);
+        saveBasketToStorage(
+          {
+            items: state.items,
+            count: state.count,
+            total: state.total,
+          },
+          user
+        );
+      })
 			.addCase(logoutUser.fulfilled, (state) => {
 				state.items = []
 				state.count = 0

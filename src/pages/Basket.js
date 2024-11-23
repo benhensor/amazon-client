@@ -26,7 +26,6 @@ export default function Basket() {
 	const dispatch = useDispatch()
 	const navigate = useNavigate()
 	const windowWidth = useWindowWidth()
-	const basketState = useSelector((state) => state.basket)
 	const basketItems = useSelector(selectBasketItems)
 	const basketItemsSelected = useSelector(selectBasketItemsSelected)
 	const basketTotal = useSelector(selectBasketTotal)

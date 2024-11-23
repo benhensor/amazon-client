@@ -23,6 +23,7 @@ import Addresses from './pages/Addresses'
 import AddNewAddress from './pages/AddNewAddress'
 import UnderConstruction from './pages/UnderConstruction'
 import Checkout from './pages/Checkout'
+import OrderConfirmation from './pages/OrderConfirmation'
 
 const HeaderLayout = () => (
 	<>
@@ -39,6 +40,7 @@ const HeaderLayout = () => (
 				<Route path="/department/:slug" element={<Department />} />
 				<Route path="/product/:id" element={<Product />} />
 				<Route path="/basket" element={<Basket />} />
+				<Route path="/order-confirmation" element={<OrderConfirmation />} />
 				<Route
 					path="/account"
 					element={
@@ -86,18 +88,18 @@ const HeaderLayout = () => (
 )
 
 function App() {
-	// const dispatch = useDispatch()
+	const dispatch = useDispatch()
 
-	// useEffect(() => {
-	// 	// console.log('check logged in')
-	// 	dispatch(checkLoggedIn())
-	// }, [dispatch])
+	useEffect(() => {
+		// console.log('check logged in')
+		dispatch(checkLoggedIn())
+	}, [dispatch])
 
-	// useEffect(() => {
-	// 	// console.log('fetch user basket')
-	// 	dispatch(hydrateBasket())
-	// 	dispatch(loadBasket())
-	// }, [dispatch])
+	useEffect(() => {
+		// console.log('fetch user basket')
+		dispatch(hydrateBasket())
+		dispatch(loadBasket())
+	}, [dispatch])
 	
 	return (
 		<Router>
