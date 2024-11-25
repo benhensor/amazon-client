@@ -189,7 +189,7 @@ export default function Header() {
 					)}
 				</HeaderItem>
 				<HeaderItem>
-					<button className="got-to-account">
+					<button className="go-to-account" onClick={() => handleHeaderItemClick('/account/orders')}>
 						<p>Returns</p>
 						<span>& Orders</span>
 					</button>

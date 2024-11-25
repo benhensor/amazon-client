@@ -7,9 +7,14 @@ import BasketFullIcon from '../icons/BasketFullIcon'
 import GiftCard from '../assets/img/checkout/gift-card.png'
 import Footer from '../components/footer/Footer'
 import styled from 'styled-components'
-import { updateItemQuantity, clearBasket, clearBasketItems } from '../redux/slices/basketSlice'
+import {
+	updateItemQuantity,
+	clearBasket,
+	clearBasketItems,
+} from '../redux/slices/basketSlice'
 import { fetchAddresses } from '../redux/slices/addressSlice'
-import { addOrder } from '../redux/slices/orderSlice'
+import { createOrder } from '../redux/slices/orderSlice'
+import uuidV4 from 'uuid-v4'
 
 // Separate components for better organization
 const HeaderLogo = () => (
@@ -131,36 +136,44 @@ const OrderItem = ({ item, quantity, handleQuantityChange }) => {
 			<div className="details">
 				<div className="row">
 					<div className="image">
-						<img src={item.product_data.thumbnail} alt={item.product_data.title} />
+						<img
+							src={item.product_data.thumbnail}
+							alt={item.product_data.title}
+						/>
 					</div>
 					<div className="info">
 						<h4>{item.title}</h4>
-						<p className="description">{item.product_data.description}</p>
+						<p className="description">
+							{item.product_data.description}
+						</p>
 						<p className="small">
 							<strong>£{item.product_data.price}</strong>
 						</p>
-						<p className="small">{item.product_data.shippingInformation}</p>
-						<p className="small">Sold by {item.product_data.brand}</p>
+						<p className="small">
+							{item.product_data.shippingInformation}
+						</p>
+						<p className="small">
+							Sold by {item.product_data.brand}
+						</p>
 						<div className="quantity">
 							<p>
 								<strong>Quantity:</strong> {quantity}{' '}
 								<select
-                  name="quantity"
-                  id={item.basket_item_id}
-                  onChange={(e) => handleQuantityChange(e, item)}
-                  value=""
-									className='primary-link'
-                >
-                  <option value="">Change</option>
-                  {[...Array(5)].map((_, i) => (
-                    <option
-                      key={i + 1}
-                      value={i + 1}
-                    >
-                      {i + 1}
-                    </option>
-                  ))}
-                </select>
+									name="quantity"
+									id={item.basket_item_id}
+									onChange={(e) =>
+										handleQuantityChange(e, item)
+									}
+									value=""
+									className="primary-link"
+								>
+									<option value="">Change</option>
+									{[...Array(5)].map((_, i) => (
+										<option key={i + 1} value={i + 1}>
+											{i + 1}
+										</option>
+									))}
+								</select>
 							</p>
 							<p className="small">Gift options not available</p>
 						</div>
@@ -182,7 +195,9 @@ const OrderSummary = ({
 	const orderTotal = itemsTotal + shippingCost
 	return (
 		<StyledOrderSummary>
-			<button className="primary-btn pill-btn" onClick={handleOrderClick}>Buy now</button>
+			<button className="primary-btn pill-btn" onClick={handleOrderClick}>
+				Buy now
+			</button>
 			{showPrivacyNotice && <PrivacyNotice />}
 			<hr />
 			<div className="subtotals">
@@ -213,21 +228,30 @@ export default function Checkout() {
 	const dispatch = useDispatch()
 	const navigate = useNavigate()
 	const [selectedShipping, setSelectedShipping] = useState('standard')
-	const currentUser = useSelector((state) => state.user.currentUser) || { first_name: '', last_name: '' };
+	const currentUser = useSelector((state) => state.user.currentUser) || {
+		first_name: '',
+		last_name: '',
+	}
 	const defaultAddress = useSelector((state) =>
 		state.addresses.addresses.find((address) => address.is_default)
-	) || { address_line1: '', address_line2: '', city: '', postcode: '', county: '', country: '' };
+	) || {
+		address_line1: '',
+		address_line2: '',
+		city: '',
+		postcode: '',
+		county: '',
+		country: '',
+	}
 	const basketItems = useSelector((state) => state.basket.items)
 	const itemsTotal = useSelector((state) => state.basket.total)
-	const [orderData, setOrderData] = useState({
-		shipping: selectedShipping,
-		items: basketItems,
-		total: itemsTotal,
-	})
 
 	useEffect(() => {
 		dispatch(fetchAddresses())
 	}, [dispatch])
+
+	useEffect(() => {
+		console.log('Basket items:', basketItems)
+	}, [basketItems])
 
 	const onShippingChange = (option) => {
 		setSelectedShipping(option)
@@ -313,9 +337,20 @@ export default function Checkout() {
 
 		return shippingOptions
 	}
+	
+	const shippingOptions = useShippingOptions()
 
 	const handleOrderClick = () => {
-		dispatch(addOrder(orderData))
+		const orderData = {
+			order_id: uuidV4(),
+			user_id: currentUser.user_id,
+			order_placed: new Date(),
+			shipping: shippingOptions,
+			order_items: basketItems,
+			total: itemsTotal,
+		}
+		console.log('Order data:', orderData)
+		dispatch(createOrder(orderData))
 		dispatch(clearBasket())
 		dispatch(clearBasketItems())
 		navigate('/order-confirmation')
@@ -333,7 +368,6 @@ export default function Checkout() {
 		)
 	}
 
-	const shippingOptions = useShippingOptions()
 
 	if (!shippingOptions)
 		return (
@@ -403,7 +437,9 @@ export default function Checkout() {
 										selectedShipping={selectedShipping}
 										shippingOptions={shippingOptions}
 										onShippingChange={setSelectedShipping}
-										handleQuantityChange={handleQuantityChange}
+										handleQuantityChange={
+											handleQuantityChange
+										}
 									/>
 								))}
 							</div>
@@ -423,7 +459,10 @@ export default function Checkout() {
 
 						<section className="order-controls">
 							<div className="btn-container">
-								<button className="primary-btn pill-btn" onClick={handleOrderClick}>
+								<button
+									className="primary-btn pill-btn"
+									onClick={handleOrderClick}
+								>
 									Buy Now
 								</button>
 							</div>
@@ -712,16 +751,15 @@ const StyledOrderItem = styled.article`
 	}
 
 	select {
-    appearance: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
+		appearance: none;
+		-webkit-appearance: none;
+		-moz-appearance: none;
 		border: none;
 		background: none;
 
 		&:focus {
 			outline: none;
 		}
-
 	}
 
 	@media only screen and (max-width: 768px) {

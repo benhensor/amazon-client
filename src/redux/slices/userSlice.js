@@ -111,7 +111,7 @@ export const { setUser, logout, initializeUser } = userSlice.actions
 // Thunk to check if a user is logged in
 export const checkLoggedIn = createAsyncThunk(
   'user/checkLoggedIn',
-  async (_, { dispatch, rejectWithValue }) => {
+  async (_, { rejectWithValue }) => {
     try {
       const response = await userAPI.checkAuth()
 			//dispatch(fetchUserBasket())
@@ -148,7 +148,7 @@ export const registerUser = createAsyncThunk(
 // Thunk to login a user
 export const loginUser = createAsyncThunk(
 	'user/loginUser',
-	async (credentials, { dispatch, rejectWithValue }) => {
+	async (credentials, { rejectWithValue }) => {
 		try {
 			const response = await userAPI.loginUser(credentials)
 			//dispatch(fetchUserBasket())

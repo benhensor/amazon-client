@@ -1,5 +1,5 @@
 import React from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import ScamazonMusicImg from '../assets/img/scamazon_music.png'
 import GiftCard from '../assets/img/checkout/gift-card.png'
 import styled from 'styled-components'
@@ -79,9 +79,9 @@ export default function OrderConfirmation() {
 										Learn more
 									</span>
 								</p>
-								<p className="primary-link">
+								<Link className="primary-link" to="/account/orders">
 									Review or edit your orders ▸
-								</p>
+								</Link>
 							</div>
 						</div>
 					</div>
@@ -95,9 +95,11 @@ export default function OrderConfirmation() {
 							</div>
 							<div className="promo-details">
 								<h3>3 months FREE</h3>
-								<button className="primary-btn pill-btn">
-									Sign up and pay later
-								</button>
+								<div className="button-container">
+									<button className="primary-btn pill-btn">
+										Sign up and pay later
+									</button>
+								</div>
 								<p>
 									£9.99/month after 3 months trial. Cancel
 									anytime.
@@ -140,7 +142,7 @@ export default function OrderConfirmation() {
 			<div className="gift-card-container">
 				<GiftCardOffer />
 			</div>
-			<div className="continue-shopping">
+			<div className="button-container">
 				<button
 					className="primary-btn pill-btn"
 					onClick={handleContinueShopping}
@@ -196,20 +198,23 @@ const OrderConfirmationContainer = styled.div`
 
 	.promo-elements {
 		display: flex;
-		gap: var(--spacing-md);
 	}
 
 	.promo-image {
 		flex: 1;
+		width: 100%;
+		height: 100%;
 		img {
 			max-width: 100%;
 			width: 100%;
 			height: auto;
+			object-fit: contain;
 		}
 	}
 
 	.promo-details {
 		flex: 1;
+		padding-left: 0 var(--spacing-md);
 		text-align: center;
 		display: flex;
 		flex-direction: column;
@@ -248,8 +253,8 @@ const OrderConfirmationContainer = styled.div`
 		margin: 0 auto var(--spacing-lg) auto;
 	}
 
-	.continue-shopping {
-		width: 50rem;
+	.button-container {
+		max-width: 50rem;
 		text-align: center;
 		margin: var(--spacing-lg) auto;
 	}
@@ -263,6 +268,42 @@ const OrderConfirmationContainer = styled.div`
 			margin-top: var(--spacing-lg);
 			flex-direction: column;
 			padding: 0;
+		}
+
+		.button-container {
+			max-width: 100rem;
+			padding: 0 var(--spacing-md);
+			text-align: center;
+			margin: var(--spacing-lg) auto;
+		}
+	}
+
+	@media only screen and (max-width: 768px) {
+		.outer {
+			padding: var(--spacing-sm);
+			border-radius: 0;
+			margin: 0;
+		}
+
+		.order-confirmation-container {
+			background-color: var(--white);
+			border: 1px solid var(--md-grey);
+			padding: var(--spacing-sm);
+			border-radius: var(--br-lg);
+			display: flex;
+		}
+
+		.scamazon-music-promo {
+			margin-top: var(--spacing-md);
+			flex-direction: column;
+			padding: 0;
+		}
+
+		.button-container {
+			max-width: 100rem;
+			padding: 0 var(--spacing-md);
+			text-align: center;
+			margin: var(--spacing-lg) auto;
 		}
 	}
 
@@ -285,8 +326,9 @@ const OrderConfirmationContainer = styled.div`
 		.promo-elements {
 			flex-direction: column;
 		}
-		.continue-shopping {
-			width: 30rem;
+		.button-container {
+			width: 100%;
+			padding: 0 var(--spacing-sm);
 			text-align: center;
 			margin: var(--spacing-lg) auto;
 		}

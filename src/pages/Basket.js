@@ -118,7 +118,7 @@ export default function Basket() {
 	}
 
 	const handleCheckoutClick = () => {
-		if (basketItemsSelected.length > 1) {
+		if (basketItemsSelected.length >= 1) {
 			navigate('/checkout')
 		} else {
 			return

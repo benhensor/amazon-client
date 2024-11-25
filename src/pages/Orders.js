@@ -1,8 +1,38 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
+import React, { useEffect } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { useDispatch, useSelector } from 'react-redux'
+import { addItemToBasket } from '../redux/slices/basketSlice'
+import { fetchOrders, deleteOrderById } from '../redux/slices/orderSlice'
 import styled from 'styled-components'
 
 export default function Orders() {
+	const dispatch = useDispatch()
+	const navigate = useNavigate()
+	const currentUser = useSelector((state) => state.user.currentUser)
+	const orders = useSelector((state) => state.orders.orders)
+
+	useEffect(() => {
+		// fetch orders
+		dispatch(fetchOrders())
+	}, [dispatch])
+
+	console.log('orders: ', orders)
+	console.log('user: ', currentUser)
+
+	const formatDate = (dateString) => {
+		const date = new Date(dateString)
+		const options = { day: '2-digit', month: 'long', year: 'numeric' }
+		return date.toLocaleDateString('en-GB', options)
+	}
+
+	const buyItAgain = (product) => {
+		dispatch(addItemToBasket({product, quantity: 1}))
+	}
+
+	const handleViewItem = (itemId) => {
+		navigate(`/product/${itemId}`)
+	}
+
 	return (
 		<YourOrders>
 			<div className="content">
@@ -17,10 +47,11 @@ export default function Orders() {
 				<div className="header">
 					<h1>Your Orders</h1>
 					<form action="">
-						<input 
-              id="order-search"
-              name="order-search"
-              type="text" />
+						<input
+							id="order-search"
+							name="order-search"
+							type="text"
+						/>
 						<button>Search Orders</button>
 					</form>
 				</div>
@@ -38,7 +69,13 @@ export default function Orders() {
 				</div>
 
 				<div className="order-history">
-					<p>(Number) orders placed in</p>
+					<p>
+						<strong>
+							{orders.length} order
+							{orders.length > 1 && 's'}
+						</strong>{' '}
+						placed in
+					</p>
 					<select name="" id="">
 						<option value="">past three months</option>
 						<option value="">past six months</option>
@@ -48,84 +85,146 @@ export default function Orders() {
 				</div>
 
 				<div className="order-list">
-					<div className="order">
-						<div className="order-header">
-							<div className="order-header-item">
-								<p>order placed</p>
-								<p>(order date)</p>
-							</div>
-							<div className="order-header-item">
-								<p>total</p>
-								<p>(order total)</p>
-							</div>
-							<div className="order-header-item">
-								<p>dispatch to</p>
-								<p>(shipping address)</p>
-							</div>
-							<div className="order-header-item">
-								<p>order #</p>
-								<p>(order number)</p>
-							</div>
-						</div>
-
-						<div className="order-body">
-							<div className='order-body-items'>
-								<div className="order-status">
-									<p>Delivered (date delivered)</p>
-								</div>
-								<div className="order-item">
-									<div className="order-item-details">
-										<div className="order-item-image">
-                      image
-											<img src="" alt="" />
-										</div>
-										<div className="order-item-info">
-											<p>Product name/description</p>
-											<p>
-												Return items: Eligible until
-												(product.returnInfo)
-											</p>
-											<div className="order-buttons">
-												<button>Buy it again</button>
-												<button>View item</button>
-											</div>
-										</div>
+					{orders
+						.slice() // Create a copy of the array to avoid mutating the original state
+						.sort(
+							(a, b) =>
+								new Date(b.order_placed) -
+								new Date(a.order_placed)
+						) // Sort by most recent first
+						.map((order) => (
+							<div key={order.order_id} className="order">
+								<div className="order-header">
+									<div className="order-header-item">
+										<p>order placed</p>
+										<p>{formatDate(order.order_placed)}</p>
+									</div>
+									<div className="order-header-item">
+										<p>total</p>
+										<p>£{order.total}</p>
+									</div>
+									<div className="order-header-item">
+										<p>dispatch to</p>
+										<p className="primary-link">
+											{currentUser.first_name +
+												' ' +
+												currentUser.last_name}
+										</p>
+									</div>
+									<div className="order-header-item">
+										<p>order # {order.order_id}</p>
+										<p className="primary-link">
+											View order details
+										</p>
 									</div>
 								</div>
-							</div>
 
-							<div className="order-options">
-								<button className="accent">
-									Problem with order
-								</button>
-								<button>Track package</button>
-								<button>Return items</button>
-								<button>Share gift receipt</button>
-								<button>Leave seller feedback</button>
-								<button>Write a product review</button>
-							</div>
-						</div>
+								<div className="order-body">
+									<div className="order-body-items">
+										<div className="order-status">
+											<p>
+												Delivered{' '}
+												{formatDate(order.order_placed)}
+											</p>
+										</div>
+										{order.order_items.map((item) => (
+											<div
+												key={item.order_item_id}
+												className="order-item"
+											>
+												<div className="order-item-details">
+													<div className="order-item-image">
+														<img
+															src={
+																item
+																	.product_data
+																	.thumbnail
+															}
+															alt={
+																item
+																	.product_data
+																	.title
+															}
+														/>
+													</div>
+													<div className="order-item-info">
+														<p className="primary-link">
+															{
+																item
+																	.product_data
+																	.title
+															}
+														</p>
+														<p className="description primary-link">
+															{
+																item
+																	.product_data
+																	.description
+															}
+														</p>
+														<p className="returns-policy">
+															Return items:{' '}
+															{
+																item
+																	.product_data
+																	.returnPolicy
+															}
+														</p>
+														<div className="order-buttons">
+															<button 
+																onClick={() => buyItAgain(item.product_data)}
+																className="primary-btn"
+															>
+																Buy it again
+															</button>
+															<button
+																onClick={() => handleViewItem(item.product_data.id)}
+															>
+																View item
+															</button>
+														</div>
+													</div>
+												</div>
+											</div>
+										))}
+									</div>
 
-						<div className="order-archive-btn">
-							<button className="archive-btn primary-link">
-								Archive order
-							</button>
-						</div>
-					</div>
+									<div className="order-options">
+										<button className="accent">
+											Problem with order
+										</button>
+										<button className="accent">
+											Track package
+										</button>
+										<button>Return items</button>
+										<button>Delete order</button>
+										<button>Leave seller feedback</button>
+										<button>Write a product review</button>
+									</div>
+								</div>
+
+								<div className="order-archive-btn">
+									<button 
+										onClick={() => dispatch(deleteOrderById(order.order_id))}
+										className="archive-btn primary-link"
+									>
+										Delete order
+									</button>
+								</div>
+							</div>
+						))}
 				</div>
 			</div>
-
-			<div>Buy it again</div>
 		</YourOrders>
 	)
 }
 
 const YourOrders = styled.div`
 	background-color: var(--white);
-  overflow-x: hidden;
+	overflow-x: hidden;
 	.content {
 		max-width: 92rem;
-		margin: 0 auto;
+		margin: 0 auto var(--spacing-lg) auto;
 	}
 
 	.breadcrumb {
@@ -207,6 +306,9 @@ const YourOrders = styled.div`
 	}
 
 	.order-list {
+		display: flex;
+		flex-direction: column;
+		gap: var(--spacing-md);
 		.order {
 			border: 1px solid var(--border-grey);
 			border-radius: var(--br-lg);
@@ -242,67 +344,82 @@ const YourOrders = styled.div`
 				display: flex;
 				padding: var(--spacing-md);
 				border-bottom: 1px solid var(--border-grey);
-				.order-status {
-					p {
-						font-weight: 600;
-					}
-				}
 
-				.order-item {
-					display: flex;
-
-					.order-item-details {
-            display: flex;
-						.order-item-image {
-							img {
-								max-width: 7rem;
-								max-height: 7rem;
-							}
+				.order-body-items {
+					.order-status {
+						margin-bottom: var(--spacing-sm);
+						p {
+							font-weight: 600;
 						}
+					}
 
-						.order-item-info {
-              
-							p {
-                display: inline-block;
-                width: 100%;
-							}
-
-							.order-buttons {
-                display: flex;
-                gap: var(--spacing-sm);
-								button {
-									padding: var(--spacing-sm) var(--spacing-md);
-									background-color: var(--black);
-									color: var(--white);
-									border: none;
-									border-radius: var(--br-25);
-									margin-right: var(--spacing-sm);
+					.order-item {
+						margin-bottom: var(--spacing-md);
+						.order-item-details {
+							display: flex;
+							.order-item-image {
+								min-width: 10rem;
+								height: auto;
+								img {
+									max-width: 100%;
+									height: auto;
 								}
 							}
-							button.accent {
-								background-color: var(--yellow);
+
+							.order-item-info {
+								.description {
+									font-size: var(--font-xs);
+								}
+								p {
+									display: inline-block;
+									width: 100%;
+								}
+							}
+
+							.returns-policy {
+								font-size: var(--font-xs);
+								margin-bottom: var(--spacing-sm);
+							}
+						}
+						.order-buttons {
+							display: flex;
+							gap: var(--spacing-sm);
+							button {
+								width: 12rem;
+								border: 1px solid var(--lt-text);
+								color: var(--dk-blue);
+								border-radius: var(--br-25);
+								margin-right: var(--spacing-sm);
+								&:hover {
+									background-color: var(--lt-grey);
+								}
 							}
 						}
 					}
 				}
 
 				.order-options {
-          flex: 1;
 					display: flex;
 					flex-direction: column;
 					gap: var(--spacing-xs);
-					padding: var(--spacing-sm);
-					width: 60rem;
+					padding-left: var(--spacing-lg);
+					min-width: 25rem;
 					button {
 						padding: var(--spacing-sm) var(--spacing-md);
 						background-color: transparent;
 						color: var(--paleblue);
-						border: 1px solid var(--lt-grey);
+						border: 1px solid var(--lt-text);
 						border-radius: var(--br-25);
+						transition: var(--tr-fast);
+						&:hover {
+							background-color: var(--secondary-hover);
+						}
+					}
+					.accent {
+						background-color: var(--yellow);
 					}
 				}
 			}
-
 			.order-archive-btn {
 				display: flex;
 				padding: var(--spacing-sm) var(--spacing-md);
@@ -317,15 +434,27 @@ const YourOrders = styled.div`
 	@media only screen and (max-width: 959px) {
 		padding: 0 var(--spacing-md);
 	}
-	@media only screen and (max-width: 768px) {
+	@media only screen and (max-width: 879px) {
 		padding: 0 var(--spacing-sm);
+
+		.order-list .order .order-body {
+			flex-direction: column;
+		}
+
+		.order-list .order .order-body .order-body-items {
+			margin-bottom: var(--spacing-md);
+		}
+
+		.order-list .order .order-body .order-options {
+			padding: 0;
+		}
 
 		.order-filters {
 			padding: 0;
 			nav {
-        font-size: var(--font-xxs);
+				font-size: var(--font-xxs);
 				ul {
-          justify-content: space-between;
+					justify-content: space-between;
 					gap: 0;
 					li {
 						padding: 0;
@@ -337,11 +466,25 @@ const YourOrders = styled.div`
 	@media only screen and (max-width: 450px) {
 		padding: 0 var(--spacing-sm);
 
+		.order {
+			.order-header {
+				flex-direction: column;
+				.order-header-item {
+					margin: 0;
+					margin-bottom: var(--spacing-sm);
+					&:last-child {
+						margin: 0;
+						align-items: flex-start;
+					}
+				}
+			}
+		}
+
 		.order-filters {
 			padding: 0;
 			nav {
 				ul {
-          justify-content: space-between;
+					justify-content: space-between;
 					gap: 0;
 					li {
 						padding: 0;
