@@ -22,7 +22,7 @@ export const basketAPI = {
 				},
 			 }
 		)
-		console.log('updateBasket', response.data)
+		// console.log('updateBasket', response.data)
 		return response.data
 	},
   toggleItemSelected: async (basketItemId, isSelected) => {

@@ -249,9 +249,9 @@ export default function Checkout() {
 		dispatch(fetchAddresses())
 	}, [dispatch])
 
-	useEffect(() => {
-		console.log('Basket items:', basketItems)
-	}, [basketItems])
+	// useEffect(() => {
+	// 	console.log('selectedShipping:', selectedShipping)
+	// }, [selectedShipping])
 
 	const onShippingChange = (option) => {
 		setSelectedShipping(option)
@@ -287,19 +287,22 @@ export default function Checkout() {
 
 		return {
 			premium: {
-				dates: formatDeliveryDate(nextWorkingDay),
+				rawDates: { from: nextWorkingDay },
+				formattedDates: formatDeliveryDate(nextWorkingDay),
 				cutoffText:
 					'Order within ' +
 					(14 - currentHour) +
 					' hours for next-day delivery',
 			},
 			express: {
-				dates: `${formatDeliveryDate(
+				rawDates: { from: expressMin, to: expressMax },
+				formattedDates: `${formatDeliveryDate(
 					expressMin
 				)} - ${formatDeliveryDate(expressMax)}`,
 			},
 			standard: {
-				dates: `${formatDeliveryDate(
+				rawDates: { from: standardMin, to: standardMax },
+				formattedDates: `${formatDeliveryDate(
 					standardMin
 				)} - ${formatDeliveryDate(standardMax)}`,
 			},
@@ -317,19 +320,22 @@ export default function Checkout() {
 				standard: {
 					label: 'Standard Delivery',
 					price: 3.99,
-					dates: deliveryDates.standard.dates,
+					dates: deliveryDates.standard.formattedDates,
+					rawDates: deliveryDates.standard.rawDates,
 					description: 'Delivery within 5-7 working days',
 				},
 				express: {
 					label: 'Express Delivery',
 					price: 7.99,
-					dates: deliveryDates.express.dates,
+					dates: deliveryDates.express.formattedDates,
+					rawDates: deliveryDates.express.rawDates,
 					description: 'Delivery within 2-3 working days',
 				},
 				premium: {
 					label: 'Premium Next-Day',
 					price: 12.99,
-					dates: deliveryDates.premium.dates,
+					dates: deliveryDates.premium.formattedDates,
+					rawDates: deliveryDates.premium.rawDates,
 					description: `Next working day delivery when ordered before 2pm. ${deliveryDates.premium.cutoffText}`,
 				},
 			})
@@ -341,15 +347,24 @@ export default function Checkout() {
 	const shippingOptions = useShippingOptions()
 
 	const handleOrderClick = () => {
+		const selectedOption = shippingOptions[selectedShipping];
+		const rawDates = selectedOption.rawDates;
 		const orderData = {
 			order_id: uuidV4(),
 			user_id: currentUser.user_id,
 			order_placed: new Date(),
-			shipping: shippingOptions,
+			shipping: {
+				method: selectedShipping,
+				price: selectedOption.price,
+				dates: selectedOption.dates,
+				range_from: rawDates.from,
+				range_to: rawDates.to || null, // If no range_to, default to null
+				description: selectedOption.description,
+			},
 			order_items: basketItems,
 			total: itemsTotal,
 		}
-		console.log('Order data:', orderData)
+		console.log('orderData:', orderData)
 		dispatch(createOrder(orderData))
 		dispatch(clearBasket())
 		dispatch(clearBasketItems())
