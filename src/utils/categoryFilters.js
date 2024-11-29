@@ -1,4 +1,39 @@
 export const categoryFilters = (category, products) => {
+	console.log('categoryFilters', category, products)
+
+	const categoryList = [
+		"beauty",
+		"fragrances",
+		"furniture",
+		"groceries",
+		"home-decoration",
+		"kitchen-accessories",
+		"laptops",
+		"mens-shirts",
+		"mens-shoes",
+		"mens-watches",
+		"mobile-accessories",
+		"motorcycle",
+		"skin-care",
+		"smartphones",
+		"sports-accessories",
+		"sunglasses",
+		"tablets",
+		"tops",
+		"vehicle",
+		"womens-bags",
+		"womens-dresses",
+		"womens-jewellery",
+		"womens-shoes",
+		"womens-watches"
+	]
+
+	if (!categoryList.includes(category)) {
+		const uniqueCategories = [...new Set(products.map(product => product.category))];
+		console.log('uniqueCategories', uniqueCategories)
+		return { category: uniqueCategories };  // Wrap in an object with the 'category' key
+	}
+
 	// Helper function to capitalize each word
 	const capitalizeWords = (str) => {
 		return str

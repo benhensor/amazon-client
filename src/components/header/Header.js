@@ -232,14 +232,38 @@ export default function Header() {
 						<UnionJackIcon />
 					</HeaderItem>
 					<HeaderItem>
-						<p>Hello, Sign in</p>
-						<span>
-							Account & Lists
-							<ArrowheadIcon fill="var(--lt-grey)" />
-						</span>
-					</HeaderItem>
+					{currentUser ? (
+						<button
+							className="go-to-account"
+							onClick={() => handleHeaderItemClick('/account')}
+						>
+							<p>Hello {currentUser?.first_name}</p>
+							<span>
+								Account & Lists
+								<ArrowheadIcon
+									fill="var(--lt-grey)"
+									direction="down"
+								/>
+							</span>
+						</button>
+					) : (
+						<button
+							className="go-to-account"
+							onClick={() => handleHeaderItemClick('/auth')}
+						>
+							<p>Hello, Sign in</p>
+							<span>
+								Account & Lists
+								<ArrowheadIcon
+									fill="var(--lt-grey)"
+									direction="down"
+								/>
+							</span>
+						</button>
+					)}
+				</HeaderItem>
 					<HeaderItem>
-					<button className="go-to-account">
+					<button className="go-to-account" onClick={() => handleHeaderItemClick('/account/orders')}>
 						<p>Returns</p>
 						<span>& Orders</span>
 					</button>

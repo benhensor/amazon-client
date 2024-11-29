@@ -15,6 +15,7 @@ const initialState = {
 	categories: [],
 	categoryList: [],
 	currentProduct: null,
+	selectedCategory: null,
 	selectedDepartment: {},
 	status: 'idle',
 	error: null,
@@ -36,6 +37,9 @@ const productsSlice = createSlice({
 		setCurrentProduct(state, action) {
 			state.currentProduct = action.payload
 		},
+		setSelectedCategory(state, action) {
+			state.selectedCategory = action.payload
+		},
 		setDepartment(state, action) {
 			state.selectedDepartment = action.payload
 		},
@@ -53,6 +57,7 @@ export const {
 	setCategories,
 	setCategoryList,
 	setCurrentProduct,
+	setSelectedCategory,
 	setDepartment,
 	setStatus,
 	setError,

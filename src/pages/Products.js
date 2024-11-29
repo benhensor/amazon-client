@@ -4,12 +4,13 @@ import { useDispatch, useSelector } from 'react-redux'
 import {
 	fetchSearchResults,
 	fetchProductsByCategory,
+	setSelectedCategory,
 } from '../redux/slices/productsSlice'
 import { categoryFilters } from '../utils/categoryFilters'
-import { formatQuery } from '../utils/formatCategory'
+import formatQuery from '../utils/formatQuery'
 import Sidebar from '../components/filters/Sidebar'
 import MobileFilterMenu from '../components/filters/MobileFilterMenu'
-import Product from '../components/products/Product'
+import ProductsGrid from '../components/products/ProductsGrid'
 import FilterIcon from '../icons/FilterIcon'
 import styled from 'styled-components'
 
@@ -33,17 +34,20 @@ export default function Products() {
 			// If there's a slug, we're showing products by category
 			if (slug) {
 				dispatch(fetchProductsByCategory(slug))
+				dispatch(setSelectedCategory(slug))
 				setHeading(formatQuery(slug))
 			}
 			// If there's a searchTerm (e.g., from `/search/searchTerm` route)
 			else if (searchTerm) {
 				dispatch(fetchSearchResults(searchTerm))
+				dispatch(setSelectedCategory(searchTerm))
 				setHeading(formatQuery(searchTerm))
 			}
 			// If there's a category and searchTerm (e.g., from `/category/categoryName/search/searchTerm`)
 			else if (category && searchTerm) {
 				dispatch(fetchProductsByCategory(category))
 				dispatch(fetchSearchResults(searchTerm))
+				dispatch(setSelectedCategory(category))
 				setHeading(`${formatQuery(category)}: ${searchTerm}`)
 			}
 		}
@@ -52,7 +56,9 @@ export default function Products() {
 	}, [dispatch, slug, category, searchTerm])
 
 	useEffect(() => {
+		// console.log('Selected category:', selectedCategory, products)
 		if (selectedCategory) {
+			console.log('Selected category:', selectedCategory, products)
 			const newFilters = categoryFilters(selectedCategory, products)
 			setFilters(newFilters)
 
@@ -67,7 +73,7 @@ export default function Products() {
 		}
 
 		setFilteredProducts(products)
-		setOriginalProducts(products) 
+		setOriginalProducts(products)
 	}, [selectedCategory, products, slug, searchTerm])
 
 	const handleSort = (type) => {
@@ -105,56 +111,56 @@ export default function Products() {
 
 	// Modified handleFilterChange to maintain sorting after filtering
 	const handleFilterChange = (filterType, value) => {
-    setSelectedFilters((prev) => {
-        const updated = {
-            ...prev,
-            [filterType]: prev[filterType].includes(value)
-                ? prev[filterType].filter((item) => item !== value)
-                : [...prev[filterType], value],
-        };
+		setSelectedFilters((prev) => {
+			const updated = {
+				...prev,
+				[filterType]: prev[filterType].includes(value)
+					? prev[filterType].filter((item) => item !== value)
+					: [...prev[filterType], value],
+			}
 
-        // Apply filters (case-insensitive comparison)
-        let newFilteredProducts = products.filter((product) => {
-            return Object.entries(updated).every(([type, values]) => {
-                if (values.length === 0) return true;
+			// Apply filters (case-insensitive comparison)
+			let newFilteredProducts = products.filter((product) => {
+				return Object.entries(updated).every(([type, values]) => {
+					if (values.length === 0) return true
 
-                if (type === 'tags') {
-                    return values.some((value) =>
-                        (product.tags || [])
-                            .map((tag) => tag.toLowerCase()) // Make product tags lowercase
-                            .includes(value.toLowerCase()) // Make filter value lowercase
-                    );
-                }
-                if (type === 'brand') {
-                    return values.includes(product.brand);
-                }
-                return true;
-            });
-        });
+					if (type === 'tags') {
+						return values.some(
+							(value) =>
+								(product.tags || [])
+									.map((tag) => tag.toLowerCase()) // Make product tags lowercase
+									.includes(value.toLowerCase()) // Make filter value lowercase
+						)
+					}
+					if (type === 'brand') {
+						return values.includes(product.brand)
+					}
+					return true
+				})
+			})
 
-        // Reapply current sorting if active
-        if (sortType) {
-            newFilteredProducts = [...newFilteredProducts].sort((a, b) => {
-                const direction = sortDirection === 'asc' ? 1 : -1;
-                if (sortType === 'price') {
-                    return (a.price - b.price) * direction;
-                } else if (sortType === 'rating') {
-                    return (a.rating - b.rating) * direction;
-                } else if (sortType === 'discount') {
-                    return (
-                        (a.discountPercentage - b.discountPercentage) *
-                        direction
-                    );
-                }
-                return 0;
-            });
-        }
+			// Reapply current sorting if active
+			if (sortType) {
+				newFilteredProducts = [...newFilteredProducts].sort((a, b) => {
+					const direction = sortDirection === 'asc' ? 1 : -1
+					if (sortType === 'price') {
+						return (a.price - b.price) * direction
+					} else if (sortType === 'rating') {
+						return (a.rating - b.rating) * direction
+					} else if (sortType === 'discount') {
+						return (
+							(a.discountPercentage - b.discountPercentage) *
+							direction
+						)
+					}
+					return 0
+				})
+			}
 
-        setFilteredProducts(newFilteredProducts);
-        return updated;
-    });
-};
-
+			setFilteredProducts(newFilteredProducts)
+			return updated
+		})
+	}
 
 	if (status === 'loading')
 		return (
@@ -217,15 +223,7 @@ export default function Products() {
 				)}
 
 				<MainContent>
-					<ProductGrid>
-						{filteredProducts.length > 0 ? (
-							filteredProducts.map((product) => (
-								<Product key={product.id} product={product} />
-							))
-						) : (
-							<p>No products found</p>
-						)}
-					</ProductGrid>
+					<ProductsGrid products={filteredProducts} />
 				</MainContent>
 			</ContentWrapper>
 		</ProductsPage>
@@ -289,13 +287,4 @@ const MobileFilterToggle = styled.button`
 const MainContent = styled.main`
 	flex: 1;
 	background-color: var(--white);
-`
-
-const ProductGrid = styled.div`
-	display: grid;
-	grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
-	gap: var(--spacing-sm);
-	padding: var(--spacing-sm);
-	@media only screen and (max-width: 768px) {
-	}
 `

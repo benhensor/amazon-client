@@ -127,6 +127,6 @@ const ProductCard = styled.div`
 	}
 
 	@media only screen and (max-width: 768px) {
-		padding: var(--spacing-xs);
+		padding: var(--spacing-md);
 	}
 `

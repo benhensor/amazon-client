@@ -1,4 +1,5 @@
 import React from 'react'
+import formatQuery from '../../utils/formatQuery'
 import SortingBtn from '../buttons/SortingBtn'
 import styled from 'styled-components'
 
@@ -19,15 +20,18 @@ export default function Sidebar({
 
 	return (
 		<DesktopSidebar>
-			{filters.length > 0 && (
-				<SectionContent>
-					<p>Filter by:</p>
-					{Object.entries(filters).map(([filterType, values]) => (
-						<FilterGroup key={filterType}>
-							<FilterType>
-								{filterType.charAt(0).toUpperCase() +
-									filterType.slice(1)}
-							</FilterType>
+			{Object.entries(filters).map(([filterType, values]) => (
+				<SectionContent key={filterType}>
+					{/* Handle the filter type and capitalize the first letter */}
+					<h3>Filters</h3>
+					<p>
+						{filterType.charAt(0).toUpperCase() +
+							filterType.slice(1)}
+						:
+					</p>
+					{Array.isArray(values) ? (
+						// If the filter values are an array (e.g., for category, tags, brands)
+						<FilterGroup>
 							{values.map((value) => (
 								<FilterOption key={value}>
 									<input
@@ -42,14 +46,42 @@ export default function Sidebar({
 											)
 										}
 									/>
-									{value}
+									{formatQuery(value)}
 								</FilterOption>
 							))}
 							<Separator />
 						</FilterGroup>
-					))}
+					) : (
+						// If the filter values are an object (e.g., simulated filters)
+						<FilterGroup>
+							{Object.entries(values).map(
+								([subFilterType, subValues]) => (
+									<FilterOption key={subFilterType}>
+										<p>{subFilterType}:</p>
+										{subValues.map((subValue) => (
+											<label key={subValue}>
+												<input
+													type="checkbox"
+													checked={selectedFilters[
+														subFilterType
+													]?.includes(subValue)}
+													onChange={() =>
+														handleFilterChange(
+															subFilterType,
+															subValue
+														)
+													}
+												/>
+												{subValue}
+											</label>
+										))}
+									</FilterOption>
+								)
+							)}
+						</FilterGroup>
+					)}
 				</SectionContent>
-			)}
+			))}
 			<SectionContent>
 				<p>Sort by:</p>
 				<SortingControls>
@@ -80,7 +112,7 @@ export default function Sidebar({
 const DesktopSidebar = styled.aside`
 	position: sticky;
 	top: 4.6rem;
-	width: 25rem;
+	min-width: 25rem;
 	height: calc(100vh - 60px);
 	border-right: 1px solid var(--lt-grey);
 	background-color: var(--white);
@@ -110,12 +142,6 @@ const SortingControls = styled.div`
 
 const FilterGroup = styled.div`
 	margin-bottom: var(--spacing-md);
-`
-
-const FilterType = styled.p`
-	font-weight: bold;
-	margin-bottom: var(--spacing-xs);
-	color: var(--dk-blue);
 `
 
 const FilterOption = styled.label`

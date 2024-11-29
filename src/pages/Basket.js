@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { useWindowWidth } from '../utils/useWindowWidth'
@@ -15,7 +15,7 @@ import {
 	removeItemFromBasket,
 	clearBasket,
 } from '../redux/slices/basketSlice'
-import { formatQuery } from '../utils/formatCategory'
+import formatQuery from '../utils/formatQuery'
 import { checkIsAllSelected } from '../utils/checkIsAllSelected'
 import BuyButton from '../components/buttons/BuyButton'
 import BasketQuantityBtn from '../components/buttons/BasketQuantityBtn'
@@ -89,15 +89,14 @@ export default function Basket() {
 	}
 
 	const handleDelete = (basket_item_id) => {
-		console.log('Deleting item:', basket_item_id);
-		dispatch(removeItemFromBasket(basket_item_id));
-	
+		console.log('Deleting item:', basket_item_id)
+		dispatch(removeItemFromBasket(basket_item_id))
+
 		// Check if the basket is empty after removing the item
 		if (basketItems.length === 1) {
-			dispatch(clearBasket());
+			dispatch(clearBasket())
 		}
-	};
-	
+	}
 
 	const handleClearBasket = () => {
 		dispatch(clearBasket())
@@ -126,14 +125,16 @@ export default function Basket() {
 	}
 
 	const ItemSelect = (item) => {
-		console.log('Item:', item)
+		// console.log('Item:', item)
 		return (
 			<Select>
 				<input
 					id={item.basket_item_id}
 					type="checkbox"
 					checked={item.is_selected}
-					onChange={() => handleToggleItemSelected(item.basket_item_id)}
+					onChange={() =>
+						handleToggleItemSelected(item.basket_item_id)
+					}
 				/>
 			</Select>
 		)
@@ -195,14 +196,20 @@ export default function Basket() {
 				<Content>
 					{ItemSelect(item)}
 					<Image onClick={() => handleProductClick(item)}>
-						<img src={item.product_data.thumbnail} alt={item.product_data.name} />
+						<img
+							src={item.product_data.thumbnail}
+							alt={item.product_data.name}
+						/>
 					</Image>
 					<Details>
 						<h3 onClick={() => handleProductClick(item)}>
 							{item.product_data.title}
 						</h3>
 						<div className="price">
-							£{(item.product_data.price * item.quantity).toFixed(2)}
+							£
+							{(item.product_data.price * item.quantity).toFixed(
+								2
+							)}
 						</div>
 						<div className="crime">
 							<CrimeLogo />
@@ -215,7 +222,8 @@ export default function Basket() {
 						</div>
 						<p
 							className={
-								item.product_data.availabilityStatus === 'In Stock'
+								item.product_data.availabilityStatus ===
+								'In Stock'
 									? 'in'
 									: 'out'
 							}
@@ -226,7 +234,9 @@ export default function Basket() {
 						<p>
 							{item.product_data.brand
 								? `by ${item.product_data.brand}`
-								: `from ${formatQuery(item.product_data.category)}`}
+								: `from ${formatQuery(
+										item.product_data.category
+								  )}`}
 						</p>
 					</Details>
 				</Content>
@@ -251,7 +261,10 @@ export default function Basket() {
 				<Content>
 					{ItemSelect(item)}
 					<Image onClick={() => handleProductClick(item)}>
-						<img src={item.product_data.thumbnail} alt={item.product_data.name} />
+						<img
+							src={item.product_data.thumbnail}
+							alt={item.product_data.name}
+						/>
 					</Image>
 					<Details>
 						<h3 onClick={() => handleProductClick(item)}>
@@ -260,11 +273,14 @@ export default function Basket() {
 						<p>
 							{item.product_data.brand
 								? `by ${item.product_data.brand}`
-								: `from ${formatQuery(item.product_data.category)}`}
+								: `from ${formatQuery(
+										item.product_data.category
+								  )}`}
 						</p>
 						<p
 							className={
-								item.product_data.availabilityStatus === 'In Stock'
+								item.product_data.availabilityStatus ===
+								'In Stock'
 									? 'in'
 									: 'out'
 							}
@@ -289,7 +305,9 @@ export default function Basket() {
 					<div className="price">
 						£{(item.product_data.price * item.quantity).toFixed(2)}
 					</div>
-					<div className="discount">-{item.product_data.discountPercentage}%</div>
+					<div className="discount">
+						-{item.product_data.discountPercentage}%
+					</div>
 					<div className="link">
 						<span>Save more with Subscribe & Save</span>
 					</div>
@@ -377,23 +395,27 @@ export default function Basket() {
 				<Subtotal>
 					{basketItemsSelected.length > 0 ? (
 						<>
-						<p>
-							Subtotal
+							<p>
+								Subtotal
+								{windowWidth >= 768 && (
+									<span>
+										{' '}
+										({basketCount + ' '}
+										item
+										{basketItemsSelected.length > 1
+											? 's'
+											: ''}
+										)
+									</span>
+								)}
+								:<span> £{basketTotal.toFixed(2)}</span>
+							</p>
 							{windowWidth >= 768 && (
-								<span> ({basketCount + ' '} 
-
-								item
-								{basketItemsSelected.length > 1 ? 's' : ''}
-								)</span>
+								<div className="order-gift">
+									<input type="checkbox" />
+									<p>This order contains a gift</p>
+								</div>
 							)}
-							:<span> £{basketTotal.toFixed(2)}</span>
-						</p>
-						{windowWidth >= 768 && (
-							<div className="order-gift">
-								<input type="checkbox" />
-								<p>This order contains a gift</p>
-							</div>
-						)}
 						</>
 					) : (
 						<p className="none-selected">No items selected</p>
@@ -401,9 +423,16 @@ export default function Basket() {
 					<div className="checkout-btn">
 						<BuyButton
 							text={
-								windowWidth >= 768 && basketItemsSelected.length === 0
+								windowWidth >= 768 &&
+								basketItemsSelected.length === 0
 									? `Proceed to Checkout`
-									: `Proceed to Checkout (${basketItemsSelected.length} item${basketItemsSelected.length > 1 ? 's' : ''})`
+									: `Proceed to Checkout (${
+											basketItemsSelected.length
+									  } item${
+											basketItemsSelected.length > 1
+												? 's'
+												: ''
+									  })`
 							}
 							onClick={handleCheckoutClick}
 						/>

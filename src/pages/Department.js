@@ -6,9 +6,9 @@ import {
 	fetchDepartmentData,
 } from '../redux/slices/productsSlice'
 import { superCategories } from '../utils/superCategories'
-import { formatQuery } from '../utils/formatCategory'
+import formatQuery from '../utils/formatQuery'
 import PageHeader from '../components/pageheader/PageHeader'
-import Product from '../components/products/Product'
+import ProductsGrid from '../components/products/ProductsGrid'
 import Sidebar from '../components/filters/Sidebar'
 import MobileFilterMenu from '../components/filters/MobileFilterMenu'
 import styled from 'styled-components'
@@ -27,11 +27,9 @@ export default function Department() {
 	const [filtersOpen, setFiltersOpen] = useState(false)
 	const [filterValueMap, setFilterValueMap] = useState({})
 
-	const [originalProducts, setOriginalProducts] = useState([]) 
-	const [sortType, setSortType] = useState(null) 
+	const [originalProducts, setOriginalProducts] = useState([])
+	const [sortType, setSortType] = useState(null)
 	const [sortDirection, setSortDirection] = useState(null)
-
-
 
 	useEffect(() => {
 		if (slug) {
@@ -44,12 +42,14 @@ export default function Department() {
 			}
 			setCurrentDepartment()
 		}
-
 	}, [slug, dispatch])
 
-
 	useEffect(() => {
-		if (selectedDepartment && selectedDepartment.subCategories && products.length > 0) {
+		if (
+			selectedDepartment &&
+			selectedDepartment.subCategories &&
+			products.length > 0
+		) {
 			// Filter products to only those in the current department's subcategories
 			const productsInDepartment = products.filter((product) =>
 				selectedDepartment.subCategories.includes(product.category)
@@ -83,9 +83,6 @@ export default function Department() {
 		}
 	}, [selectedDepartment, products])
 
-
-
-
 	useEffect(() => {
 		if (departmentProducts.length > 0) {
 			setOriginalProducts(departmentProducts) // Store the original unsorted products
@@ -93,44 +90,38 @@ export default function Department() {
 		}
 	}, [departmentProducts])
 
-
-
-
 	const handleSort = (type) => {
-    if (sortType === type) {
-      // Toggle through: asc -> desc -> reset
-      if (sortDirection === 'asc') {
-        setSortDirection('desc')
-      } else if (sortDirection === 'desc') {
-        // Reset sorting
-        setSortType(null)
-        setSortDirection(null)
-        setFilteredProducts([...originalProducts]) // Reset to original order
-        return
-      }
-    } else {
-      // New sort type
-      setSortType(type)
-      setSortDirection('asc')
-    }
+		if (sortType === type) {
+			// Toggle through: asc -> desc -> reset
+			if (sortDirection === 'asc') {
+				setSortDirection('desc')
+			} else if (sortDirection === 'desc') {
+				// Reset sorting
+				setSortType(null)
+				setSortDirection(null)
+				setFilteredProducts([...originalProducts]) // Reset to original order
+				return
+			}
+		} else {
+			// New sort type
+			setSortType(type)
+			setSortDirection('asc')
+		}
 
-    const sortedProducts = [...filteredProducts].sort((a, b) => {
-      const direction = sortDirection === 'asc' ? 1 : -1
-      if (type === 'price') {
-        return (a.price - b.price) * direction
-      } else if (type === 'rating') {
-        return (a.rating - b.rating) * direction
-      } else if (type === 'discount') {
-        return (a.discountPercentage - b.discountPercentage) * direction
-      }
-      return 0
-    })
+		const sortedProducts = [...filteredProducts].sort((a, b) => {
+			const direction = sortDirection === 'asc' ? 1 : -1
+			if (type === 'price') {
+				return (a.price - b.price) * direction
+			} else if (type === 'rating') {
+				return (a.rating - b.rating) * direction
+			} else if (type === 'discount') {
+				return (a.discountPercentage - b.discountPercentage) * direction
+			}
+			return 0
+		})
 
-    setFilteredProducts(sortedProducts)
-  }
-
-
-
+		setFilteredProducts(sortedProducts)
+	}
 
 	const handleFilterChange = (filterType, formattedValue) => {
 		setSelectedFilters((prev) => {
@@ -158,9 +149,6 @@ export default function Department() {
 			return updated
 		})
 	}
-
-
-
 
 	if (status === 'loading') {
 		return (
@@ -194,9 +182,9 @@ export default function Department() {
 							filters={filters}
 							selectedFilters={selectedFilters}
 							handleFilterChange={handleFilterChange}
-              handleSort={handleSort}
-              sortType={sortType}
-              sortDirection={sortDirection}
+							handleSort={handleSort}
+							sortType={sortType}
+							sortDirection={sortDirection}
 						/>
 
 						<MobileFilterMenu
@@ -206,8 +194,8 @@ export default function Department() {
 							filtersOpen={filtersOpen}
 							setFiltersOpen={setFiltersOpen}
 							handleSort={handleSort}
-              sortType={sortType}
-              sortDirection={sortDirection}
+							sortType={sortType}
+							sortDirection={sortDirection}
 						/>
 					</>
 				)}
@@ -218,11 +206,7 @@ export default function Department() {
 						{departmentProducts.length} products in{' '}
 						{selectedDepartment.title}
 					</ResultCount>
-					<ProductGrid>
-						{filteredProducts.map((product) => (
-							<Product key={product.id} product={product} />
-						))}
-					</ProductGrid>
+					<ProductsGrid products={filteredProducts} />
 				</MainContent>
 			</Content>
 		</DepartmentContainer>
@@ -258,15 +242,5 @@ const ResultCount = styled.p`
 	margin-bottom: var(--spacing-sm);
 	font-size: var(--font-sm);
 	color: var(--md-grey);
-`
-
-const ProductGrid = styled.div`
-	display: grid;
-	grid-template-columns: repeat(auto-fill, minmax(22rem, 1fr));
-	gap: var(--spacing-sm);
-
-	@media only screen and (max-width: 768px) {
-		grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
-		gap: var(--spacing-sm);
-	}
+	padding-left: var(--spacing-sm);
 `

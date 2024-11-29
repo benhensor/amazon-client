@@ -14,7 +14,7 @@ import {
 } from '../redux/slices/basketSlice'
 import { fetchAddresses } from '../redux/slices/addressSlice'
 import { createOrder } from '../redux/slices/orderSlice'
-import uuidV4 from 'uuid-v4'
+import { v4 as uuidV4 } from 'uuid'
 
 // Separate components for better organization
 const HeaderLogo = () => (
@@ -363,6 +363,7 @@ export default function Checkout() {
 			},
 			order_items: basketItems,
 			total: itemsTotal,
+			status: 'pending',
 		}
 		console.log('orderData:', orderData)
 		dispatch(createOrder(orderData))

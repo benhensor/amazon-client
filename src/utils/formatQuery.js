@@ -1,4 +1,4 @@
-export const formatQuery = (query) => {
+const formatQuery = (query) => {
   if (!query) return ''; // Handle empty or undefined query
   
   // Check if the query contains 'search=' and extract the part after it
@@ -12,3 +12,5 @@ export const formatQuery = (query) => {
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize first letter of each word
     .join(' '); // Join back into a string with spaces
 };
+
+export default formatQuery;

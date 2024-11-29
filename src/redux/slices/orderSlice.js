@@ -33,7 +33,7 @@ export const fetchOrders = createAsyncThunk(
 			const response = await axios.get(`${API_URL}/api/orders/fetch`, {
 				withCredentials: true,
 			})
-			console.log('fetchOrders return: ', response.data.orders)
+			// console.log('fetchOrders return: ', response.data.orders)
 			return response.data.orders
 		} catch (error) {
 			throw rejectWithValue(error.response.data)
@@ -41,7 +41,22 @@ export const fetchOrders = createAsyncThunk(
 	}
 )
 
-
+export const updateOrderStatus = createAsyncThunk(
+	'orders/updateOrderStatus',
+	async ({ orderId, status }, { rejectWithValue }) => {
+		try {
+			const response = await axios.put(
+				`${API_URL}/api/orders/update/${orderId}`,
+				{ status },
+				{ withCredentials: true }
+			)
+			console.log('updateOrderStatus return: ', response.data.order)
+			return response.data.order
+		} catch (error) {
+			return rejectWithValue(error.response.data)
+		}
+	}
+)
 
 export const deleteOrderById = createAsyncThunk(
 	'orders/deleteOrder',
@@ -76,6 +91,25 @@ const orderSlice = createSlice({
 				state.status = 'failed'
 				state.error = action.payload || action.error.message
 			})
+		// Update Order Status
+			.addCase(updateOrderStatus.pending, (state) => {
+				state.status = 'loading'
+			})
+			.addCase(updateOrderStatus.fulfilled, (state, action) => {
+				state.status = 'succeeded'
+				// Update the specific order in the state
+				const updatedOrder = action.payload
+				const index = state.orders.findIndex(
+					(order) => order.order_id === updatedOrder.order_id
+				)
+				if (index !== -1) {
+					state.orders[index] = updatedOrder // Replace the old order with the updated one
+				}
+			})
+			.addCase(updateOrderStatus.rejected, (state, action) => {
+				state.status = 'failed'
+				state.error = action.payload || action.error.message
+			})
 			// Delete Order
 			.addCase(deleteOrderById.fulfilled, (state, action) => {
 				const deletedOrderId = action.meta.arg // The `orderId` passed to the thunk
@@ -89,6 +123,6 @@ const orderSlice = createSlice({
 	},
 })
 
-export const { addOrder, deleteOrder, updateOrderStatus } = orderSlice.actions
+export const { addOrder, deleteOrder } = orderSlice.actions
 
 export default orderSlice.reducer

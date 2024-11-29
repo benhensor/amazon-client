@@ -7,7 +7,7 @@ import {
 } from '../redux/slices/productsSlice'
 import { addItemToBasket } from '../redux/slices/basketSlice'
 import { superCategories } from '../utils/superCategories'
-import { formatQuery } from '../utils/formatCategory'
+import formatQuery from '../utils/formatQuery'
 import { useWindowWidth } from '../utils/useWindowWidth'
 import { generateVoteCount } from '../utils/starCalculator'
 import BuyButton from '../components/buttons/BuyButton'
@@ -45,10 +45,7 @@ export default function Product() {
 
 			try {
 				// If we don't have a current product or the URL ID doesn't match the current product
-				if (
-					!currentProduct ||
-					currentProduct.id.toString() !== id
-				) {
+				if (!currentProduct || currentProduct.id.toString() !== id) {
 					await dispatch(fetchSingleProduct(id)).unwrap()
 				}
 			} catch (err) {
@@ -70,7 +67,7 @@ export default function Product() {
 			currentProduct.images.length > 0
 		) {
 			setCurrentImage(currentProduct.images[0])
-			setActiveThumbnail(0) 
+			setActiveThumbnail(0)
 		}
 	}, [currentProduct])
 
@@ -91,9 +88,7 @@ export default function Product() {
 	)
 
 	const handleDepartmentBreadcrumbClick = (slug) => {
-		navigate(
-			`/department/${slug}`
-		)
+		navigate(`/department/${slug}`)
 	}
 
 	const handleCategoryBreadcrumbClick = (category) => {
@@ -107,7 +102,7 @@ export default function Product() {
 	}
 
 	const handleAddToBasketClick = (product) => {
-		dispatch(addItemToBasket({product, quantity: itemQuantity}))
+		dispatch(addItemToBasket({ product, quantity: itemQuantity }))
 	}
 
 	const renderProductImages = () => {
@@ -155,10 +150,13 @@ export default function Product() {
 	}
 
 	const renderProductAvailability = () => {
-		const voteCount = generateVoteCount(currentProduct.rating);
+		const voteCount = generateVoteCount(currentProduct.rating)
 		return (
 			<InfoBlock>
-				<ProductRating rating={currentProduct.rating} voteCount={voteCount} />
+				<ProductRating
+					rating={currentProduct.rating}
+					voteCount={voteCount}
+				/>
 				<p
 					className={
 						currentProduct.availabilityStatus === 'In Stock'
@@ -210,9 +208,15 @@ export default function Product() {
 					<QuantityBtn
 						quantity={itemQuantity}
 						setQuantity={setItemQuantity}
-					>Quantity:</QuantityBtn>
-					<BuyButton onClick={() => handleAddToBasketClick(currentProduct)} text="Add to Basket" type='large'/>
-					<BuyButton onClick={() => {}} text="Buy Now" type='large'/>
+					>
+						Quantity:
+					</QuantityBtn>
+					<BuyButton
+						onClick={() => handleAddToBasketClick(currentProduct)}
+						text="Add to Basket"
+						type="large"
+					/>
+					<BuyButton onClick={() => {}} text="Buy Now" type="large" />
 				</div>
 			</InfoBlock>
 		)
@@ -307,7 +311,9 @@ export default function Product() {
 					</li>
 					<li
 						onClick={() =>
-							handleCategoryBreadcrumbClick(currentProduct.category)
+							handleCategoryBreadcrumbClick(
+								currentProduct.category
+							)
 						}
 					>
 						{formatQuery(currentProduct.category)}

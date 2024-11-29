@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { fetchCategoryList } from '../../redux/slices/productsSlice'
-import { formatQuery } from '../../utils/formatCategory'
+import formatQuery from '../../utils/formatQuery'
 import styled from 'styled-components'
 import SearchIcon from '../../icons/SearchIcon'
 

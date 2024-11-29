@@ -17,7 +17,7 @@ export default function AuthPortal() {
 	const { loading, error } = useSelector((state) => state.user)
 
 	const handleHomeClick = () => {
-		console.log('Home clicked')
+		// console.log('Home clicked')
 		navigate('/')
 	}
 

@@ -9,7 +9,7 @@ export const basketAPI = {
 		const response = await axios.get(`${API_URL}/api/basket`, {
 			withCredentials: true,
 		})
-		console.log('fetchBasket', response)
+		// console.log('fetchBasket', response)
 		return response.data
 	},
 	updateBasket: async (basketData) => {

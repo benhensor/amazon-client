@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk, createSelector } from '@reduxjs/toolkit'
-import uuidV4 from 'uuid-v4'
+import { v4 as uuidV4 } from 'uuid';
 import { basketAPI } from '../../api/basketAPI'
 import { logoutUser } from './userSlice'
 
@@ -28,7 +28,7 @@ const loadBasketFromStorage = () => {
 		const storedBasket = sessionStorage.getItem(BASKET_STORAGE_KEY)
 		if (storedBasket) {
 			const parsedBasket = JSON.parse(storedBasket)
-			console.log('parseddBasket', parsedBasket)
+			// console.log('parseddBasket', parsedBasket)
 			return {
 				items: parsedBasket.items || [],
 				count: calculateCount(parsedBasket.items),
@@ -45,9 +45,9 @@ const loadBasketFromStorage = () => {
 
 const loadBasketFromDatabase = async () => {
   try {
-    console.log('Loading basket from database...');
+    // console.log('Loading basket from database...');
     const basketData = await basketAPI.fetchBasket(); // Fetch data
-    console.log('Raw basket data:', basketData);
+    // console.log('Raw basket data:', basketData);
 
     return {
       items: basketData.items || [],
@@ -251,7 +251,7 @@ export const clearBasketItems = createAsyncThunk(
   'basket/clearBasketItems',
   async (_, { getState, rejectWithValue }) => {
     try {
-      const { basket, user } = getState();
+      const { user } = getState();
       return { items: [], user };
     } catch (error) {
       return rejectWithValue('Failed to clear basket items');

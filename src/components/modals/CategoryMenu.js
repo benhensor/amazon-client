@@ -1,15 +1,12 @@
 import React, { useEffect } from 'react'
-import {
-	superCategories
-} from '../../utils/superCategories'
-import { formatQuery } from '../../utils/formatCategory'
+import { superCategories } from '../../utils/superCategories'
+import formatQuery from '../../utils/formatQuery'
 import styled from 'styled-components'
 import ProfileIcon from '../../icons/ProfileIcon'
 import ChevronIcon from '../../icons/ChevronIcon'
 import CloseIcon from '../../icons/CloseIcon'
 
 export default function CategoryMenu({ menuOpen, closeMenu, onSearch }) {
-
 	useEffect(() => {
 		// Prevent scroll when menu is open
 		document.body.style.overflow = menuOpen ? 'hidden' : 'auto'
@@ -19,46 +16,45 @@ export default function CategoryMenu({ menuOpen, closeMenu, onSearch }) {
 	}, [menuOpen])
 
 	// Department component to handle each category section
-  const Department = ({ category }) => (
-    <DepartmentWrapper>
-      <h3>{category.title}</h3>
-      <ul>
-        {category.subCategories.map((subCategory, i) => (
-          <li key={i} onClick={() => onSearch(subCategory)}>
-            <div>
-              <p>{formatQuery(subCategory)}</p>
-              <ChevronIcon direction="right" />
-            </div>
-          </li>
-        ))}
-      </ul>
-    </DepartmentWrapper>
-  )
-
-		return (
-			<>
-				<ModalBackground $menuOpen={menuOpen} onClick={closeMenu} />
-				<CategoryMenuContainer $menuOpen={menuOpen}>
-					<CategoryMenuHeader>
-						<div className='profile'>
-							<ProfileIcon />
+	const Department = ({ category }) => (
+		<DepartmentWrapper>
+			<h3>{category.title}</h3>
+			<ul>
+				{category.subCategories.map((subCategory, i) => (
+					<li key={i} onClick={() => onSearch(subCategory)}>
+						<div>
+							<p>{formatQuery(subCategory)}</p>
+							<ChevronIcon direction="right" />
 						</div>
-						<p>Hello...</p>
-						<button onClick={closeMenu}>
-							<CloseIcon />
-						</button>
-					</CategoryMenuHeader>
-					<Heading>
-						<h2>Shop by Department</h2>
-					</Heading>
-					{superCategories.map((category, index) => (
-          <Department key={index} category={category} />
-        ))}
-				</CategoryMenuContainer>
-			</>
-		)
-	}
+					</li>
+				))}
+			</ul>
+		</DepartmentWrapper>
+	)
 
+	return (
+		<>
+			<ModalBackground $menuOpen={menuOpen} onClick={closeMenu} />
+			<CategoryMenuContainer $menuOpen={menuOpen}>
+				<CategoryMenuHeader>
+					<div className="profile">
+						<ProfileIcon />
+					</div>
+					<p>Hello...</p>
+					<button onClick={closeMenu}>
+						<CloseIcon />
+					</button>
+				</CategoryMenuHeader>
+				<Heading>
+					<h2>Shop by Department</h2>
+				</Heading>
+				{superCategories.map((category, index) => (
+					<Department key={index} category={category} />
+				))}
+			</CategoryMenuContainer>
+		</>
+	)
+}
 
 const ModalBackground = styled.div`
 	position: fixed;
