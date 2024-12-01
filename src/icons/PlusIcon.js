@@ -14,6 +14,8 @@ export default function PlusIcon() {
 }
 
 const SVG = styled.svg`
+	width: 2rem;
+	height: 2rem;
   display: block;
 	position: relative;
 	path {

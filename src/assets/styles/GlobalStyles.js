@@ -44,6 +44,8 @@ const GlobalStyles = createGlobalStyle`
     --crime-blue: #2193C2;
     --basket-total: #91F6FE;
     --crime-orange: #F8991D;
+    --active-payment-method: #FF8F00;
+    --inactive-payment-method: #E0E1E1;
     --link-white-hover: #F7FAFA;
     --star-rating: #DF7921;
     --discount-red: #CC0C39;
@@ -65,6 +67,8 @@ const GlobalStyles = createGlobalStyle`
     --def-address-green: #067D62;
     --autofill-border: #50C4D9;
     --autofill-gradient: linear-gradient(90deg, #ECFDFF 0%, #C9F3FA 100%);
+    --scrollbar-thumb: #969999;
+    --scrollbar-thumb-hover: #6F7373;
 
     // spacing
     --spacing-xxs: .2rem;

@@ -17,6 +17,7 @@ import Product from './pages/Product'
 import Department from './pages/Department'
 import Account from './pages/Account'
 import Orders from './pages/Orders'
+import Payments from './pages/Payments'
 import Basket from './pages/Basket'
 import Footer from './components/footer/Footer'
 import Addresses from './pages/Addresses'
@@ -54,6 +55,14 @@ const HeaderLayout = () => (
 					element={
 						<ProtectedRoute>
 							<Orders />
+						</ProtectedRoute>
+					}
+				/>
+				<Route
+					path="/account/payments"
+					element={
+						<ProtectedRoute>
+							<Payments />
 						</ProtectedRoute>
 					}
 				/>

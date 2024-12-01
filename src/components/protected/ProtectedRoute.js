@@ -9,7 +9,7 @@ const ProtectedRoute = ({ children }) => {
     //const dispatch = useDispatch()
     const { isLoggedIn, loading, currentUser } = useSelector((state) => state.user)
 
-    console.log('protected route', { isLoggedIn, loading, currentUser })
+    // console.log('protected route', { isLoggedIn, loading, currentUser })
 
     // useEffect(() => {
     //     if (authToken && !isLoggedIn && !currentUser) {

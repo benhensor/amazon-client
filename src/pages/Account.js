@@ -22,7 +22,7 @@ export default function Account() {
 			case 'Your Schizzness Account':
 				return '/account/under-construction'
 			case 'Your Payments':
-				return '/account/under-construction'
+				return '/account/payments'
 			case 'Gift Cards & Top Up':
 				return '/account/under-construction'
 			case 'Your Messages':
