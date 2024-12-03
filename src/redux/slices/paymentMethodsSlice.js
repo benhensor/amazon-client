@@ -5,16 +5,19 @@ const API_URL = process.env.REACT_APP_API_URL
 
 export const fetchPaymentMethods = createAsyncThunk(
 	'paymentMethods/fetchPaymentMethods',
-	async (_, { rejectWithValue }) => {
+	async (_, { dispatch, rejectWithValue }) => {
 		// console.log('fetchPaymentMethods called')
+		dispatch(setLoading(true))
 		try {
 			const response = await axios.get(
 				`${API_URL}/api/payment-methods`,
 				{ withCredentials: true }
 			)
 			// console.log('fetchPaymentMethods return: ', response.data)
+			dispatch(setLoading(false))
 			return response.data
 		} catch (error) {
+			dispatch(setLoading(false))
 			return rejectWithValue(error.response.data)
 		}
 	}
@@ -25,7 +28,7 @@ export const setDefaultPaymentMethod = createAsyncThunk(
 	async (paymentMethodId, { rejectWithValue }) => {
 		try {
 			const response = await axios.put(
-				`${API_URL}/api/payment-methods/default`,
+				`${API_URL}/api/payment-methods/default/${paymentMethodId}`,
 				{},
 				{ withCredentials: true }
 			)
@@ -45,7 +48,14 @@ const paymentMethodsSlice = createSlice({
 		loading: false,
 		error: null,
 	},
-	reducers: {},
+	reducers: {
+		setLoading: (state, action) => {
+			state.loading = action.payload
+		},
+		setError: (state, action) => {
+			state.error = action.payload
+		},
+	},
 	extraReducers: (builder) => {
 		// Handle fetching payment methods
 		builder
@@ -87,5 +97,7 @@ const paymentMethodsSlice = createSlice({
 
 	},
 })
+
+export const { setLoading, setError } = paymentMethodsSlice.actions
 
 export default paymentMethodsSlice.reducer

@@ -1,55 +1,73 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { getAttributes } from '../utils/paymentMethods'
 import { useDispatch, useSelector } from 'react-redux'
 import {
 	fetchPaymentMethods,
-	setDefaultPaymentMethod,
 } from '../redux/slices/paymentMethodsSlice'
+import PaymentMethod from '../components/payments/PaymentMethod'
+import PaymentMethodThumbnail from '../components/payments/PaymentMethodThumbnail'
 import PlusIcon from '../icons/PlusIcon'
 import GiftCard from '../assets/img/payments/wallet-gift-card.png'
+import ExclamationIcon from '../icons/ExclaimationIcon'
 import styled from 'styled-components'
 
 export default function Payments() {
 	const dispatch = useDispatch()
-	const user = useSelector((state) => state.user.currentUser)
+	const loading = useSelector((state) => state.paymentMethods.loading)
 	const paymentMethods = useSelector(
 		(state) => state.paymentMethods.paymentMethods
 	)
-	const defaultPaymentMethod = useSelector(
-		(state) => state.paymentMethods.defaultPaymentMethod
-	)
+	const defaultPaymentMethod =
+		useSelector((state) => state.paymentMethods.defaultPaymentMethod) || {}
+
+		const getSortedPaymentMethods = () => {
+			if (loading) {
+				return [];
+			}
+			const now = new Date();
+		
+			return paymentMethods
+				.map((method) => {
+					// Recalculate expiration status dynamically
+					const [month, year] = (method.end_date || "").split('/').map(Number);
+					const expirationDate = new Date(`20${year}`, month - 1); // Parse MM/YY
+					const isExpired = expirationDate < now;
+		
+					return {
+						...method,
+						status: isExpired ? "expired" : method.status,
+					};
+				})
+				.filter((method) => method && method.payment_method_id)
+				.sort((a, b) => {
+					if (a.payment_method_id === defaultPaymentMethod.payment_method_id) {
+						return -1;
+					}
+					if (b.payment_method_id === defaultPaymentMethod.payment_method_id) {
+						return 1;
+					}
+		
+					if (a.status === "expired" && b.status !== "expired") return 1;
+					if (b.status === "expired" && a.status !== "expired") return -1;
+		
+					return (a.bank || "").localeCompare(b.bank || "");
+				});
+		};
+		
 
 	useEffect(() => {
 		dispatch(fetchPaymentMethods())
 	}, [dispatch])
 
-	const PaymentMethodThumbnail = ({ card, isMethodInListDisplay }) => {
-		if (!card) return null
-		const { logo, img, typeLogo, background } = getAttributes(card)
-		return (
-			<StyledPaymentMethodThumbnail
-				style={{ background: background }}
-				$isMethodInListDisplay={isMethodInListDisplay}
-			>
-				<div className="thumbnail-logo">{logo}</div>
-				{(card.bank === 'Lloyds Bank' || card.bank === 'Halifax') && (
-					<div className="thumbnail-img">{img}</div>
-				)}
-				{card.status === 'default' && !isMethodInListDisplay && (
-					<div className="thumbnail-default">
-						<p>•••• {card.number.slice(-4)}</p>
-						<p>
-							{user.first_name} {user.last_name}
-						</p>
-					</div>
-				)}
-				<div className="thumbnail-details">
-					{typeLogo}
-					<p>{card.account}</p>
-				</div>
-			</StyledPaymentMethodThumbnail>
-		)
+	useEffect(() => {
+		console.log('paymentMethods', paymentMethods)
+	}, [paymentMethods])
+
+	const sortedPaymentMethods = getSortedPaymentMethods()
+	console.log('sortedPaymentMethods', sortedPaymentMethods)
+
+	if (loading && !sortedPaymentMethods.length) {
+		return <div>Loading...</div>
 	}
 
 	return (
@@ -70,40 +88,12 @@ export default function Payments() {
 						<PaymentMethods>
 							<h2>Cards & accounts</h2>
 							<div className="cards-container">
-								{paymentMethods.map((card) => (
+								{sortedPaymentMethods.map((card) => (
 									<>
-										<CardContainer
+										<PaymentMethod
 											key={card.payment_method_id}
-											$isActive={
-												defaultPaymentMethod.payment_method_id ===
-												card.payment_method_id
-											}
-										>
-											<div className="thumbnail-container">
-												<PaymentMethodThumbnail
-													card={card}
-													isMethodInListDisplay={true}
-												/>
-											</div>
-											<div className="card-details">
-												<p className="card-account">
-													{card.bank +
-														' ' +
-														card.account_type +
-														' Account'}
-												</p>
-												<p className="card-detail">
-													Debit card ending in ••••{' '}
-													{card.number.slice(-4)}
-												</p>
-												{card.status === 'expired' && (
-													<p className="expired">
-														❗️ Expired on{' '}
-														{card.end_date}
-													</p>
-												)}
-											</div>
-										</CardContainer>
+											card={card}
+										/>
 										<hr />
 									</>
 								))}
@@ -142,22 +132,26 @@ export default function Payments() {
 								/>
 							</div>
 							<div className="card-details">
-								<p className="card-account">
-									{defaultPaymentMethod.bank +
-										' ' +
-										defaultPaymentMethod.account_type +
-										' Account'}
-								</p>
-								<p className="card-detail">
-									Debit card ending in ••••{' '}
-									{defaultPaymentMethod.number.slice(-4)}
-								</p>
-								{defaultPaymentMethod.status === 'expired' && (
-									<p className="expired">
-										❗️ Expired on{' '}
-										{defaultPaymentMethod.end_date}
+								{defaultPaymentMethod.bank && (
+									<p className="card-account">
+										{defaultPaymentMethod.bank}{' '}{defaultPaymentMethod.type}{' '}
+										{defaultPaymentMethod.account}{' '}
+										Account
 									</p>
 								)}
+								{defaultPaymentMethod.number && (
+									<p className="card-detail">
+										Debit card ending in ••••{' '}
+										{defaultPaymentMethod.number.slice(-4)}
+									</p>
+								)}
+								{defaultPaymentMethod.status === 'expired' &&
+									defaultPaymentMethod.end_date && (
+										<p className="expired">
+											<ExclamationIcon /> Expired on{' '}
+											{defaultPaymentMethod.end_date}
+										</p>
+									)}
 							</div>
 						</DefaultPaymentMethod>
 					</Content>
@@ -215,6 +209,11 @@ const PageHeader = styled.div`
 const Content = styled.div`
 	display: flex;
 	gap: var(--spacing-lg);
+
+	@media only screen and (max-width: 959px) {
+		flex-direction: column-reverse;
+		gap: var(--spacing-md);
+	}
 `
 
 const PaymentMethods = styled.div`
@@ -317,133 +316,6 @@ const PaymentMethods = styled.div`
 			margin: auto 0;
 			font-size: var(--font-sm);
 			text-align: center;
-		}
-	}
-`
-
-const CardContainer = styled.div`
-	display: flex;
-	border-radius: var(--br-sm);
-	gap: var(--spacing-sm);
-	background-color: ${($props) => ($props.$isActive ? 'var(--white)' : '')};
-	padding: var(--spacing-md) var(--spacing-sm);
-	border-left: ${($props) =>
-		$props.$isActive ? '5px solid var(--active-payment-method)' : 'none'};
-	box-shadow: ${($props) =>
-		$props.$isActive ? '0 4px 6px rgba(0, 0, 0, 0.1)' : 'none'};
-	z-index: ${($props) => ($props.$isActive ? '1' : '0')};
-	transition: background-color 0.3s, box-shadow 0.3s;
-
-	&:hover {
-		.card-details .card-account,
-		.card-detail {
-			cursor: pointer;
-			color: var(--active-payment-method);
-			text-decoration: underline;
-		}
-	}
-
-	.thumbnail-container {
-		width: 8.5rem;
-		height: 5.4rem;
-	}
-
-	.card-details {
-		display: flex;
-		flex-direction: column;
-		gap: var(--spacing-xs);
-		line-height: 1.2;
-		.card-account {
-			font-size: var(--font-sm);
-			font-weight: 700;
-		}
-
-		.card-detail {
-			font-size: var(--font-xs);
-		}
-	}
-	.expired {
-		font-size: var(--font-xs);
-		color: var(--input-error);
-	}
-`
-
-const StyledPaymentMethodThumbnail = styled.div`
-	border-radius: var(--br-sm);
-	width: 100%;
-	height: 100%;
-	padding: var(--spacing-xs);
-	position: relative;
-	.thumbnail-logo {
-		position: absolute;
-		top: ${($props) =>
-			$props.$isMethodInListDisplay
-				? 'var(--spacing-xs)'
-				: 'var(--spacing-sm)'};
-		left: ${($props) =>
-			$props.$isMethodInListDisplay ? 'var(--spacing-xs)' : '1.2rem'};
-		display: flex;
-		align-items: flex-start;
-		svg {
-			width: ${($props) =>
-				$props.$isMethodInListDisplay ? '2rem' : '8.5rem'};
-			height: 100%;
-		}
-	}
-
-	.thumbnail-img {
-		position: absolute;
-		top: 50%;
-		left: 50%;
-		transform: translate(-50%, -50%);
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		svg {
-			width: 100%;
-			height: auto;
-		}
-	}
-
-	.thumbnail-default {
-		position: absolute;
-		bottom: ${($props) =>
-			$props.$isMethodInListDisplay
-				? 'var(--spacing-xs)'
-				: 'var(--spacing-md)'};
-		left: ${($props) =>
-			$props.$isMethodInListDisplay ? 'var(--spacing-xs)' : '1.2rem'};
-		display: flex;
-		flex-direction: column;
-		align-items: flex-start;
-		p {
-			font-weight: 700;
-			color: var(--white);
-			font-size: ${($props) =>
-				$props.$isMethodInListDisplay ? '.4rem' : '1.2rem'};
-		}
-	}
-
-	.thumbnail-details {
-		position: absolute;
-		bottom: ${($props) =>
-			$props.$isMethodInListDisplay
-				? 'var(--spacing-xs)'
-				: 'var(--spacing-sm)'};
-		right: ${($props) =>
-			$props.$isMethodInListDisplay ? 'var(--spacing-xs)' : '1.2rem'};
-		display: flex;
-		flex-direction: column;
-		align-items: flex-end;
-		svg {
-			width: ${($props) =>
-				$props.$isMethodInListDisplay ? '1.2rem' : '5rem'};
-			height: auto;
-		}
-		p {
-			color: var(--white);
-			font-size: ${($props) =>
-				$props.$isMethodInListDisplay ? '.4rem' : '.8rem'};
 		}
 	}
 `

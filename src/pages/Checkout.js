@@ -2,11 +2,6 @@ import React, { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { format, addBusinessDays } from 'date-fns'
-import Logo from '../icons/Logo'
-import BasketFullIcon from '../icons/BasketFullIcon'
-import GiftCard from '../assets/img/checkout/gift-card.png'
-import Footer from '../components/footer/Footer'
-import styled from 'styled-components'
 import {
 	updateItemQuantity,
 	clearBasket,
@@ -15,214 +10,13 @@ import {
 import { fetchAddresses } from '../redux/slices/addressSlice'
 import { createOrder } from '../redux/slices/orderSlice'
 import { v4 as uuidV4 } from 'uuid'
-
-// Separate components for better organization
-const HeaderLogo = () => (
-	<Link to="/">
-		<StyledLogo>
-			<Logo letterColor="var(--white)" />
-			<p>.co.uk</p>
-		</StyledLogo>
-	</Link>
-)
-
-const BasketButton = ({ onClick }) => (
-	<StyledBasket onClick={onClick}>
-		<BasketFullIcon />
-		<span>Basket</span>
-	</StyledBasket>
-)
-
-const GiftCardOffer = () => (
-	<StyledGiftCard>
-		<div className="image">
-			<img src={GiftCard} alt="Scamazon gift card" />
-		</div>
-		<div className="details">
-			Get a{' '}
-			<strike>
-				<strong className="old-price">£20</strong>
-			</strike>{' '}
-			<span className="new-price">
-				<strong>£30</strong>
-			</span>{' '}
-			<strong>Gift Card</strong> if approved for{' '}
-			<strong>The Scamazon Gnarlaycard</strong>.{' '}
-			<span className="primary-link">
-				<strong>Apply now</strong>
-			</span>
-			. <strong>Representative 28.9% APR variable</strong>. Credit broker:
-			Scamazon EU S.A.R.L. Lender: Gnarlays. T&Cs apply.
-		</div>
-	</StyledGiftCard>
-)
-
-const PrivacyNotice = () => (
-	<p className="small">
-		By placing your order you agree to Scamazon's{' '}
-		<span className="primary-link">Conditions of Use & Sale</span>. Please
-		see our <span className="primary-link">Privacy Notice</span>, our{' '}
-		<span className="primary-link">Cookies Notice</span> and our{' '}
-		<span className="primary-link">Interest-Based Ads Notice</span>.
-	</p>
-)
-
-const ReturnPolicy = () => (
-	<section className="return-policy">
-		<p>
-			Need help? Check our{' '}
-			<span className="primary-link">help pages</span> or{' '}
-			<span className="primary-link">contact us</span>
-		</p>
-		<p>
-			When you click the "Buy now" button, we'll send you an e-mail
-			message acknowledging receipt of your order. Your contract to
-			purchase an item will not be complete until we send you an e-mail to
-			indicate that the item has been dispatched.
-		</p>
-		<p>
-			Within 30 days of delivery, you may return new, unopened physical
-			merchandise in its original condition. Exceptions and restrictions
-			apply. See Scamazon's{' '}
-			<span className="primary-link">Return Policy</span>.
-		</p>
-		<Link to="/basket" className="primary-link">
-			Back to basket
-		</Link>
-	</section>
-)
-
-const PaymentSection = () => (
-	<section className="payment">
-		<div>
-			<h3>Payment method</h3>
-			<button className="primary-link">
-				Use a gift card, voucher or promo code
-			</button>
-		</div>
-		<button className="primary-link">Change</button>
-	</section>
-)
-
-const DeliveryOption = ({ option, selected, onChange, shippingOption }) => {
-	if (!shippingOption) return null
-
-	return (
-		<StyledDeliveryOption>
-			<input
-				type="radio"
-				checked={selected === option}
-				onChange={() => onChange(option)}
-				name="shipping"
-			/>
-			<div>
-				<p>
-					<strong>{shippingOption.dates}</strong>
-				</p>
-				<p className="small">
-					£{shippingOption.price.toFixed(2)} - {shippingOption.label}
-				</p>
-				<p className="small description">
-					{shippingOption.description}
-				</p>
-			</div>
-		</StyledDeliveryOption>
-	)
-}
-
-const OrderItem = ({ item, quantity, handleQuantityChange }) => {
-	return (
-		<StyledOrderItem>
-			<div className="details">
-				<div className="row">
-					<div className="image">
-						<img
-							src={item.product_data.thumbnail}
-							alt={item.product_data.title}
-						/>
-					</div>
-					<div className="info">
-						<h4>{item.title}</h4>
-						<p className="description">
-							{item.product_data.description}
-						</p>
-						<p className="small">
-							<strong>£{item.product_data.price}</strong>
-						</p>
-						<p className="small">
-							{item.product_data.shippingInformation}
-						</p>
-						<p className="small">
-							Sold by {item.product_data.brand}
-						</p>
-						<div className="quantity">
-							<p>
-								<strong>Quantity:</strong> {quantity}{' '}
-								<select
-									name="quantity"
-									id={item.basket_item_id}
-									onChange={(e) =>
-										handleQuantityChange(e, item)
-									}
-									value=""
-									className="primary-link"
-								>
-									<option value="">Change</option>
-									{[...Array(5)].map((_, i) => (
-										<option key={i + 1} value={i + 1}>
-											{i + 1}
-										</option>
-									))}
-								</select>
-							</p>
-							<p className="small">Gift options not available</p>
-						</div>
-					</div>
-				</div>
-			</div>
-		</StyledOrderItem>
-	)
-}
-
-const OrderSummary = ({
-	itemsTotal,
-	shippingMethod,
-	shippingOptions,
-	showPrivacyNotice,
-	handleOrderClick,
-}) => {
-	const shippingCost = shippingOptions[shippingMethod]?.price || 0
-	const orderTotal = itemsTotal + shippingCost
-	return (
-		<StyledOrderSummary>
-			<button className="primary-btn pill-btn" onClick={handleOrderClick}>
-				Buy now
-			</button>
-			{showPrivacyNotice && <PrivacyNotice />}
-			<hr />
-			<div className="subtotals">
-				<div className="order-summary">
-					<div className="order-subtotal">
-						<p className="small">Items:</p>
-						<p className="small">£{itemsTotal.toFixed(2)}</p>
-					</div>
-					<div className="order-subtotal">
-						<p className="small">Postage & Packing:</p>
-						<p className="small">£{shippingCost.toFixed(2)}</p>
-					</div>
-					<div className="order-subtotal total">
-						<h3>Order Total:</h3>
-						<h3>£{orderTotal.toFixed(2)}</h3>
-					</div>
-					<p className="small">
-						Order totals include VAT.{' '}
-						<span className="primary-link">See details</span>
-					</p>
-				</div>
-			</div>
-		</StyledOrderSummary>
-	)
-}
+import PaymentMethod from '../components/payments/PaymentMethod'
+import Logo from '../icons/Logo'
+import BasketFullIcon from '../icons/BasketFullIcon'
+import GiftCard from '../assets/img/checkout/gift-card.png'
+import Footer from '../components/footer/Footer'
+import styled from 'styled-components'
+import { current } from '@reduxjs/toolkit'
 
 export default function Checkout() {
 	const dispatch = useDispatch()
@@ -242,6 +36,9 @@ export default function Checkout() {
 		county: '',
 		country: '',
 	}
+	const paymentMethod = useSelector(
+		(state) => state.paymentMethods.defaultPaymentMethod
+	)
 	const basketItems = useSelector((state) => state.basket.items)
 	const itemsTotal = useSelector((state) => state.basket.total)
 
@@ -249,10 +46,238 @@ export default function Checkout() {
 		dispatch(fetchAddresses())
 	}, [dispatch])
 
-	// useEffect(() => {
-	// 	console.log('selectedShipping:', selectedShipping)
-	// }, [selectedShipping])
+	const HeaderLogo = () => (
+		<Link to="/">
+			<StyledLogo>
+				<Logo letterColor="var(--white)" />
+				<p>.co.uk</p>
+			</StyledLogo>
+		</Link>
+	)
 
+	const BasketButton = ({ onClick }) => (
+		<StyledBasket onClick={onClick}>
+			<BasketFullIcon />
+			<span>Basket</span>
+		</StyledBasket>
+	)
+
+	const GiftCardOffer = () => (
+		<StyledGiftCard>
+			<div className="image">
+				<img src={GiftCard} alt="Scamazon gift card" />
+			</div>
+			<div className="details">
+				Get a{' '}
+				<strike>
+					<strong className="old-price">£20</strong>
+				</strike>{' '}
+				<span className="new-price">
+					<strong>£30</strong>
+				</span>{' '}
+				<strong>Gift Card</strong> if approved for{' '}
+				<strong>The Scamazon Gnarlaycard</strong>.{' '}
+				<span className="primary-link">
+					<strong>Apply now</strong>
+				</span>
+				. <strong>Representative 28.9% APR variable</strong>. Credit
+				broker: Scamazon EU S.A.R.L. Lender: Gnarlays. T&Cs apply.
+			</div>
+		</StyledGiftCard>
+	)
+
+	const PrivacyNotice = () => (
+		<p className="small">
+			By placing your order you agree to Scamazon's{' '}
+			<span className="primary-link">Conditions of Use & Sale</span>.
+			Please see our <span className="primary-link">Privacy Notice</span>,
+			our <span className="primary-link">Cookies Notice</span> and our{' '}
+			<span className="primary-link">Interest-Based Ads Notice</span>.
+		</p>
+	)
+
+	const ReturnPolicy = () => (
+		<section className="return-policy">
+			<p>
+				Need help? Check our{' '}
+				<span className="primary-link">help pages</span> or{' '}
+				<span className="primary-link">contact us</span>
+			</p>
+			<p>
+				When you click the "Buy now" button, we'll send you an e-mail
+				message acknowledging receipt of your order. Your contract to
+				purchase an item will not be complete until we send you an
+				e-mail to indicate that the item has been dispatched.
+			</p>
+			<p>
+				Within 30 days of delivery, you may return new, unopened
+				physical merchandise in its original condition. Exceptions and
+				restrictions apply. See Scamazon's{' '}
+				<span className="primary-link">Return Policy</span>.
+			</p>
+			<Link to="/basket" className="primary-link">
+				Back to basket
+			</Link>
+		</section>
+	)
+
+	const PaymentSection = ({ card }) => {
+		console.log('PaymentSection card:', card)
+		return (
+			<section className="payment">
+				<div>
+					<h3>Payment method</h3>
+
+					{currentUser.isLoggedIn &&
+						<div className="payment-method">
+							<PaymentMethod card={card} />
+						</div>
+					}
+
+					<button className="primary-link">
+						Use a gift card, voucher or promo code
+					</button>
+				</div>
+				{currentUser.isLoggedIn ?
+					<button
+					onClick={() => navigate('/account/payments')}
+					className="primary-link"
+				>
+					Change
+				</button>
+				:
+				<p className="primary-link">Change</p>
+
+				}
+			</section>
+		)
+	}
+
+	const DeliveryOption = ({ option, selected, onChange, shippingOption }) => {
+		if (!shippingOption) return null
+
+		return (
+			<StyledDeliveryOption>
+				<input
+					type="radio"
+					checked={selected === option}
+					onChange={() => onChange(option)}
+					name="shipping"
+				/>
+				<div>
+					<p>
+						<strong>{shippingOption.dates}</strong>
+					</p>
+					<p className="small">
+						£{shippingOption.price.toFixed(2)} -{' '}
+						{shippingOption.label}
+					</p>
+					<p className="small description">
+						{shippingOption.description}
+					</p>
+				</div>
+			</StyledDeliveryOption>
+		)
+	}
+
+	const OrderItem = ({ item, quantity, handleQuantityChange }) => {
+		return (
+			<StyledOrderItem>
+				<div className="details">
+					<div className="row">
+						<div className="image">
+							<img
+								src={item.product_data.thumbnail}
+								alt={item.product_data.title}
+							/>
+						</div>
+						<div className="info">
+							<h4>{item.title}</h4>
+							<p className="description">
+								{item.product_data.description}
+							</p>
+							<p className="small">
+								<strong>£{item.product_data.price}</strong>
+							</p>
+							<p className="small">
+								{item.product_data.shippingInformation}
+							</p>
+							<p className="small">
+								Sold by {item.product_data.brand}
+							</p>
+							<div className="quantity">
+								<p>
+									<strong>Quantity:</strong> {quantity}{' '}
+									<select
+										name="quantity"
+										id={item.basket_item_id}
+										onChange={(e) =>
+											handleQuantityChange(e, item)
+										}
+										value=""
+										className="primary-link"
+									>
+										<option value="">Change</option>
+										{[...Array(5)].map((_, i) => (
+											<option key={i + 1} value={i + 1}>
+												{i + 1}
+											</option>
+										))}
+									</select>
+								</p>
+								<p className="small">
+									Gift options not available
+								</p>
+							</div>
+						</div>
+					</div>
+				</div>
+			</StyledOrderItem>
+		)
+	}
+
+	const OrderSummary = ({
+		itemsTotal,
+		shippingMethod,
+		shippingOptions,
+		showPrivacyNotice,
+		handleOrderClick,
+	}) => {
+		const shippingCost = shippingOptions[shippingMethod]?.price || 0
+		const orderTotal = itemsTotal + shippingCost
+		return (
+			<StyledOrderSummary>
+				<button
+					className="primary-btn pill-btn"
+					onClick={handleOrderClick}
+				>
+					Buy now
+				</button>
+				{showPrivacyNotice && <PrivacyNotice />}
+				<hr />
+				<div className="subtotals">
+					<div className="order-summary">
+						<div className="order-subtotal">
+							<p className="small">Items:</p>
+							<p className="small">£{itemsTotal.toFixed(2)}</p>
+						</div>
+						<div className="order-subtotal">
+							<p className="small">Postage & Packing:</p>
+							<p className="small">£{shippingCost.toFixed(2)}</p>
+						</div>
+						<div className="order-subtotal total">
+							<h3>Order Total:</h3>
+							<h3>£{orderTotal.toFixed(2)}</h3>
+						</div>
+						<p className="small">
+							Order totals include VAT.{' '}
+							<span className="primary-link">See details</span>
+						</p>
+					</div>
+				</div>
+			</StyledOrderSummary>
+		)
+	}
 	const onShippingChange = (option) => {
 		setSelectedShipping(option)
 	}
@@ -343,12 +368,12 @@ export default function Checkout() {
 
 		return shippingOptions
 	}
-	
+
 	const shippingOptions = useShippingOptions()
 
 	const handleOrderClick = () => {
-		const selectedOption = shippingOptions[selectedShipping];
-		const rawDates = selectedOption.rawDates;
+		const selectedOption = shippingOptions[selectedShipping]
+		const rawDates = selectedOption.rawDates
 		const orderData = {
 			order_id: uuidV4(),
 			user_id: currentUser.user_id,
@@ -383,7 +408,6 @@ export default function Checkout() {
 			})
 		)
 	}
-
 
 	if (!shippingOptions)
 		return (
@@ -432,7 +456,7 @@ export default function Checkout() {
 							</button>
 						</section>
 
-						<PaymentSection />
+						<PaymentSection card={paymentMethod} />
 
 						<section>
 							<GiftCardOffer />
@@ -657,6 +681,10 @@ const StyledMain = styled.main`
 		display: flex;
 		justify-content: space-between;
 		align-items: flex-start;
+	}
+
+	.payment-method {
+		width: 100%;
 	}
 
 	.delivery-date {

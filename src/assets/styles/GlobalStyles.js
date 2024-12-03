@@ -69,6 +69,7 @@ const GlobalStyles = createGlobalStyle`
     --autofill-gradient: linear-gradient(90deg, #ECFDFF 0%, #C9F3FA 100%);
     --scrollbar-thumb: #969999;
     --scrollbar-thumb-hover: #6F7373;
+    --default-green: #ADE422;
 
     // spacing
     --spacing-xxs: .2rem;
