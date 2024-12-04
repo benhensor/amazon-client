@@ -7,8 +7,9 @@ import styled from 'styled-components'
 
 export default function PaymentMethod({ card }) {
   const dispatch = useDispatch()
-  const defaultPaymentMethod = useSelector((state) => state.paymentMethods.defaultPaymentMethod)
+  const defaultPaymentMethod = useSelector((state) => state.paymentMethods.defaultPaymentMethod) || {}
 
+	console.log('defaultPaymentMethod', card)
   const handleSetDefaultPaymentMethod = (paymentMethodId) => {
 		dispatch(setDefaultPaymentMethod(paymentMethodId))
 	}

@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react'
+import { useSelector } from 'react-redux'
 import { superCategories } from '../../utils/superCategories'
 import formatQuery from '../../utils/formatQuery'
 import styled from 'styled-components'
@@ -7,6 +8,8 @@ import ChevronIcon from '../../icons/ChevronIcon'
 import CloseIcon from '../../icons/CloseIcon'
 
 export default function CategoryMenu({ menuOpen, closeMenu, onSearch }) {
+	const currentUser = useSelector((state) => state.user.currentUser) 
+	const isLoggedIn = useSelector((state) => state.user.isLoggedIn)
 	useEffect(() => {
 		// Prevent scroll when menu is open
 		document.body.style.overflow = menuOpen ? 'hidden' : 'auto'
@@ -35,23 +38,23 @@ export default function CategoryMenu({ menuOpen, closeMenu, onSearch }) {
 	return (
 		<>
 			<ModalBackground $menuOpen={menuOpen} onClick={closeMenu} />
-			<CategoryMenuContainer $menuOpen={menuOpen}>
-				<CategoryMenuHeader>
+			<ModalContainer $menuOpen={menuOpen}>
+				<ModalHeader>
 					<div className="profile">
 						<ProfileIcon />
+						<p>Hello{currentUser && isLoggedIn ? ` ${currentUser.first_name}!` : '...'}</p>
 					</div>
-					<p>Hello...</p>
 					<button onClick={closeMenu}>
 						<CloseIcon />
 					</button>
-				</CategoryMenuHeader>
+				</ModalHeader>
 				<Heading>
 					<h2>Shop by Department</h2>
 				</Heading>
 				{superCategories.map((category, index) => (
 					<Department key={index} category={category} />
 				))}
-			</CategoryMenuContainer>
+			</ModalContainer>
 		</>
 	)
 }
@@ -69,7 +72,7 @@ const ModalBackground = styled.div`
 	transition: var(--tr-medium);
 `
 
-const CategoryMenuContainer = styled.div`
+const ModalContainer = styled.div`
 	position: fixed;
 	top: 0;
 	left: 0;
@@ -82,30 +85,38 @@ const CategoryMenuContainer = styled.div`
 		$menuOpen ? 'translateX(0)' : 'translateX(-100%)'};
 	opacity: ${({ $menuOpen }) => ($menuOpen ? 1 : 0)};
 	transition: var(--tr-medium);
-
 	@media only screen and (max-width: 450px) {
 		width: 100%;
 	}
 `
 
-const CategoryMenuHeader = styled.div`
+const ModalHeader = styled.div`
 	display: flex;
 	align-items: center;
+	justify-content: space-between;
+	width: 100%;
 	padding: var(--spacing-md) var(--spacing-lg);
 	background-color: var(--md-blue);
 	position: relative;
 	div.profile {
-		width: 3rem;
+		display: flex;
+		align-items: center;
+		gap: var(--spacing-md);
 		height: 3rem;
 		svg {
 			fill: var(--white);
 		}
 	}
+
 	p {
+		display: flex;
+		align-items: center;
+		min-width: fit-content;
+		color: var(--white);
 		font-size: var(--font-lg);
 		font-weight: bold;
-		margin-left: var(--spacing-sm);
 	}
+
 	button {
 		display: flex;
 		align-items: center;
@@ -148,7 +159,7 @@ const DepartmentWrapper = styled.div`
 		cursor: pointer;
 		div {
 			width: 100%;
-			padding: var(--spacing-sm) var(--spacing-md);
+			padding: var(--spacing-sm) var(--spacing-md) var(--spacing-sm) var(--spacing-sm);
 			display: flex;
 			justify-content: space-between;
 		}

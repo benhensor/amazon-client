@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { logoutUser } from '../../redux/slices/userSlice'
 import styled from 'styled-components'
 import ProfileIcon from '../../icons/ProfileIcon'
@@ -10,6 +10,8 @@ import CloseIcon from '../../icons/CloseIcon'
 export default function NavMenu({ menuOpen, closeMenu }) {
 	const dispatch = useDispatch()
 	const navigate = useNavigate()
+	const currentUser = useSelector((state) => state.user.currentUser)
+	const isLoggedIn = useSelector((state) => state.user.isLoggedIn)	
 
 	useEffect(() => {
 		// Disable scroll when modal is open
@@ -36,73 +38,66 @@ export default function NavMenu({ menuOpen, closeMenu }) {
 		closeMenu()
 	}
 
+	const menuItemProps = {
+		account: {
+			text: 'Account',
+			destination: '/account',
+			label: 'Account',
+		},
+		lists: {
+			text: 'Lists',
+			destination: '/account/under-construction',
+			label: 'Lists',
+		},
+		currency: {
+			text: 'Currency',
+			destination: '/account/under-construction',
+			label: 'Currency',
+		},
+		addresses: {
+			text: 'Update location',
+			destination: '/account/addresses',
+			label: 'Update location',
+		},
+		orders: {
+			text: 'Orders & Returns',
+			destination: '/account/orders',
+			label: 'Orders & Returns',
+		},
+	}
+
+	const menuItems = Object.keys(menuItemProps).map((key) => {
+		const item = menuItemProps[key]
+		return (
+			<MenuItem key={key}>
+				<ChevronIcon direction="left" />
+				<button className='menu-btn' onClick={() => handleMenuItemClick(item.destination)}>
+					{item.text}
+				</button>
+			</MenuItem>
+		)
+	})
+
 	return (
 		<>
 			<ModalBackground $menuOpen={menuOpen} onClick={closeMenu} />
-			<MenuContainer $menuOpen={menuOpen}>
-				<MenuHeader>
+			<ModalContainer $menuOpen={menuOpen}>
+				<ModalHeader>
 					<div className="profile">
 						<ProfileIcon />
+						<p>Hello{currentUser && isLoggedIn ? ` ${currentUser.first_name}!` : '...'}</p>
 					</div>
-					<p>Hello...</p>
-					<button className='close-btn' onClick={closeMenu}>
+					<button onClick={closeMenu}>
 						<CloseIcon />
 					</button>
-				</MenuHeader>
+				</ModalHeader>
 
-				<MenuItem>
-					<ChevronIcon direction="left" />
-					<button className='menu-btn' onClick={() => handleMenuItemClick('/account')}>
-						Account
-					</button>
-				</MenuItem>
-
-				<MenuItem>
-					<ChevronIcon direction="left" />
-					<button
-						className='menu-btn' onClick={() =>
-							handleMenuItemClick('/account/under-construction')
-						}
-					>
-						Lists
-					</button>
-				</MenuItem>
-
-				<MenuItem>
-					<ChevronIcon direction="left" />
-					<button
-						className='menu-btn' onClick={() =>
-							handleMenuItemClick('/account/under-construction')
-						}
-					>
-						Currency
-					</button>
-				</MenuItem>
-
-				<MenuItem>
-					<ChevronIcon direction="left" />
-					<button
-						className='menu-btn' onClick={() =>
-							handleMenuItemClick('/account/addresses')
-						}
-					>
-						Update location
-					</button>
-				</MenuItem>
-
-				<MenuItem>
-					<ChevronIcon direction="left" />
-					<button
-						className='menu-btn' onClick={() => handleMenuItemClick('/account/orders')}
-					>
-						Orders & Returns
-					</button>
-				</MenuItem>
+				{menuItems}
 
 				<MenuItem>
 					<button className='signout-btn' onClick={handleLogoutClick}>Sign Out</button>
 				</MenuItem>
-			</MenuContainer>
+			</ModalContainer>
 		</>
 	)
 }
@@ -120,7 +115,7 @@ const ModalBackground = styled.div`
 	transition: var(--tr-medium);
 `
 
-const MenuContainer = styled.div`
+const ModalContainer = styled.div`
 	position: fixed;
 	top: 0;
 	right: 0;
@@ -130,8 +125,6 @@ const MenuContainer = styled.div`
 	color: var(--black);
 	z-index: 999;
 	overflow-y: auto;
-	display: flex;
-	flex-direction: column;
 	transform: ${({ $menuOpen }) =>
 		$menuOpen ? 'translateX(0)' : 'translateX(100%)'};
 	opacity: ${({ $menuOpen }) => ($menuOpen ? 1 : 0)};
@@ -141,33 +134,34 @@ const MenuContainer = styled.div`
 	}
 `
 
-const MenuHeader = styled.div`
+const ModalHeader = styled.div`
 	display: flex;
 	align-items: center;
+	justify-content: space-between;
 	width: 100%;
 	padding: var(--spacing-md) var(--spacing-lg);
 	background-color: var(--md-blue);
 	position: relative;
-	margin-bottom: var(--spacing-md);
-	> div {
+	div.profile {
 		display: flex;
 		align-items: center;
-	}
-	div.profile {
-		width: 3rem;
+		gap: var(--spacing-md);
 		height: 3rem;
 		svg {
 			fill: var(--white);
 		}
 	}
+	
 	p {
+		display: flex;
+		align-items: center;
+		min-width: fit-content;
 		color: var(--white);
 		font-size: var(--font-lg);
 		font-weight: bold;
-		margin-left: var(--spacing-sm);
 	}
-	
-	.close-btn {
+
+	button {
 		display: flex;
 		align-items: center;
 		justify-content: center;
