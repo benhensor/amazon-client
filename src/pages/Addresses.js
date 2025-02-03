@@ -1,28 +1,32 @@
 import React, { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
+import { useWindowWidth } from '../utils/useWindowWidth'
 import { useSelector, useDispatch } from 'react-redux'
 import {
 	fetchAddresses,
 	setDefaultAddress,
-	updateAddress,
 	deleteAddress,
 } from '../redux/slices/addressSlice'
 import PlusIcon from '../icons/PlusIcon'
+import ChevronIcon from '../icons/ChevronIcon'
 import Logo from '../icons/Logo'
 import styled from 'styled-components'
 
 export default function Addresses() {
 	const dispatch = useDispatch()
+	const navigate = useNavigate()
 	const { addresses } = useSelector((state) => state.addresses)
 	const [sortedAddresses, setSortedAddresses] = useState([])
 	const [defaultAddressChanged, setDefaultAddressChanged] = useState(false)
 
 	let timeoutId
 
+	const smallScreens = useWindowWidth() < 619
+
 	useEffect(() => {
 		dispatch(fetchAddresses())
 	}, [dispatch])
-
+	
 	useEffect(() => {
 		if (addresses.length > 0) {
 			const defaultAddress = addresses.find(
@@ -32,24 +36,27 @@ export default function Addresses() {
 				(address) => !address.is_default
 			)
 			const sortedNonDefaultAddresses = nonDefaultAddresses.sort(
-				(a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+				(a, b) => new Date(b.created_at) - new Date(a.created_at)
 			)
 			setSortedAddresses(
 				[defaultAddress, ...sortedNonDefaultAddresses].filter(Boolean)
 			)
 		}
 	}, [addresses])
+	useEffect(() => {
+		console.log('Addresses:', sortedAddresses)	
+	}, [sortedAddresses])
 
-	const handleEdit = (id, updatedData) => {
-		dispatch(updateAddress({ id, addressData: updatedData }))
+	const handleEdit = (addressId) => {
+		navigate('/account/addresses/edit-address', { state: { addressId } })
 	}
 
-	const handleDelete = (id) => {
-		dispatch(deleteAddress(id))
+	const handleDelete = (addressId) => {
+		dispatch(deleteAddress(addressId))
 	}
 
-	const changeDefaultAddress = (id) => {
-		dispatch(setDefaultAddress(id))
+	const changeDefaultAddress = (addressId) => {
+		dispatch(setDefaultAddress(addressId))
 		setDefaultAddressChanged(true)
 		if (timeoutId) {
 			clearTimeout(timeoutId)
@@ -60,16 +67,29 @@ export default function Addresses() {
 		}, 3000)
 	}
 
+	const MobileAddNewAddressBlock = ({ text }) => {
+		return (
+			<MobileBlock $smallScreens={smallScreens}>
+				<MobileLink to="/account/addresses/new-address">
+					<div className="text">
+						<p>{text}</p>
+					</div>
+					<div className="mobile-icon">
+						<ChevronIcon direction='right'/>
+					</div>
+				</MobileLink>
+			</MobileBlock>
+		)
+	}
+
 	const AddressBlock = ({ address }) => {
 		if (!address) return null
 
 		return (
 			<Block>
-				<BlockContainer>
+				<BlockContainer $smallScreens={smallScreens}>
 					<div
-						className={`container ${
-							address.address_id ? 'border-solid' : 'border-dash'
-						}`}
+						className={`container ${address.address_id ? 'border-solid' : 'border-dash'}`}
 					>
 						{address.address_id ? (
 							<>
@@ -89,13 +109,15 @@ export default function Addresses() {
 									<p>{address.postcode}</p>
 									<p>{address.county}</p>
 									<p>{address.country}</p>
-									<p>{address.phone_number}</p>
-									<p>{address.deliveryInstructions}</p>
+									<p>Phone number: {address.phone_number}</p>
+									<p>{address.delivery_instructions}</p>
+									{!address.delivery_instructions && (
+										<button className="primary-link">
+											Add delivery instructions
+										</button>
+									)}
 								</div>
 								<div className="address-controls">
-									<button className="primary-link">
-										Add delivery instructions
-									</button>
 									<div>
 										<button
 											className="primary-link"
@@ -105,7 +127,7 @@ export default function Addresses() {
 										>
 											Edit
 										</button>
-										|
+										{!smallScreens && '|'}
 										<button
 											className="primary-link"
 											onClick={() =>
@@ -116,7 +138,7 @@ export default function Addresses() {
 										</button>
 										{!address.is_default && (
 											<>
-												|
+												{!smallScreens && '|'}
 												<button
 													className="primary-link"
 													onClick={() =>
@@ -133,12 +155,14 @@ export default function Addresses() {
 								</div>
 							</>
 						) : (
-							<div className="add-address">
-								<div className="icon">
-									<PlusIcon />
-								</div>
-								<div className="text">
-									<p>Add Address</p>
+							<div className="add-address-container desktop">
+								<div className="add-address">
+									<div className="icon">
+										<PlusIcon />
+									</div>
+									<div className="text">
+										<p>Add new address</p>
+									</div>
 								</div>
 							</div>
 						)}
@@ -169,9 +193,16 @@ export default function Addresses() {
 					<h1>Your Addresses</h1>
 				</PageHeader>
 				<LayoutGrid>
-					<Link to="/account/addresses/new-address">
+					{smallScreens ? (
+						<>
+							<MobileAddNewAddressBlock text='Add a new address' />
+							<MobileAddNewAddressBlock text='Add a new pickup location' />
+						</>
+					) : (
+						<Link to="/account/addresses/new-address">
 						<AddressBlock address={{}} />
 					</Link>
+					)}
 					{sortedAddresses.map((address) => (
 						<AddressBlock key={address.address_id} address={address} />
 					))}
@@ -238,15 +269,12 @@ const Page = styled.div`
 		padding: var(--spacing-md);
 	}
 	@media only screen and (max-width: 450px) {
-		padding: 0;
+		padding: 0 var(--spacing-sm);
 	}
 `
 
 const PageHeader = styled.div`
 	padding: var(--spacing-sm) 0;
-	@media only screen and (max-width: 450px) {
-		padding: var(--spacing-sm);
-	}
 `
 
 const LayoutGrid = styled.div`
@@ -257,12 +285,12 @@ const LayoutGrid = styled.div`
 		grid-template-columns: repeat(3, 1fr);
 		gap: var(--spacing-md);
 	}
-	@media only screen and (max-width: 768px) {
-		grid-template-columns: repeat(1, 1fr); /* 1 column for mobile */
+	@media only screen and (max-width: 899px) {
+		grid-template-columns: repeat(2, 1fr); /* 2 column for tablet */
 		gap: var(--spacing-sm);
 	}
-	@media only screen and (max-width: 450px) {
-		gap: 0;
+	@media only screen and (max-width: 619px) {
+		grid-template-columns: repeat(1, 1fr); /* 1 column for mobile */
 	}
 `
 
@@ -285,10 +313,15 @@ const Block = styled.div`
 		justify-content: center;
 	}
 
-	@media only screen and (max-width: 450px) {
-		padding-top: 100%;
-		border: none;
-	}
+	@media only screen and (max-width: 619px) {
+    padding-top: 0; /* Remove the aspect ratio constraint */
+    position: static; /* Reset position */
+    height: auto;
+    
+    & > * {
+      position: static; /* Reset absolute positioning of children */
+    }
+  }
 `
 
 const BlockContainer = styled.div`
@@ -314,6 +347,9 @@ const BlockContainer = styled.div`
 	}
 	.border-solid {
 		border: 1px solid var(--md-grey);
+	}
+	.add-address-container {
+		margin: auto auto;
 	}
 	.add-address {
 		width: 100%;
@@ -352,7 +388,7 @@ const BlockContainer = styled.div`
 		flex-direction: column;
 		align-items: flex-start;
 		font-size: var(--font-sm);
-		padding: var(--spacing-lg);
+		padding: var(--spacing-lg) 0 0 var(--spacing-lg);
 	}
 	.name {
 		font-size: var(--font-md);
@@ -369,10 +405,97 @@ const BlockContainer = styled.div`
 			gap: var(--spacing-sm);
 		}
 	}
-	@media only screen and (max-width: 450px) {
-		padding: var(--spacing-sm);
+	@media only screen and (max-width: 619px) {
+		padding: 0;
 		&:hover {
 			background-color: transparent;
 		}
+
+		.add-address-container.desktop {
+			display: none;
+		}
+
+		.add-address-container.mobile {
+			width: 100%;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			color: var(--paleblue);
+			border-top: 1px solid var(--border-grey);
+			border-bottom: 1px solid var(--border-grey);
+		}
+
+		.add-address-container {
+			margin: var(--spacing-sm) 0;
+		}
+		.add-address {
+			flex-direction: row-reverse;
+			justify-content: space-between;
+			color: var(--paleblue);
+			font-size: var(--font-sm);
+			padding: var(--spacing-sm);
+			svg {
+				width: .8rem;
+				height: auto;
+				fill: var(--paleblue);
+			}
+		}
+
+		.default {
+			padding: var(--spacing-sm);
+		}
+
+		.address {
+			width: 100%;
+			height: 100%;
+			display: flex;
+			flex-direction: column;
+			align-items: flex-start;
+			font-size: var(--font-sm);
+			padding: var(--spacing-md) var(--spacing-sm);
+		}
+
+		.address-controls {
+			padding: 0 var(--spacing-sm) var(--spacing-md) var(--spacing-sm);
+			gap: var(--spacing-sm);
+		}
+
+		.address-controls button {
+			font-size: var(--font-xs);
+			color: var(--md-blue);
+			border: 1px solid var(--md-blue);
+			border-radius: var(--br-25);
+			padding: var(--spacing-sm) var(--spacing-md);
+			&:hover {
+				text-decoration: none;
+				background-color: var(--md-blue);
+				color: var(--white);
+			}
+		}
 	}
+`
+
+const MobileBlock = styled.div`
+	color: var(--paleblue);
+	border-top: 1px solid var(--md-grey);
+	border-bottom: 1px solid var(--md-grey);
+	padding: var(--spacing-sm) 0;
+	.mobile-icon {
+		width: 1rem;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		svg {
+			width: 100%;
+			height: auto;
+			fill: var(--paleblue);
+		}
+	}
+`
+
+const MobileLink = styled(Link)`
+	width: 100%;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
 `

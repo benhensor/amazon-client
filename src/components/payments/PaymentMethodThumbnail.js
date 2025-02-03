@@ -1,10 +1,8 @@
 import React from 'react'
-import { useSelector } from 'react-redux'
 import { getAttributes } from '../../utils/paymentMethods'
 import styled from 'styled-components'
 
 export default function PaymentMethodThumbnail({ card, isMethodInListDisplay }) {
-  const user = useSelector((state) => state.user.currentUser)
   const { logo, img, typeLogo, background } = getAttributes(card)
   return (
     <Thumbnail
@@ -22,9 +20,9 @@ export default function PaymentMethodThumbnail({ card, isMethodInListDisplay }) 
 				)}
 				{card.status === 'default' && !isMethodInListDisplay && (
 					<div className="thumbnail-default">
-						<p>•••• •••• •••• {card.number.slice(-4) || null}</p>
+						<p>•••• •••• •••• {card.card_number.slice(-4) || null}</p>
 						<p>
-							{user.first_name} {user.last_name}
+							{card.cardholder_name}
 						</p>
 					</div>
 				)}

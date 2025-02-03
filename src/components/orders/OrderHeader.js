@@ -3,6 +3,11 @@ import { formatDate } from '../../utils/formatDate'
 import styled from 'styled-components'
 
 export default function OrderHeader({ items, currentUser }) {
+
+	const total = items.reduce((sum, item) => {
+		return sum + (parseFloat(item.price) || 0)
+	}, 0)
+
 	return (
 		<StyledOrderHeader>
 			<div className="header-item">
@@ -16,12 +21,7 @@ export default function OrderHeader({ items, currentUser }) {
 				<p>
 					<strong>
 						£
-						{items
-							.reduce(
-								(sum, item) => sum + item.product_data.price,
-								0
-							)
-							.toFixed(2)}
+						{total.toFixed(2)}
 					</strong>
 				</p>
 			</div>
@@ -29,7 +29,7 @@ export default function OrderHeader({ items, currentUser }) {
 				<p>dispatch to</p>
 				<p className="primary-link">
 					<strong>
-						{currentUser.first_name + ' ' + currentUser.last_name}
+						{currentUser.full_name}
 					</strong>
 				</p>
 			</div>

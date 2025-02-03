@@ -1,9 +1,10 @@
 import React from 'react'
 import styled from 'styled-components'
 
-export default function CloseIcon() {
+export default function CloseIcon({ color }) {
 	return (
 		<SVG
+			$color={color}	
 			viewBox="0 0 800 800"
 			fill="none"
 			xmlns="http://www.w3.org/2000/svg"
@@ -17,7 +18,7 @@ const SVG = styled.svg`
 	width: 2rem;
 	height: auto;
 	path {
-		stroke: var(--white);
-		fill: var(--white);
+		stroke: ${({ $color }) => $color || 'var(--black)'};
+		fill: ${({ $color }) => $color || 'var(--black)'};
 	}
 `

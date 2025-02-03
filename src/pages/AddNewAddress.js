@@ -14,7 +14,7 @@ export default function AddNewAddress() {
 	const formik = useFormik({
     initialValues: {
       country: 'United Kingdom',  
-      type: 'home',
+      address_type: 'home',
       full_name: '',
       phone_number: '',
       postcode: '',
@@ -22,18 +22,29 @@ export default function AddNewAddress() {
       address_line2: '',
       city: '',
       county: '',
-      is_default: false,          
+			delivery_instructions: '',
+      is_default: false,
+			is_billing: false,	          
     },
     validationSchema: addressSchema,  
+		validate: values => {
+      console.log("Validation running with values:", values);
+      console.log("Current validation schema:", addressSchema);
+      return {};
+    },
     onSubmit: (values, { setSubmitting }) => {
-      console.log("Submitting form with values:", values);
-      console.log("Submitting form with errors:", formik.errors);
+			// if (formik.isSubmitting) {
+			// 	return
+			// }
+			setSubmitting(true)
       dispatch(createNewAddress(values))    
         .unwrap()
-        .then(() => {
+        .then((response) => {
+					console.log('Successfully added address:', response);
           navigate('/account/addresses');  
         })
         .catch((error) => {
+      		console.error('Raw error object:', JSON.stringify(error, null, 2));
           console.error('Failed to add address:', error);
         })
         .finally(() => {
@@ -87,13 +98,13 @@ export default function AddNewAddress() {
 						</select>
 					</div>
 					<div className="form-group">
-						<label htmlFor="type">Address Type</label>
+						<label htmlFor="address_type">Address Type</label>
 						<select
-							id="type"
-							name="type"
+							id="address_type"
+							name="address_type"
 							onChange={formik.handleChange}
 							onBlur={formik.handleBlur}
-							value={formik.values.type}
+							value={formik.values.address_type}
 						>
 							<option value="home">Home</option>
 							<option value="work">Work</option>
@@ -217,6 +228,23 @@ export default function AddNewAddress() {
 							<div className="error">{formik.errors.county}</div>
 						) : null}
 					</div>
+					<div className="form-group">
+						<label htmlFor="delivery_instructions">
+							Delivery Instructions (optional)
+						</label>
+						<input
+							type="text"
+							id="delivery_instructions"
+							name="delivery_instructions"
+							onChange={formik.handleChange}
+							onBlur={formik.handleBlur}
+							value={formik.values.delivery_instructions}
+							placeholder="Any special instructions for delivery"
+						/>
+						{formik.touched.delivery_instructions && formik.errors.delivery_instructions ? (
+							<div className="error">{formik.errors.delivery_instructions}</div>
+						) : null}
+					</div>
 					<div className="form-group default">
 						<input
 							type="checkbox"
@@ -231,6 +259,22 @@ export default function AddNewAddress() {
 						</label>
 						{formik.touched.is_default && formik.errors.is_default ? (
 							<div className="error">{formik.errors.is_default}</div>
+						) : null}
+					</div>
+					<div className="form-group default">
+						<input
+							type="checkbox"
+							id="is_billing"
+							name="is_billing"
+							onChange={formik.handleChange}
+							onBlur={formik.handleBlur}
+							checked={formik.values.is_billing}
+						/>
+						<label htmlFor="is_billing">
+							Make this my billing address
+						</label>
+						{formik.touched.is_billing && formik.errors.is_billing ? (
+							<div className="error">{formik.errors.is_billing}</div>
 						) : null}
 					</div>
 					<button type="submit" className="primary-btn" disabled={formik.isSubmitting}>Add address</button>

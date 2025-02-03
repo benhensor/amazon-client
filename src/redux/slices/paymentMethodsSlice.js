@@ -15,9 +15,26 @@ export const fetchPaymentMethods = createAsyncThunk(
 			)
 			// console.log('fetchPaymentMethods return: ', response.data)
 			dispatch(setLoading(false))
-			return response.data
+			return response.data.data
 		} catch (error) {
 			dispatch(setLoading(false))
+			return rejectWithValue(error.response.data)
+		}
+	}
+)
+
+export const addPaymentMethod = createAsyncThunk(
+	'paymentMethods/addPaymentMethod',
+	async (paymentMethodData, { rejectWithValue }) => {
+		try {
+			const response = await axios.post(
+				`${API_URL}/api/payment-methods`,
+				paymentMethodData,
+				{ withCredentials: true }
+			)
+			console.log('addPaymentMethod return: ', response.data)
+			return response.data.data
+		} catch (error) {
 			return rejectWithValue(error.response.data)
 		}
 	}
@@ -33,6 +50,22 @@ export const setDefaultPaymentMethod = createAsyncThunk(
 				{ withCredentials: true }
 			)
 			console.log('setDefaultPaymentMethod return: ', response.data)
+			return response.data.data
+		} catch (error) {
+			return rejectWithValue(error.response.data)
+		}
+	}
+)
+
+export const deletePaymentMethod = createAsyncThunk(
+	'paymentMethods/deletePaymentMethod',
+	async (paymentMethodId, { rejectWithValue }) => {
+		try {
+			const response = await axios.delete(
+				`${API_URL}/api/payment-methods/${paymentMethodId}`,
+				{ withCredentials: true }
+			)
+			console.log('deletePaymentMethod return: ', response.data)
 			return response.data
 		} catch (error) {
 			return rejectWithValue(error.response.data)
@@ -73,6 +106,22 @@ const paymentMethodsSlice = createSlice({
 				state.error = action.payload || 'Failed to fetch payment methods'
 			})
 
+		// Handle adding a payment method
+		builder
+			.addCase(addPaymentMethod.pending, (state) => {
+				state.loading = true
+				state.error = null
+			})
+			.addCase(addPaymentMethod.fulfilled, (state, action) => {
+				state.loading = false
+				// Add the new payment method to the list
+				state.paymentMethods.push(action.payload)
+			})
+			.addCase(addPaymentMethod.rejected, (state, action) => {
+				state.loading = false
+				state.error = action.payload || 'Failed to add payment method'
+			})
+
 		// Handle setting a default payment method
 		builder
 			.addCase(setDefaultPaymentMethod.pending, (state) => {
@@ -93,6 +142,24 @@ const paymentMethodsSlice = createSlice({
 			.addCase(setDefaultPaymentMethod.rejected, (state, action) => {
 				state.loading = false
 				state.error = action.payload || 'Failed to set default payment method'
+			})
+
+		// Handle deleting a payment method
+		builder
+			.addCase(deletePaymentMethod.pending, (state) => {
+				state.loading = true
+				state.error = null
+			})
+			.addCase(deletePaymentMethod.fulfilled, (state, action) => {
+				state.loading = false
+				// Remove the deleted payment method from the list
+				state.paymentMethods = state.paymentMethods.filter(
+					(method) => method.payment_method_id !== action.meta.arg
+				)
+			})
+			.addCase(deletePaymentMethod.rejected, (state, action) => {
+				state.loading = false
+				state.error = action.payload || 'Failed to delete payment method'
 			})
 
 	},

@@ -1,6 +1,6 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import {
 	updateOrderStatus,
 	deleteOrderById,
@@ -12,6 +12,36 @@ import styled from 'styled-components'
 export default function GroupedOrders({ orders, currentUser }) {
 	const dispatch = useDispatch()
 	const navigate = useNavigate()
+	const orderedProducts = useSelector(
+		(state) => state.products.orderedProducts
+	)
+
+	const productMap = useMemo(() => {
+		const map = orderedProducts.reduce((acc, order) => {
+			order.products.forEach((product) => {
+				acc[order.order_id] = acc[order.order_id] || {}
+				acc[order.order_id][product.id] = product
+			})
+			return acc
+		}, {})
+		return map
+	}, [orderedProducts])
+
+	const groupedItems = orders.reduce((acc, order) => {
+		order.order_items.forEach((item) => {
+			const productData = productMap[order.order_id]?.[item.product_id]
+			if (productData) {
+				const category = productData.category
+				if (!acc[category]) acc[category] = []
+				acc[category].push({
+					...item,
+					product_data: productData,
+					order,
+				})
+			}
+		})
+		return acc
+	}, {})
 
 	const buyItAgain = (product) => {
 		dispatch(addItemToBasket({ product, quantity: 1 }))
@@ -22,24 +52,11 @@ export default function GroupedOrders({ orders, currentUser }) {
 	}
 
 	const handleUpdateOrderStatus = (orderId, status) => {
-		console.log(orderId, status)
+		console.log('orderId, status', orderId, status)
 		dispatch(updateOrderStatus({ orderId, status }))
 	}
 
-	const groupedItems = orders.reduce((acc, order) => {
-		order.order_items.forEach((item) => {
-			const category = item.product_data.category
-			if (!acc[category]) acc[category] = []
-			acc[category].push({ ...item, order })
-		})
-		console.log(acc)
-		return acc
-	}, {})
-
-	console.log('groupedItems', groupedItems)
-
 	const RenderOrderOptions = ({ order }) => {
-		console.log('renderorderoptions', order)
 		const enroute = order.order.status === 'pending'
 		const delivered = order.order.status === 'delivered'
 		const cancelled = order.order.status === 'cancelled'
@@ -107,14 +124,16 @@ export default function GroupedOrders({ orders, currentUser }) {
 										}`}
 									>
 										{cancelled
-                      ? ''
-                      : new Date(
-											    items[0].order.shipping.range_from
-										      ) > new Date()
+											? ''
+											: new Date(
+													items[0].order.shipping.range_from
+											  ) > new Date()
 											? 'Delivery estimate: '
 											: 'Delivered '}
 										<strong>
-											{cancelled ? '' : items[0].order.shipping.dates}
+											{cancelled
+												? ''
+												: items[0].order.shipping.dates}
 										</strong>
 									</p>
 								</div>
@@ -247,9 +266,9 @@ const OrderBody = styled.div`
 			}
 		}
 
-    .cancelled {
-      color: var(--input-error);  
-    }
+		.cancelled {
+			color: var(--input-error);
+		}
 
 		.delivered {
 			color: var(--dk-blue);

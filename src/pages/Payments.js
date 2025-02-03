@@ -1,59 +1,68 @@
-import React, { useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
-import {
-	fetchPaymentMethods,
-} from '../redux/slices/paymentMethodsSlice'
+import { fetchPaymentMethods, addPaymentMethod } from '../redux/slices/paymentMethodsSlice'
 import PaymentMethod from '../components/payments/PaymentMethod'
 import PaymentMethodThumbnail from '../components/payments/PaymentMethodThumbnail'
+import AddPaymentMethod from '../components/modals/AddPaymentMethod'
 import PlusIcon from '../icons/PlusIcon'
 import GiftCard from '../assets/img/payments/wallet-gift-card.png'
 import ExclamationIcon from '../icons/ExclaimationIcon'
+import { Loader } from '../assets/styles/GlobalStyles'
 import styled from 'styled-components'
 
 export default function Payments() {
 	const dispatch = useDispatch()
 	const loading = useSelector((state) => state.paymentMethods.loading)
+	const [addPaymentMethodModalOpen, setAddPaymentMethodModalOpen] =
+		useState(false)
 	const paymentMethods = useSelector(
 		(state) => state.paymentMethods.paymentMethods
 	)
 	const defaultPaymentMethod =
 		useSelector((state) => state.paymentMethods.defaultPaymentMethod) || {}
 
-		const getSortedPaymentMethods = () => {
-			if (loading) {
-				return [];
-			}
-			const now = new Date();
-		
-			return paymentMethods
-				.map((method) => {
-					// Recalculate expiration status dynamically
-					const [month, year] = (method.end_date || "").split('/').map(Number);
-					const expirationDate = new Date(`20${year}`, month - 1); // Parse MM/YY
-					const isExpired = expirationDate < now;
-		
-					return {
-						...method,
-						status: isExpired ? "expired" : method.status,
-					};
-				})
-				.filter((method) => method && method.payment_method_id)
-				.sort((a, b) => {
-					if (a.payment_method_id === defaultPaymentMethod.payment_method_id) {
-						return -1;
-					}
-					if (b.payment_method_id === defaultPaymentMethod.payment_method_id) {
-						return 1;
-					}
-		
-					if (a.status === "expired" && b.status !== "expired") return 1;
-					if (b.status === "expired" && a.status !== "expired") return -1;
-		
-					return (a.bank || "").localeCompare(b.bank || "");
-				});
-		};
-		
+	const getSortedPaymentMethods = () => {
+		if (loading) {
+			return []
+		}
+		const now = new Date()
+
+		return paymentMethods
+			.map((method) => {
+				// Recalculate expiration status dynamically
+				const [month, year] = (method.end_date || '')
+					.split('/')
+					.map(Number)
+				const expirationDate = new Date(`20${year}`, month - 1) // Parse MM/YY
+				const isExpired = expirationDate < now
+
+				return {
+					...method,
+					status: isExpired ? 'expired' : method.status,
+				}
+			})
+			.filter((method) => method && method.payment_method_id)
+			.sort((a, b) => {
+				if (
+					a.payment_method_id ===
+					defaultPaymentMethod.payment_method_id
+				) {
+					return -1
+				}
+				if (
+					b.payment_method_id ===
+					defaultPaymentMethod.payment_method_id
+				) {
+					return 1
+				}
+
+				if (a.status === 'expired' && b.status !== 'expired') return 1
+				if (b.status === 'expired' && a.status !== 'expired') return -1
+
+				return (a.bank || '').localeCompare(b.bank || '')
+			})
+	}
 
 	useEffect(() => {
 		dispatch(fetchPaymentMethods())
@@ -64,10 +73,13 @@ export default function Payments() {
 	}, [paymentMethods])
 
 	const sortedPaymentMethods = getSortedPaymentMethods()
-	console.log('sortedPaymentMethods', sortedPaymentMethods)
 
-	if (loading && !sortedPaymentMethods.length) {
-		return <div>Loading...</div>
+	if (loading && !paymentMethods && !sortedPaymentMethods) {
+		return (
+			<Loader>
+				<div className="loader"></div>
+			</Loader>
+		)
 	}
 
 	return (
@@ -88,17 +100,22 @@ export default function Payments() {
 						<PaymentMethods>
 							<h2>Cards & accounts</h2>
 							<div className="cards-container">
-								{sortedPaymentMethods.map((card) => (
-									<>
-										<PaymentMethod
+								{sortedPaymentMethods.length > 0 &&
+									sortedPaymentMethods?.map((card) => (
+										<React.Fragment
 											key={card.payment_method_id}
-											card={card}
-										/>
-										<hr />
-									</>
-								))}
+										>
+											<PaymentMethod card={card} />
+											<hr />
+										</React.Fragment>
+									))}
 							</div>
-							<div className="block">
+							<div
+								className="block"
+								onClick={() =>
+									setAddPaymentMethodModalOpen(true)
+								}
+							>
 								<div className="img-placeholder">
 									<PlusIcon />
 								</div>
@@ -134,15 +151,18 @@ export default function Payments() {
 							<div className="card-details">
 								{defaultPaymentMethod.bank && (
 									<p className="card-account">
-										{defaultPaymentMethod.bank}{' '}{defaultPaymentMethod.type}{' '}
-										{defaultPaymentMethod.account}{' '}
+										{defaultPaymentMethod.bank}{' '}
+										{defaultPaymentMethod.card_type}{' '}
+										{defaultPaymentMethod.card_account}{' '}
 										Account
 									</p>
 								)}
 								{defaultPaymentMethod.number && (
 									<p className="card-detail">
 										Debit card ending in ••••{' '}
-										{defaultPaymentMethod.number.slice(-4)}
+										{defaultPaymentMethod.card_number.slice(
+											-4
+										)}
 									</p>
 								)}
 								{defaultPaymentMethod.status === 'expired' &&
@@ -156,6 +176,15 @@ export default function Payments() {
 						</DefaultPaymentMethod>
 					</Content>
 				</PaymentsTopSection>
+				<AddPaymentMethod
+					isOpen={addPaymentMethodModalOpen}
+					setIsOpen={setAddPaymentMethodModalOpen}
+					onSubmit={(formData) => {
+						console.log('formData', formData)
+						dispatch(addPaymentMethod(formData))
+						setAddPaymentMethodModalOpen(false)
+					}}
+				/>
 			</PaymentsContainer>
 		</PaymentsPage>
 	)
@@ -298,6 +327,7 @@ const PaymentMethods = styled.div`
 			height: 5.4rem;
 			border: 2px dashed var(--lt-text);
 			border-radius: var(--br-sm);
+			margin-left: 5px;
 			display: flex;
 			justify-content: center;
 			align-items: center;

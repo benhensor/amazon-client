@@ -1,6 +1,6 @@
 import ClothingImg from '../assets/img/hero/clothing.webp'
 import CosmeticsImg from '../assets/img/hero/cosmetics.webp'
-import ElectronicsImg from '../assets/img/hero/electronics.webp'
+import ElectronicsImg from '../assets/img/hero/gadgets.webp'
 import GroceriesImg from '../assets/img/hero/groceries.webp'
 import VehiclesImg from '../assets/img/hero/vehicles.webp'
 import HomeImg from '../assets/img/hero/home.webp'
@@ -33,7 +33,7 @@ export const superCategories = [
 		title: 'Beauty & Personal Care',
 		subCategories: ['beauty', 'fragrances', 'skin-care'],
 		image: CosmeticsImg,
-		cta: 'fix your appearance',
+		cta: 'fix your face',
 		previewHeading: 'Beauty Products',
 	},
 	{
@@ -47,7 +47,7 @@ export const superCategories = [
 			'tablets',
 		],
 		image: ElectronicsImg,
-		cta: 'got gadgets?',
+		cta: 'pointless gadgets?',
 		previewHeading: 'Consumer Electronics',
 	},
 	{
@@ -56,7 +56,7 @@ export const superCategories = [
 		title: 'Groceries',
 		subCategories: ['groceries'],
 		image: GroceriesImg,
-		cta: 'eat more',
+		cta: 'consume more',
 		previewHeading: 'Groceries',
 	},
 	{
@@ -65,7 +65,7 @@ export const superCategories = [
 		title: 'Home & Living',
 		subCategories: ['furniture', 'home-decoration', 'kitchen-accessories'],
 		image: HomeImg,
-		cta: 'sort your home out',
+		cta: 'sort your life out',
 		previewHeading: 'Home & Living',
 	},
 	{
@@ -74,7 +74,7 @@ export const superCategories = [
 		title: 'Automotive & Vehicles',
 		subCategories: ['motorcycle', 'vehicle'],
 		image: VehiclesImg,
-		cta: 'drive away in style',
+		cta: 'midlife crisis?',
 		previewHeading: 'Automotive & Vehicles',
 	},
 	{
@@ -83,7 +83,7 @@ export const superCategories = [
 		title: 'Sports & Outdoor',
 		subCategories: ['sports-accessories', 'sunglasses'],
 		image: SportsImg,
-		cta: 'get active',
+		cta: 'maybe go outside?',
 		previewHeading: 'Sports & Outdoor',
 	},
 ]

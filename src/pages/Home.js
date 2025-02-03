@@ -10,6 +10,7 @@ import { fetchAddresses } from '../redux/slices/addressSlice'
 import { superCategories } from '../utils/superCategories'
 import Hero from '../components/hero/Hero'
 import Carousel from '../components/products/Carousel'
+import { Loader } from '../assets/styles/GlobalStyles'
 import styled from 'styled-components'
 
 export default function Home() {
@@ -60,7 +61,9 @@ export default function Home() {
 	if (status === 'loading' || !isDataReady) {
 		return (
 			<section>
-				<div>Loading...</div>
+				<Loader>
+					<div className='loader'></div>
+				</Loader>
 			</section>
 		)
 	}

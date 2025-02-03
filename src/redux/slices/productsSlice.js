@@ -12,6 +12,7 @@ import {
 
 const initialState = {
 	products: [],
+	orderedProducts: [],
 	categories: [],
 	categoryList: [],
 	currentProduct: null,
@@ -27,6 +28,9 @@ const productsSlice = createSlice({
 	reducers: {
 		setProducts(state, action) {
 			state.products = action.payload
+		},
+		setOrderedProducts(state, action) {
+			state.orderedProducts = action.payload
 		},
 		setCategories(state, action) {
 			state.categories = action.payload
@@ -54,6 +58,7 @@ const productsSlice = createSlice({
 
 export const {
 	setProducts,
+	setOrderedProducts,
 	setCategories,
 	setCategoryList,
 	setCurrentProduct,
@@ -182,6 +187,41 @@ export const fetchDepartmentData = (department) => async (dispatch) => {
 		console.error('Error fetching department data: ', error) // Helps trace the exact error during development
 		dispatch(setError(error.toString()))
 		dispatch(setStatus('failed'))
+	}
+}
+
+export const fetchOrderedProducts = (orders) => async (dispatch) => {
+	dispatch(setStatus('loading'))
+	try {
+		const orderPromises = orders.map(async (order) => {
+			const productPromises = order.order_items.map(async (orderItem) => {
+				const product = await getProductById(orderItem.product_id)
+				return {
+					...product,
+					order_id: order.order_id,
+					quantity: orderItem.quantity,
+					price: orderItem.price,
+				}
+			})
+
+			const products = await Promise.all(productPromises)
+			return {
+				order_id: order.order_id,
+				order_date: order.order_placed,
+				products: products,
+			}
+		})
+
+		const orderedItems = await Promise.all(orderPromises)
+		dispatch(setOrderedProducts(orderedItems))
+		dispatch(setStatus('succeeded'))
+
+		return orderedItems
+	} catch (error) {
+		console.error('Error in fetchOrderedProducts:', error)
+		dispatch(setError(error.toString()))
+		dispatch(setStatus('failed'))
+		throw error
 	}
 }
 

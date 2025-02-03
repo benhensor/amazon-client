@@ -26,68 +26,154 @@ const getTypeLogo = (type) => {
 	}
 }
 
+export const generateCVV = (cardType) => {
+  // AMEX uses 4-digit CVV, others use 3-digit
+  const length = cardType.toUpperCase() === 'AMEX' ? 4 : 3;
+  return Array(length)
+    .fill(0)
+    .map(() => Math.floor(Math.random() * 10))
+    .join('');
+};
+
+export const generateAccountType = (cardType) => {
+	const randomChoice = Math.floor(Math.random() * 2);
+	return randomChoice === 0 ? 'Debit' : 'Credit';
+}
+
+export const generateDates = () => {
+  const currentDate = new Date();
+  const currentYear = currentDate.getFullYear();
+  const currentMonth = currentDate.getMonth() + 1;
+
+  // Generate start date (current month/year)
+  const startMonth = currentMonth.toString().padStart(2, '0');
+  const startYear = (currentYear % 100).toString();
+  const startDate = `${startMonth}/${startYear}`;
+
+  // Generate end date (5 years from start)
+  const endYear = ((currentYear + 5) % 100).toString();
+  const endDate = `${startMonth}/${endYear}`;
+
+  return { startDate, endDate };
+};
+
+export const generateCardNumber = (type) => {
+  // Define prefix ranges for different card types
+  const cardPrefixes = {
+    VISA: ['4'],
+    MASTERCARD: ['51', '52', '53', '54', '55'],
+    AMEX: ['34', '37'],
+    DISCOVER: ['6011', '644', '645', '646', '647', '648', '649', '65'],
+    JCB: ['3528', '3529', '353', '354', '355', '356', '357', '358']
+  };
+
+  // Get the prefix array for the specified card type
+  const prefixes = cardPrefixes[type.toUpperCase()];
+  if (!prefixes) {
+    throw new Error('Invalid card type');
+  }
+
+  // Randomly select a prefix from the available options
+  const prefix = prefixes[Math.floor(Math.random() * prefixes.length)];
+
+  // Calculate remaining length needed
+  const remainingLength = type.toUpperCase() === 'AMEX' ? 15 - prefix.length : 16 - prefix.length;
+
+  // Generate random digits for the remaining length
+  let number = prefix;
+  for (let i = 0; i < remainingLength; i++) {
+    number += Math.floor(Math.random() * 10).toString();
+  }
+
+  // Apply Luhn algorithm for the check digit
+  const digits = number.split('').map(Number);
+  let sum = 0;
+  let isEven = false;
+
+  // Loop from right to left
+  for (let i = digits.length - 1; i >= 0; i--) {
+    let digit = digits[i];
+
+    if (isEven) {
+      digit *= 2;
+      if (digit > 9) {
+        digit -= 9;
+      }
+    }
+
+    sum += digit;
+    isEven = !isEven;
+  }
+
+  // Calculate check digit
+  const checkDigit = ((Math.floor(sum / 10) + 1) * 10 - sum) % 10;
+  
+  // Return final card number with check digit
+  return number + checkDigit.toString();
+}
+
 export const getAttributes = (card) => {
 	switch (card.bank) {
 		case 'Barclays':
 			return {
 				logo: <BarclaysLogo />,
-				typeLogo: getTypeLogo(card.type),
+				typeLogo: getTypeLogo(card.card_type),
 				background: 'linear-gradient(90deg, #02BAF6 50%, #28446A)',
 			}
 		case 'HSBC':
 			return {
 				logo: <HSBCLogo />,
-				typeLogo: getTypeLogo(card.type),
+				typeLogo: getTypeLogo(card.card_type),
 				background: 'linear-gradient(90deg, #010103 50%, #272727)',
 			}
 		case 'NatWest':
 			return {
 				logo: <NatWestLogo />,
-				typeLogo: getTypeLogo(card.type),
+				typeLogo: getTypeLogo(card.card_type),
 				background: '#5A287D',
 			}
 		case 'Lloyds Bank':
 			return {
 				logo: <LloydsLogo />,
-				typeLogo: getTypeLogo(card.type),
+				typeLogo: getTypeLogo(card.card_type),
 				img: <LloydsHorse />,
 				background: 'linear-gradient(90deg, #023A2D 50%, #609256)',
 			}
 		case 'Santander':
 			return {
 				logo: <SantanderLogo />,
-				typeLogo: getTypeLogo(card.type),
+				typeLogo: getTypeLogo(card.card_type),
 				background: '#EA0001',
 			}
 		case 'Halifax':
 			return {
 				logo: null,
-				typeLogo: getTypeLogo(card.type),
+				typeLogo: getTypeLogo(card.card_type),
 				img: <HalifaxLogo />,
 				background: '#0863BA',
 			}
 		case 'RBS':
 			return {
 				logo: <RBSLogo />,
-				typeLogo: getTypeLogo(card.type),
+				typeLogo: getTypeLogo(card.card_type),
 				background: '#142E5B',
 			}
 		case 'TSB':
 			return {
 				logo: <TSBLogo />,
-				typeLogo: getTypeLogo(card.type),
+				typeLogo: getTypeLogo(card.card_type),
 				background: '#2D3B90',
 			}
 		case 'Nationwide':
 			return {
 				logo: <NationwideLogo />,
-				typeLogo: getTypeLogo(card.type),
+				typeLogo: getTypeLogo(card.card_type),
 				background: '#091C4C',
 			}
 		case 'Metro Bank':
 			return {
 				logo: <MetroBankLogo />,
-				typeLogo: getTypeLogo(card.type),
+				typeLogo: getTypeLogo(card.card_type),
 				background: '#08399C',
 			}
 		default:

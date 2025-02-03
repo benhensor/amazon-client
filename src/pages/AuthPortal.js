@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { useFormik } from 'formik'
-import { useNavigate, Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { registerSchema, loginSchema } from '../schemas/index'
 import { useDispatch, useSelector } from 'react-redux'
 import { registerUser, loginUser } from '../redux/slices/userSlice'
@@ -22,42 +22,60 @@ export default function AuthPortal() {
 	}
 
 	const handleAuth = async (values) => {
-		const { passwordConfirm, ...userData } = values;
+		const { passwordConfirm, ...userData } = values
 		// console.log('Register Payload:', userData);
 		try {
-			let result;
+			let result
 			if (isSignIn) {
 				if (showPasswordField) {
-					result = await dispatch(loginUser(userData));
-					if (loginUser.fulfilled.match(result)) {
-						navigate('/');
+					console.log('Attempting login with:', userData)
+					result = await dispatch(loginUser(userData))
+					console.log('Login Result:', result)
+
+					// Check the result properly
+					if (
+						result.payload &&
+						result.payload.status &&
+						result.payload.status.code === 200
+					) {
+						navigate('/')
 					}
 				} else {
-					setShowPasswordField(true); // First, show password field
+					setShowPasswordField(true)
 				}
 			} else {
-				result = await dispatch(registerUser(userData));
-				if (registerUser.fulfilled.match(result)) {
-					setIsSignIn(true); // Switch to sign-in after successful registration
+				result = await dispatch(registerUser(userData))
+				console.log('Register Result:', result)
+				const registerResult = result.payload
+				if (registerResult.status.code === 201) {
+					setIsSignIn(true) // Switch to sign-in after successful registration
+					formik.resetForm({
+						values: {
+							fullname: '',
+							email: values.email, // Pre-fill email for sign-in
+							password: '',
+							passwordConfirm: '',
+						},
+					})
 				}
 			}
 		} catch (err) {
-			console.error('Authentication error:', err);
+			console.error('Authentication error:', err)
 		}
-	};
+	}
 
 	const handleToggle = () => {
-		formik.resetForm({  
+		formik.resetForm({
 			values: {
 				fullname: '',
 				email: '',
 				password: '',
 				passwordConfirm: '',
 			},
-		});
-		setIsSignIn(!isSignIn);
-	};
-	
+		})
+		setIsSignIn(!isSignIn)
+	}
+
 	const formik = useFormik({
 		initialValues: {
 			fullname: '',
@@ -86,6 +104,7 @@ export default function AuthPortal() {
 							onChange={formik.handleChange}
 							onBlur={formik.handleBlur}
 							value={formik.values.email || ''}
+							autoComplete="email"
 							className={
 								formik.touched.email && formik.errors.email
 									? 'error'
@@ -98,10 +117,10 @@ export default function AuthPortal() {
 					</div>
 				) : (
 					<>
-						<div className='change-email'>
+						<div className="change-email">
 							<p>{formik.values.email}</p>
 							<button
-								className='auth-link'
+								className="auth-link"
 								type="button"
 								onClick={() => setShowPasswordField(false)}
 							>
@@ -111,7 +130,9 @@ export default function AuthPortal() {
 						<div className="input-group">
 							<div className="label-and-button">
 								<label htmlFor="password">Password</label>
-								<button className='auth-link' type="button">Forgot password?</button>
+								<button className="auth-link" type="button">
+									Forgot password?
+								</button>
 							</div>
 							<input
 								type="password"
@@ -120,6 +141,7 @@ export default function AuthPortal() {
 								onChange={formik.handleChange}
 								onBlur={formik.handleBlur}
 								value={formik.values.password || ''}
+								autoComplete="current-password"
 								className={
 									formik.touched.password &&
 									formik.errors.password
@@ -136,10 +158,7 @@ export default function AuthPortal() {
 						</div>
 					</>
 				)}
-				<button
-					className='primary-btn auth-btn'
-					type="submit"
-				>
+				<button className="primary-btn auth-btn" type="submit">
 					{showPasswordField ? 'Sign-In' : 'Continue'}
 				</button>
 			</Form>
@@ -148,21 +167,26 @@ export default function AuthPortal() {
 			<div className="legalese">
 				<p>
 					By continuing, you agree to Scamazon's{' '}
-					<span className='auth-link'>Conditions of Use and Sale</span>. Please see our{' '}
-					<span className='auth-link'>Privacy Notice</span>, our <span className='auth-link'>Cookies Notice</span>{' '}
-					and our <span className='auth-link'>Interest-Based Ads Notice</span>.
+					<span className="auth-link">
+						Conditions of Use and Sale
+					</span>
+					. Please see our{' '}
+					<span className="auth-link">Privacy Notice</span>, our{' '}
+					<span className="auth-link">Cookies Notice</span> and our{' '}
+					<span className="auth-link">Interest-Based Ads Notice</span>
+					.
 				</p>
 			</div>
 		),
 		help: (
 			<div className="need-help">
-				<span className='auth-link'>▸ Need Help?</span>
+				<span className="auth-link">▸ Need Help?</span>
 			</div>
 		),
 		buying: (
 			<div className="schizzness">
 				<p>Buying for work?</p>
-				<span className='auth-link'>Shop on Scamazon Schizzness</span>
+				<span className="auth-link">Shop on Scamazon Schizzness</span>
 			</div>
 		),
 		textOverLine: (
@@ -176,7 +200,9 @@ export default function AuthPortal() {
 	const register = {
 		heading: 'Create account',
 		form: (
-			<Form onSubmit={formik.handleSubmit}>
+			<Form
+				onSubmit={formik.handleSubmit}
+			>
 				<div className="input-group">
 					<label htmlFor="fullname">Your name</label>
 					<input
@@ -186,6 +212,7 @@ export default function AuthPortal() {
 						onChange={formik.handleChange}
 						onBlur={formik.handleBlur}
 						value={formik.values.fullname || ''}
+						autoComplete="name"
 						className={
 							formik.touched.fullname && formik.errors.fullname
 								? 'error'
@@ -205,6 +232,7 @@ export default function AuthPortal() {
 						onChange={formik.handleChange}
 						onBlur={formik.handleBlur}
 						value={formik.values.email || ''}
+						autoComplete="email"
 						className={
 							formik.touched.email && formik.errors.email
 								? 'error'
@@ -224,6 +252,7 @@ export default function AuthPortal() {
 						onChange={formik.handleChange}
 						onBlur={formik.handleBlur}
 						value={formik.values.password || ''}
+						autoComplete="new-password"
 						className={
 							formik.touched.password && formik.errors.password
 								? 'error'
@@ -243,6 +272,7 @@ export default function AuthPortal() {
 						onChange={formik.handleChange}
 						onBlur={formik.handleBlur}
 						value={formik.values.passwordConfirm || ''}
+						autoComplete="new-password"
 						className={
 							formik.touched.passwordConfirm &&
 							formik.errors.passwordConfirm
@@ -257,7 +287,7 @@ export default function AuthPortal() {
 							</div>
 						)}
 				</div>
-				<button type="submit" className='primary-btn auth-btn'>
+				<button type="submit" className="primary-btn auth-btn">
 					Continue
 				</button>
 			</Form>
@@ -266,16 +296,23 @@ export default function AuthPortal() {
 			<div className="legalese">
 				<p>
 					By creating an account, you agree to Scamazon's{' '}
-					<span className='auth-link'>Conditions of Use and Sale</span>. Please see our{' '}
-					<span className='auth-link'>Privacy Notice</span>, our <span className='auth-link'>Cookies Notice</span>{' '}
-					and our <span className='auth-link'>Interest-Based Ads Notice</span>.
+					<span className="auth-link">
+						Conditions of Use and Sale
+					</span>
+					. Please see our{' '}
+					<span className="auth-link">Privacy Notice</span>, our{' '}
+					<span className="auth-link">Cookies Notice</span> and our{' '}
+					<span className="auth-link">Interest-Based Ads Notice</span>
+					.
 				</p>
 			</div>
 		),
 		buying: (
 			<div className="schizzness">
 				<p>Buying for work?</p>
-				<span className='auth-link'>Create a free Schizzness account</span>
+				<span className="auth-link">
+					Create a free Schizzness account
+				</span>
 			</div>
 		),
 		divider: <GradientDivider />,
@@ -284,7 +321,7 @@ export default function AuthPortal() {
 				<p>
 					Already have an account?{' '}
 					<button
-						className='auth-link'
+						className="auth-link"
 						type="button"
 						onClick={handleToggle}
 					>
@@ -300,9 +337,7 @@ export default function AuthPortal() {
 	if (loading)
 		return (
 			<Container>
-				<LogoContainer
-					onClick={handleHomeClick}
-				>
+				<LogoContainer onClick={handleHomeClick}>
 					<Logo />
 				</LogoContainer>
 				<InnerContainer>
@@ -314,9 +349,7 @@ export default function AuthPortal() {
 	if (error)
 		return (
 			<Container>
-				<LogoContainer
-					onClick={handleHomeClick}
-				>
+				<LogoContainer onClick={handleHomeClick}>
 					<Logo />
 				</LogoContainer>
 				<InnerContainer>
@@ -324,13 +357,10 @@ export default function AuthPortal() {
 				</InnerContainer>
 			</Container>
 		)
-	
 
 	return (
 		<Container>
-			<LogoContainer
-					onClick={handleHomeClick}
-				>
+			<LogoContainer onClick={handleHomeClick}>
 				<Logo />
 			</LogoContainer>
 			<InnerContainer>
@@ -352,7 +382,7 @@ export default function AuthPortal() {
 				{isSignIn && (
 					<button
 						onClick={() => setIsSignIn(!isSignIn)}
-						className='secondary-btn auth-btn'
+						className="secondary-btn auth-btn"
 						type="button"
 					>
 						Create your Scamazon account
@@ -363,19 +393,19 @@ export default function AuthPortal() {
 			<GradientDivider $marginTop="var(--spacing-lg)" />
 			<ul className="legalese">
 				<li>
-					<span className='auth-link'>Conditions of Use</span>
+					<span className="auth-link">Conditions of Use</span>
 				</li>
 				<li>
-					<span className='auth-link'>Privacy Notice</span>
+					<span className="auth-link">Privacy Notice</span>
 				</li>
 				<li>
-					<span className='auth-link'>Help</span>
+					<span className="auth-link">Help</span>
 				</li>
 				<li>
-					<span className='auth-link'>Cookies Notice</span>
+					<span className="auth-link">Cookies Notice</span>
 				</li>
 				<li>
-					<span className='auth-link'>Interest-Based Ads Notice</span>
+					<span className="auth-link">Interest-Based Ads Notice</span>
 				</li>
 			</ul>
 			<div className="copyright">
@@ -518,7 +548,6 @@ const Form = styled.form`
 	div.change-email {
 		display: inline-flex;
 		gap: var(--spacing-ms);
-	
 	}
 
 	div.input-group {

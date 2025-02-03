@@ -9,7 +9,7 @@ export default function BasketQuantityBtn({
 	subtract,
 	deleteItem,
 }) {
-	console.log('q btn:', itemId, quantity)
+	// console.log('q btn:', itemId, quantity)
 	const handleSubtract = () => {
 		if (quantity > 1) {
 			subtract(itemId) // Call the subtract function with the itemId

@@ -20,8 +20,11 @@ const userSlice = createSlice({
 			state.isLoggedIn = false
 		},
 		initializeUser(state, action) {
-			state.currentUser = action.payload.user
+			state.currentUser = action.payload.data.user
 			state.isLoggedIn = true
+		},
+		clearError(state) {
+			state.error = null
 		},
 	},
 	extraReducers: (builder) => {
@@ -32,24 +35,40 @@ const userSlice = createSlice({
 				state.error = null
 			})
 			.addCase(checkLoggedIn.fulfilled, (state, action) => {
-        state.loading = false
-        if (action.payload?.user) {
-          state.currentUser = action.payload.user
-          state.isLoggedIn = true
-        } else {
-          state.currentUser = null
-          state.isLoggedIn = false
-        }
-      })
-      .addCase(checkLoggedIn.rejected, (state, action) => {
-        state.loading = false
-        state.error = action.payload
-        if (action.payload === 'Token expired') {
-          state.currentUser = null
-          state.isLoggedIn = false
-          window.location.href = '/auth'
-        }
-      })
+				state.loading = false
+				if (action.payload.status.code === 200) {
+					// console.log('checkLoggedIn', action.payload.data)
+					state.currentUser = action.payload.data.user
+					state.isLoggedIn = true
+				} else {
+					state.currentUser = null
+					state.isLoggedIn = false
+				}
+			})
+			.addCase(checkLoggedIn.rejected, (state, action) => {
+				state.loading = false
+				// Only set error if it's a genuine error, not just an unauthenticated state
+				if (
+					action.payload?.status?.description === 'Token expired' ||
+					action.payload?.status?.code >= 500
+				) {
+					state.error =
+						action.payload?.status?.description ||
+						'An error occurred'
+					if (
+						action.payload?.status?.description === 'Token expired'
+					) {
+						state.currentUser = null
+						state.isLoggedIn = false
+						window.location.href = '/auth'
+					}
+				} else {
+					// Just handle as unauthenticated without setting error
+					state.currentUser = null
+					state.isLoggedIn = false
+					state.error = null
+				}
+			})
 		// Handle registration
 		builder
 			.addCase(registerUser.pending, (state) => {
@@ -58,12 +77,13 @@ const userSlice = createSlice({
 			})
 			.addCase(registerUser.fulfilled, (state, action) => {
 				state.loading = false
-				state.currentUser = action.payload.user
+				state.currentUser = action.payload.data.user
 				state.isLoggedIn = true
 			})
 			.addCase(registerUser.rejected, (state, action) => {
 				state.loading = false
-				state.error = action.payload.message || 'An error occurred'
+				state.error =
+					action.payload?.status?.description || 'An error occurred'
 			})
 
 		// Handle login
@@ -74,19 +94,30 @@ const userSlice = createSlice({
 			})
 			.addCase(loginUser.fulfilled, (state, action) => {
 				state.loading = false
-				state.currentUser = action.payload.user
+				state.currentUser = action.payload.data.user
 				state.isLoggedIn = true
 			})
 			.addCase(loginUser.rejected, (state, action) => {
 				state.loading = false
-				state.error = action.payload
+				state.error = action.payload?.status?.description
 			})
 
 		// Handle logout
-		builder.addCase(logoutUser.fulfilled, (state) => {
-			state.currentUser = null
-			state.isLoggedIn = false
-		})
+		builder
+			.addCase(logoutUser.pending, (state) => {
+				state.loading = true
+				state.error = null
+			})
+			.addCase(logoutUser.fulfilled, (state) => {
+				state.loading = false
+				state.currentUser = null
+				state.isLoggedIn = false
+				state.error = null
+			})
+			.addCase(logoutUser.rejected, (state, action) => {
+				state.loading = false
+				state.error = action.payload?.status?.description
+			})
 
 		// Handle fetch user profile
 		builder
@@ -96,7 +127,7 @@ const userSlice = createSlice({
 			})
 			.addCase(fetchUserProfile.fulfilled, (state, action) => {
 				state.loading = false
-				state.currentUser = action.payload.user
+				state.currentUser = action.payload.data.user
 				state.isLoggedIn = true
 			})
 			.addCase(fetchUserProfile.rejected, (state, action) => {
@@ -106,31 +137,34 @@ const userSlice = createSlice({
 	},
 })
 
-export const { setUser, logout, initializeUser } = userSlice.actions
+export const { setUser, logout, initializeUser, clearError } = userSlice.actions
 
 // Thunk to check if a user is logged in
 export const checkLoggedIn = createAsyncThunk(
-  'user/checkLoggedIn',
-  async (_, { rejectWithValue }) => {
-    try {
-      const response = await userAPI.checkAuth()
-			//dispatch(fetchUserBasket())
-      return response
-    } catch (error) {
-      // If it's a 401 (Unauthorized) or 403 (Forbidden), treat it as a non-error case
-      if (error.response?.status === 401 || error.response?.status === 403) {
-        return { user: null }
-      }
-      // Only reject for actual errors (network issues, server errors, etc.)
-      if (error.response?.data?.message === 'Token expired') {
-        return rejectWithValue('Token expired')
-      }
-      return rejectWithValue(error.response?.data?.message || 'An error occurred')
-    }
-  }
+	'user/checkLoggedIn',
+	async (_, { rejectWithValue }) => {
+		try {
+			const response = await userAPI.checkAuth()
+			// console.log('checkLoggedIn', response)
+			return response
+		} catch (error) {
+			if (
+				error.response?.status.code === 401 ||
+				error.response?.status.code === 403
+			) {
+				return { data: { user: null } }
+			}
+			return rejectWithValue(
+				error.response?.data || {
+					status: {
+						description: 'An error occurred',
+					},
+				}
+			)
+		}
+	}
 )
 
-// Thunk to register a user
 export const registerUser = createAsyncThunk(
 	'user/registerUser',
 	async (userData, { rejectWithValue }) => {
@@ -139,23 +173,29 @@ export const registerUser = createAsyncThunk(
 			return response
 		} catch (error) {
 			return rejectWithValue(
-				error.response?.data?.message || 'An error occurred'
+				error.response?.data || {
+					status: {
+						description: 'An error occurred',
+					},
+				}
 			)
 		}
 	}
 )
 
-// Thunk to login a user
 export const loginUser = createAsyncThunk(
 	'user/loginUser',
-	async (credentials, { rejectWithValue }) => {
+	async (userData, { rejectWithValue }) => {
 		try {
-			const response = await userAPI.loginUser(credentials)
-			//dispatch(fetchUserBasket())
+			const response = await userAPI.loginUser(userData)
 			return response
 		} catch (error) {
 			return rejectWithValue(
-				error.response?.data?.message || 'An error occurred'
+				error.response?.data || {
+					status: {
+						description: 'An error occurred',
+					},
+				}
 			)
 		}
 	}
@@ -164,10 +204,11 @@ export const loginUser = createAsyncThunk(
 // Thunk to logout a user
 export const logoutUser = createAsyncThunk(
 	'user/logoutUser',
-	async (_, { rejectWithValue }) => {
+	async (_, { dispatch, rejectWithValue }) => {
 		try {
-			await userAPI.logoutUser()
-			return true
+			const response = await userAPI.logoutUser()
+			dispatch(logout())
+			return response
 		} catch (error) {
 			return rejectWithValue(
 				error.response?.data?.message || 'An error occurred'

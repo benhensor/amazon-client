@@ -9,7 +9,6 @@ import {
 } from '../redux/slices/basketSlice'
 import { fetchAddresses } from '../redux/slices/addressSlice'
 import { createOrder } from '../redux/slices/orderSlice'
-import { v4 as uuidV4 } from 'uuid'
 import GiftCardOffer from '../components/checkout/GiftCardOffer'
 import ReturnPolicy from '../components/checkout/ReturnPolicy'
 import PrivacyNotice from '../components/checkout/PrivacyNotice'
@@ -26,11 +25,12 @@ export default function Checkout() {
 	const dispatch = useDispatch()
 	const navigate = useNavigate()
 	const [selectedShipping, setSelectedShipping] = useState('standard')
+	const [formOpen, setFormOpen] = useState(false)
 	const currentUser = useSelector((state) => state.user.currentUser) || {
 		first_name: '',
 		last_name: '',
 	}
-	const defaultAddress = useSelector((state) =>
+	const userAddress = useSelector((state) =>
 		state.addresses.addresses.find((address) => address.is_default)
 	) || {
 		address_line1: '',
@@ -40,15 +40,57 @@ export default function Checkout() {
 		county: '',
 		country: '',
 	}
+	const [formData, setFormData] = useState({
+		guest_name: '',	
+		address_line1: '',
+		address_line2: '',
+		city: '',
+		postcode: '',
+		county: '',
+		country: '',
+	})
+	const [guestAddress, setGuestAddress] = useState(null)
 	const paymentMethod = useSelector(
 		(state) => state.paymentMethods.defaultPaymentMethod
 	)
 	const basketItems = useSelector((state) => state.basket.items)
+	const orderItems = basketItems.map((item) => ({
+		product_id: item.product_data.id,
+		quantity: item.quantity,
+		price: item.product_data.price,
+		total: item.product_data.price * item.quantity,
+	}))
 	const itemsTotal = useSelector((state) => state.basket.total)
 
 	useEffect(() => {
 		dispatch(fetchAddresses())
 	}, [dispatch])
+
+	const handleAddressInputChange = (e) => {
+		e.preventDefault()
+		const { name, value } = e.target
+		setFormData({ ...formData, [name]: value })
+	}
+
+	const handleFormOpen = () => {
+		setFormData({
+			guest_name: '',
+			address_line1: '',
+			address_line2: '',
+			city: '',
+			postcode: '',
+			county: '',
+			country: '',
+		})
+		setGuestAddress(null)
+		setFormOpen(true)
+	}
+
+	const handleSave = (e) => {
+		e.preventDefault()
+		setGuestAddress(formData)
+		setFormOpen(false)
+	}
 
 	const HeaderLogo = () => (
 		<Link to="/">
@@ -71,13 +113,14 @@ export default function Checkout() {
 	}
 
 	const formattedAddress = {
-		address1: defaultAddress.address_line1,
-		address2: defaultAddress.address_line2,
-		city: defaultAddress.city,
-		postcode: defaultAddress.postcode,
-		county: defaultAddress.county,
-		country: defaultAddress.country,
+		address1: userAddress.address_line1,
+		address2: userAddress.address_line2,
+		city: userAddress.city,
+		postcode: userAddress.postcode,
+		county: userAddress.county,
+		country: userAddress.country,
 	}
+
 
 	// Date utility functions
 	const formatDeliveryDate = (date) => {
@@ -163,9 +206,7 @@ export default function Checkout() {
 		const selectedOption = shippingOptions[selectedShipping]
 		const rawDates = selectedOption.rawDates
 		const orderData = {
-			order_id: uuidV4(),
-			user_id: currentUser.user_id,
-			order_placed: new Date(),
+			order_placed: new Date().toISOString().slice(0, 19).replace('T', ' '),
 			shipping: {
 				method: selectedShipping,
 				price: selectedOption.price,
@@ -174,9 +215,8 @@ export default function Checkout() {
 				range_to: rawDates.to || null, // If no range_to, default to null
 				description: selectedOption.description,
 			},
-			order_items: basketItems,
-			total: itemsTotal,
-			status: 'pending',
+			order_items: orderItems,
+			total: itemsTotal
 		}
 		console.log('orderData:', orderData)
 		dispatch(createOrder(orderData))
@@ -229,15 +269,99 @@ export default function Checkout() {
 									Delivering to {currentUser.first_name}{' '}
 									{currentUser.last_name}
 								</h3>
-								{currentUser.isLoggedIn ? (
+								{currentUser.isLoggedIn && (
 									<p>
 										{Object.values(formattedAddress).join(', ')}
 									</p>
-								) : (
+								)}
+								{(!currentUser.isLoggedIn && guestAddress === null) ? (
 									<p>
 										Enter delivery address.
 									</p>
+								) : (
+									<div>
+										<form action=""
+											onSubmit={(e) => e.preventDefault()}
+										>
+											<div className="input-group">
+												<label htmlFor="guest_name">Name</label>
+												<input
+													type="text"
+													name="guest_name"
+													id="guest_name"
+													onChange={handleAddressInputChange}
+												/>
+											</div>
+											<div className="input-group">
+												<label htmlFor="address_line1">Address Line 1</label>
+												<input
+													type="text"
+													name="address_line1"
+													id="address_line1"
+													onChange={handleAddressInputChange}
+												/>
+											</div>
+											<div className="input-group">
+												<label htmlFor="address_line2">Address Line 2</label>
+												<input
+													type="text"
+													name="address_line2"
+													id="address_line2"
+													onChange={handleAddressInputChange}
+												/>
+											</div>
+											<div className="input-group">
+												<label htmlFor="city">City</label>
+												<input
+													type="text"
+													name="city"
+													id="city"
+													onChange={handleAddressInputChange}
+												/>
+											</div>
+											<div className="input-group">
+												<label htmlFor="postcode">Postcode</label>
+												<input
+													type="text"
+													name="postcode"
+													id="postcode"
+													onChange={handleAddressInputChange}
+												/>
+											</div>
+											<div className="input-group">
+												<label htmlFor="county">County</label>
+												<input
+													type="text"
+													name="county"
+													id="county"
+													onChange={handleAddressInputChange}
+												/>
+											</div>
+											<div className="input-group">
+												<label htmlFor="country">Country</label>
+												<input
+													type="text"
+													name="country"
+													id="country"
+													onChange={handleAddressInputChange}
+												/>
+											</div>
+											<button
+												className="primary-link"
+												onClick={handleSave}
+											>
+												Save address
+											</button>
+										</form>
+									</div>
 								)}
+
+								{!currentUser.isLoggedIn && guestAddress && (
+									<p>
+										{Object.values(guestAddress).join(', ')}
+									</p>
+								)}
+							
 								<button className="primary-link">
 									Add delivery instructions
 								</button>
@@ -252,7 +376,7 @@ export default function Checkout() {
 							) : (
 								<button
 									className="primary-link"
-									onClick={() => {}}
+									onClick={handleFormOpen}
 								>
 									Add
 								</button>

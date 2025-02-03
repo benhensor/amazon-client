@@ -40,7 +40,7 @@ export const addressSchema = yup.object().shape({
 		.min(3, 'Name must be at least 3 characters')
 		.max(50, 'Name cannot exceed 50 characters')
 		.required('Required'),
-	type: yup
+	address_type: yup
 		.string()
 		.oneOf(['home', 'work', 'other'], 'Please select a valid address type')
 		.required('Required'),
@@ -81,5 +81,10 @@ export const addressSchema = yup.object().shape({
 		.min(3, 'Country must be at least 3 characters')
 		.max(50, 'Country cannot exceed 50 characters')
 		.required('Required'),
+	delivery_instructions: yup
+		.string()
+		.min(3, 'Instructions must be at least 3 characters')
+		.max(100, 'Instructions cannot exceed 50 characters'),
 	is_default: yup.boolean(),
+	is_billing: yup.boolean(),
 })

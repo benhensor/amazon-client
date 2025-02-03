@@ -22,6 +22,7 @@ import Basket from './pages/Basket'
 import Footer from './components/footer/Footer'
 import Addresses from './pages/Addresses'
 import AddNewAddress from './pages/AddNewAddress'
+import EditAddress from './pages/EditAddress'
 import UnderConstruction from './pages/UnderConstruction'
 import Checkout from './pages/Checkout'
 import OrderConfirmation from './pages/OrderConfirmation'
@@ -79,6 +80,14 @@ const HeaderLayout = () => (
 					element={
 						<ProtectedRoute>
 							<AddNewAddress />
+						</ProtectedRoute>
+					}
+				/>
+				<Route
+					path="/account/addresses/edit-address"
+					element={
+						<ProtectedRoute>
+							<EditAddress />
 						</ProtectedRoute>
 					}
 				/>

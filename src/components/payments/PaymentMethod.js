@@ -9,7 +9,6 @@ export default function PaymentMethod({ card }) {
   const dispatch = useDispatch()
   const defaultPaymentMethod = useSelector((state) => state.paymentMethods.defaultPaymentMethod) || {}
 
-	console.log('defaultPaymentMethod', card)
   const handleSetDefaultPaymentMethod = (paymentMethodId) => {
 		dispatch(setDefaultPaymentMethod(paymentMethodId))
 	}
@@ -37,14 +36,14 @@ export default function PaymentMethod({ card }) {
 					{card.bank +
 						' ' +
 						' ' +
-						card.type +
+						card.card_type +
 						' ' +
-						card.account +
+						card.card_account +
 						' Account'}
 				</p>
 				<p className="card-detail">
-					{card.number &&
-						`Debit card ending in •••• ${card.number.slice(-4)}`}
+					{card.card_number &&
+						`Debit card ending in •••• ${card.card_number.slice(-4)}`}
 				</p>
 				{card.status === 'expired' && (
 					<p className="expired">

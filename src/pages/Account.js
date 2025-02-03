@@ -37,9 +37,9 @@ export default function Account() {
 		}
 	}
 
-	const handleSignout = () => {
-		dispatch(logoutUser())
-		navigate('/auth')
+	const handleSignout = async () => {
+		await dispatch(logoutUser()).unwrap()
+		navigate('/')
 	}
 
 	const AccountOption = ({ option }) => {

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { categoryFilters } from '../../utils/categoryFilters'
 import Sidebar from '../filters/Sidebar'
 import MobileFilterMenu from '../filters/MobileFilterMenu'
-import ProductsGrid from '../products/ProductsGrid'
+import BuyAgainGrid from '../products/BuyAgainGrid'
 import FilterIcon from '../../icons/FilterIcon'
 import styled from 'styled-components'
 
@@ -16,8 +16,6 @@ export default function BuyAgain({ products }) {
 	const [sortDirection, setSortDirection] = useState(null)
 
 	const selectedCategory = 'buy-again'
-
-	console.log('Buy again:', products)
 
 	useEffect(() => {
 		if (selectedCategory) {
@@ -149,7 +147,7 @@ export default function BuyAgain({ products }) {
         >
           Filters <FilterIcon />
         </MobileFilterToggle>
-              <ProductsGrid products={filteredProducts} />
+              <BuyAgainGrid products={filteredProducts} />
       </div>
 		</ContentWrapper>
 	)

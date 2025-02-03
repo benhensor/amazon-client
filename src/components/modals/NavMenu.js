@@ -13,6 +13,8 @@ export default function NavMenu({ menuOpen, closeMenu }) {
 	const currentUser = useSelector((state) => state.user.currentUser)
 	const isLoggedIn = useSelector((state) => state.user.isLoggedIn)	
 
+	const userFirstName = currentUser?.full_name.split(' ')[0]
+
 	useEffect(() => {
 		// Disable scroll when modal is open
 		if (menuOpen) {
@@ -85,10 +87,10 @@ export default function NavMenu({ menuOpen, closeMenu }) {
 				<ModalHeader>
 					<div className="profile">
 						<ProfileIcon />
-						<p>Hello{currentUser && isLoggedIn ? ` ${currentUser.first_name}!` : '...'}</p>
+						<p>Hello{currentUser && isLoggedIn ? ` ${userFirstName}!` : '...'}</p>
 					</div>
 					<button onClick={closeMenu}>
-						<CloseIcon />
+						<CloseIcon color={'var(--white)'} />
 					</button>
 				</ModalHeader>
 

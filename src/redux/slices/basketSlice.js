@@ -45,10 +45,7 @@ const loadBasketFromStorage = () => {
 
 const loadBasketFromDatabase = async () => {
   try {
-    // console.log('Loading basket from database...');
-    const basketData = await basketAPI.fetchBasket(); // Fetch data
-    // console.log('Raw basket data:', basketData);
-
+    const basketData = await basketAPI.fetchBasket();
     return {
       items: basketData.items || [],
       count: calculateCount(basketData.items),
@@ -57,6 +54,12 @@ const loadBasketFromDatabase = async () => {
       error: null,
     };
   } catch (error) {
+    // For unauthorized requests (401) or any auth-related errors, 
+    // silently return null without logging the error
+    if (error.response?.status === 401 || error.message?.includes('unauthorized')) {
+      return null;
+    }
+    // Only log actual errors that aren't related to authorization
     console.error('Error loading basket from database:', error.message);
     return null;
   }
@@ -123,6 +126,41 @@ export const loadBasket = createAsyncThunk(
 			return rejectWithValue('Failed to load basket from database')
 		}
 	}
+)
+
+// Thunks
+export const fetchUserBasket = createAsyncThunk(
+  'basket/fetchUserBasket',
+  async (_, { getState, rejectWithValue }) => {
+    try {
+      const { user } = getState()
+      let basketItems
+
+      if (user.isLoggedIn) {
+        try {
+          const response = await basketAPI.fetchBasket()
+          basketItems = response.BasketItems
+        } catch (error) {
+          // For unauthorized requests, fallback to guest basket without error
+          if (error.response?.status === 401 || error.message?.includes('unauthorized')) {
+            const guestBasketData = loadBasketFromStorage()
+            basketItems = guestBasketData?.items || []
+          } else {
+            throw error; // Re-throw non-auth related errors
+          }
+        }
+      } else {
+        const guestBasketData = loadBasketFromStorage()
+        basketItems = guestBasketData?.items || []
+      }
+
+      return basketItems
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data || 'Failed to fetch basket'
+      )
+    }
+  }
 )
 
 export const addItemToBasket = createAsyncThunk(
@@ -295,7 +333,6 @@ const basketSlice = createSlice({
 				state.items = items
 				state.count = calculateCount(items)
 				state.total = calculateTotal(items)
-				console.log('basket', { state })
 				saveBasketToStorage(
 					{
 						items: state.items,

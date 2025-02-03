@@ -1,5 +1,4 @@
 export const categoryFilters = (category, products) => {
-	console.log('categoryFilters', category, products)
 
 	const categoryList = [
 		"beauty",
@@ -30,7 +29,6 @@ export const categoryFilters = (category, products) => {
 
 	if (!categoryList.includes(category)) {
 		const uniqueCategories = [...new Set(products.map(product => product.category))];
-		console.log('uniqueCategories', uniqueCategories)
 		return { category: uniqueCategories };  // Wrap in an object with the 'category' key
 	}
 

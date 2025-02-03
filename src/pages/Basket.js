@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { useWindowWidth } from '../utils/useWindowWidth'
@@ -9,6 +9,7 @@ import {
 	selectBasketItemsSelected,
 	selectBasketTotal,
 	toggleItemSelected,
+	fetchUserBasket,
 	selectAllItems,
 	deselectAllItems,
 	updateItemQuantity,
@@ -34,14 +35,9 @@ export default function Basket() {
 		checkIsAllSelected(basketItemsSelected, basketItems)
 	)
 
-	// useEffect(() => {
-	// 	console.log('Basket items:', basketItems)
-	// 	console.log('Basket state:', basketState)
-	// }, [basketItems, basketState])
-
-	// useEffect(() => {
-	// 	dispatch(fetchUserBasket())
-	// }, [dispatch])
+	useEffect(() => {
+		dispatch(fetchUserBasket())
+	}, [dispatch])
 
 	const handleProductClick = (product) => {
 		dispatch(setCurrentProduct(product))
@@ -89,7 +85,7 @@ export default function Basket() {
 	}
 
 	const handleDelete = (basket_item_id) => {
-		console.log('Deleting item:', basket_item_id)
+		// console.log('Deleting item:', basket_item_id)
 		dispatch(removeItemFromBasket(basket_item_id))
 
 		// Check if the basket is empty after removing the item
@@ -112,7 +108,7 @@ export default function Basket() {
 	}
 
 	const handleToggleItemSelected = (basket_item_id) => {
-		console.log('Toggling item:', basket_item_id)
+		// console.log('Toggling item:', basket_item_id)
 		dispatch(toggleItemSelected(basket_item_id))
 	}
 
@@ -125,7 +121,6 @@ export default function Basket() {
 	}
 
 	const ItemSelect = (item) => {
-		// console.log('Item:', item)
 		return (
 			<Select>
 				<input

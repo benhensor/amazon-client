@@ -14,6 +14,7 @@ export default function Orders() {
 	const dispatch = useDispatch()
 	const currentUser = useSelector((state) => state.user.currentUser)
 	const orders = useSelector((state) => state.orders.orders)
+	const orderedProducts = useSelector((state) => state.products.orderedProducts)
 	const [numOfPendingOrders, setNumOfPendingOrders] = useState(0)
 	const [activeNav, setActiveNav] = useState('orders')
 	const [orderHistoryFilter, setOrderHistoryFilter] = useState('all time')
@@ -27,16 +28,12 @@ export default function Orders() {
 	}, [dispatch])
 
 	useEffect(() => {
-		if (orders.length > 0) {
-			const orderedProducts = orders.reduce((acc, order) => {
-				const products = order.order_items.map(
-					(orderItem) => orderItem.product_data
-				)
-				return [...acc, ...products]
-			}, [])
-			setPreviouslyOrderedProducts(orderedProducts)
-		}
-	}, [orders])
+    const extractedProducts = orderedProducts.flatMap(order => order.products);
+    const uniqueProducts = extractedProducts.filter((product, index, self) =>
+        index === self.findIndex((p) => p.id === product.id)
+    );
+    setPreviouslyOrderedProducts(uniqueProducts);
+}, [orderedProducts])
 
 	useEffect(() => {
 		if (orders.length > 0) {
@@ -82,7 +79,6 @@ export default function Orders() {
 	const renderNavContent = () => {
 		switch (activeNav) {
 			case 'orders':
-				console.log(filteredOrders)
 				return (
 					<GroupedOrders
 						orders={filteredOrders}
@@ -94,7 +90,7 @@ export default function Orders() {
 			case 'local store orders':
 				return <LocalStoreOrders />
 			case 'cancelled orders':
-				return <GroupedOrders
+				return <CancelledOrders 
 						orders={cancelledOrders}
 						currentUser={currentUser}
 					/>

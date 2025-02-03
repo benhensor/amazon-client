@@ -10,6 +10,9 @@ import CloseIcon from '../../icons/CloseIcon'
 export default function CategoryMenu({ menuOpen, closeMenu, onSearch }) {
 	const currentUser = useSelector((state) => state.user.currentUser) 
 	const isLoggedIn = useSelector((state) => state.user.isLoggedIn)
+
+	const userFirstName = currentUser?.full_name.split(' ')[0]
+
 	useEffect(() => {
 		// Prevent scroll when menu is open
 		document.body.style.overflow = menuOpen ? 'hidden' : 'auto'
@@ -42,10 +45,10 @@ export default function CategoryMenu({ menuOpen, closeMenu, onSearch }) {
 				<ModalHeader>
 					<div className="profile">
 						<ProfileIcon />
-						<p>Hello{currentUser && isLoggedIn ? ` ${currentUser.first_name}!` : '...'}</p>
+						<p>Hello{currentUser && isLoggedIn ? ` ${userFirstName}!` : '...'}</p>
 					</div>
 					<button onClick={closeMenu}>
-						<CloseIcon />
+						<CloseIcon color={'var(--white)'}/>
 					</button>
 				</ModalHeader>
 				<Heading>
