@@ -52,9 +52,6 @@ export default function Addresses() {
 			)
 		}
 	}, [addresses])
-	useEffect(() => {
-		console.log('Addresses:', sortedAddresses)	
-	}, [sortedAddresses])
 
 	const handleEdit = (addressId) => {
 		navigate('/account/addresses/edit-address', { state: { addressId } })
