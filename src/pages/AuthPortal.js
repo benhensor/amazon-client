@@ -35,10 +35,7 @@ export default function AuthPortal() {
 			let result
 			if (isSignIn) {
 				if (showPasswordField) {
-					console.log('Attempting login with:', userData)
-					result = await dispatch(loginUser(userData))
-					console.log('Login Result:', result)
-
+					result = dispatch(loginUser(userData))
 					// Check the result properly
 					if (
 						result.payload &&
@@ -51,8 +48,7 @@ export default function AuthPortal() {
 					setShowPasswordField(true)
 				}
 			} else {
-				result = await dispatch(registerUser(userData))
-				console.log('Register Result:', result)
+				result = dispatch(registerUser(userData))
 				const registerResult = result.payload
 				if (registerResult.status.code === 201) {
 					setIsSignIn(true) // Switch to sign-in after successful registration
