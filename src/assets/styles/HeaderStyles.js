@@ -151,6 +151,8 @@ export const NavList = styled.ul`
   list-style: none;
   margin: 0;
   padding: 0;
+  overflow: hidden; // Add this to prevent outer scroll
+  width: 100%; // Ensure it takes full width
 `
 
 export const ScrollableNavList = styled.ul`
@@ -160,6 +162,8 @@ export const ScrollableNavList = styled.ul`
   list-style: none;
   margin: 0;
   padding: 0;
+  flex: 1; // Take up remaining space
+  min-width: 0; // Allow flex item to shrink below content size
 `
 
 export const MenuControl = styled.div`
