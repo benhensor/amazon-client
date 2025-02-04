@@ -170,6 +170,7 @@ export const registerUser = createAsyncThunk(
 	async (userData, { rejectWithValue }) => {
 		try {
 			const response = await userAPI.registerUser(userData)
+			// console.log('registerUser', response)
 			return response
 		} catch (error) {
 			return rejectWithValue(
@@ -188,6 +189,7 @@ export const loginUser = createAsyncThunk(
 	async (userData, { rejectWithValue }) => {
 		try {
 			const response = await userAPI.loginUser(userData)
+			// console.log('loginUser', response)
 			return response
 		} catch (error) {
 			return rejectWithValue(
@@ -208,6 +210,7 @@ export const logoutUser = createAsyncThunk(
 		try {
 			const response = await userAPI.logoutUser()
 			dispatch(logout())
+			console.log('logoutUser', response)
 			return response
 		} catch (error) {
 			return rejectWithValue(

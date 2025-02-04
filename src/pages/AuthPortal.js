@@ -35,8 +35,7 @@ export default function AuthPortal() {
 			let result
 			if (isSignIn) {
 				if (showPasswordField) {
-					result = dispatch(loginUser(userData))
-					// Check the result properly
+					result = await dispatch(loginUser(userData))
 					if (
 						result.payload &&
 						result.payload.status &&
@@ -48,7 +47,7 @@ export default function AuthPortal() {
 					setShowPasswordField(true)
 				}
 			} else {
-				result = dispatch(registerUser(userData))
+				result = await dispatch(registerUser(userData))
 				const registerResult = result.payload
 				if (registerResult.status.code === 201) {
 					setIsSignIn(true) // Switch to sign-in after successful registration
@@ -130,6 +129,13 @@ export default function AuthPortal() {
 								Change
 							</button>
 						</div>
+						<input
+              type="hidden"
+              name="username"
+              id="username"
+              autoComplete="username"
+              value={formik.values.email}
+            />
 						<div className="input-group">
 							<div className="label-and-button">
 								<label htmlFor="password">Password</label>
