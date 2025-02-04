@@ -8,7 +8,10 @@ import {
 } from '../../utils/paymentMethods';
 import LogoSmile from '../../icons/LogoSmile'
 import CloseIcon from '../../icons/CloseIcon'
-import styled from 'styled-components'
+import { 
+  ModalBackground,
+  PaymentMethodModalContainer
+} from '../../assets/styles/ModalStyles';
 
 export default function AddPaymentMethod({ isOpen, setIsOpen, onSubmit }) {
   const currentUser = useSelector((state) => state.user.currentUser);
@@ -108,7 +111,7 @@ export default function AddPaymentMethod({ isOpen, setIsOpen, onSubmit }) {
 
 	return (
 		<ModalBackground $menuOpen={isOpen} onClick={() => setIsOpen(false)}>
-			<ModalContainer $menuOpen={isOpen} onClick={(e) => e.stopPropagation()}
+			<PaymentMethodModalContainer $menuOpen={isOpen} onClick={(e) => e.stopPropagation()}
 			>
 				<div className="modal-controls">
 					<div className="logo">
@@ -144,6 +147,7 @@ export default function AddPaymentMethod({ isOpen, setIsOpen, onSubmit }) {
                   <option value="Lloyds Bank">Lloyds Bank</option>
                   <option value="Halifax">Halifax</option>
                   <option value="Barclays">Barclays</option>
+                  <option value="Co-op">Co-op</option>
                   <option value="HSBC">HSBC</option>
                   <option value="Santander">Santander</option>
                   <option value="NatWest">NatWest</option>
@@ -164,9 +168,9 @@ export default function AddPaymentMethod({ isOpen, setIsOpen, onSubmit }) {
                   required
                 >
                   <option value="">Select type</option>
-                  <option value="VISA">VISA</option>
-                  <option value="MASTERCARD">Mastercard</option>
-                  <option value="AMEX">American Express</option>
+                  <option value="visa">Visa</option>
+                  <option value="mastercard">Mastercard</option>
+                  <option value="american express">American Express</option>
                 </select>
               </div>
             </div>
@@ -256,140 +260,7 @@ export default function AddPaymentMethod({ isOpen, setIsOpen, onSubmit }) {
           </form>
           <p className="disclaimer">Your information is sold to the highest bidder</p>
         </div>
-      </ModalContainer>
+      </PaymentMethodModalContainer>
     </ModalBackground>
   );
 }
-
-const ModalBackground = styled.div`
-	position: fixed;
-	top: 0;
-	left: 0;
-	right: 0;
-	bottom: 0;
-	width: 100%;
-	height: 100%;
-	background: rgba(0, 0, 0, 0.7);
-	z-index: 100;
-	opacity: ${({ $menuOpen }) => ($menuOpen ? 1 : 0)};
-	visibility: ${({ $menuOpen }) => ($menuOpen ? 'visible' : 'hidden')};
-	transition: var(--tr-fast);
-`
-
-const ModalContainer = styled.div`
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%);
-	border-radius: var(--br-lg);
-	width: 50rem;
-	height: auto;
-	background-color: var(--white);
-	color: var(--black);
-	z-index: 999;
-	overflow-y: auto;
-	opacity: ${({ $menuOpen }) => ($menuOpen ? 1 : 0)};
-	padding: var(--spacing-md);
-	transition: var(--tr-medium);
-	.modal-controls {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		position: relative;
-    margin-bottom: var(--spacing-md);
-		.logo {
-			margin: 0 auto;
-		}
-		.logo svg {
-			width: 5rem;
-		}
-		svg {
-			width: 1.5rem;
-			background: none;
-			border: none;
-			cursor: pointer;
-		}
-		button {
-			position: absolute;
-			right: 0;
-			background: none;
-			border: none;
-			cursor: pointer;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-		}
-	}
-	.modal-header {
-		display: flex;
-		flex-direction: column;
-		margin-bottom: var(--spacing-md);
-		p {
-			font-size: var(--font-sm);
-		}
-		.modal-heading {
-			font-size: var(--font-lg);
-			font-weight: bold;
-		}
-	}
-	form {
-		display: flex;
-		flex-direction: column;
-		gap: var(--spacing-md);
-    margin-bottom: var(--spacing-md);
-	}
-
-	.form-group, .input-group {
-		display: flex;
-		flex-direction: column;
-		gap: var(--spacing-xs);
-	}
-
-  .form-group.group {
-    display: flex;
-    flex-direction: row;
-    gap: var(--spacing-md);
-  }
-
-  .form-group.group .input-group {
-    flex: 1;
-  }
-
-	form label {
-		font-size: var(--font-sm);
-		font-weight: bold;
-	}
-
-	form input,
-	form select {
-		padding: var(--spacing-sm);
-		font-size: var(--font-sm);
-		border-radius: var(--br-md);
-		border: 1px solid var(--border-grey);
-	}
-
-  option.def-option {
-    color: var(--lt-grey);
-  }
-
-  .form-group button {
-    display: flex;
-    justify-content: center;
-    padding: 1rem;
-    background-color: var(--lt-grey);
-    border: 1px solid var(--md-grey);
-    transition: var(--tr-fast);
-    &:hover {
-      background-color: var(--lt-grey-hover);
-    }
-  }
-
-  .disclaimer {
-    text-align: center;
-    font-size: var(--font-xs);
-    color: var(--md-grey);
-  }
-	@media only screen and (max-width: 450px) {
-		width: calc(100% - (2 * var(--spacing-sm)));
-	}
-`

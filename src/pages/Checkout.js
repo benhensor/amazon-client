@@ -1,55 +1,53 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { format, addBusinessDays } from 'date-fns'
 import {
+	hydrateBasket,
 	updateItemQuantity,
 	clearBasket,
 	clearBasketItems,
 } from '../redux/slices/basketSlice'
 import { fetchAddresses } from '../redux/slices/addressSlice'
 import { createOrder } from '../redux/slices/orderSlice'
+import { fetchPaymentMethods } from '../redux/slices/paymentMethodsSlice'
 import GiftCardOffer from '../components/checkout/GiftCardOffer'
 import ReturnPolicy from '../components/checkout/ReturnPolicy'
 import PrivacyNotice from '../components/checkout/PrivacyNotice'
 import DeliveryOption from '../components/checkout/DeliveryOption'
+import AddressSection from '../components/checkout/AddressSection'
 import PaymentSection from '../components/checkout/PaymentSection'
 import OrderItem from '../components/checkout/OrderItem'
 import OrderSummary from '../components/checkout/OrderSummary'
 import Logo from '../icons/Logo'
 import BasketFullIcon from '../icons/BasketFullIcon'
 import Footer from '../components/footer/Footer'
-import styled from 'styled-components'
+import { Loader } from '../assets/styles/GlobalStyles'
+import {
+	StyledPage,
+	StyledHeader,
+	StyledMain,
+	StyledLogo,
+	StyledBasket,
+} from '../assets/styles/CheckoutStyles'
 
 export default function Checkout() {
 	const dispatch = useDispatch()
 	const navigate = useNavigate()
 	const [selectedShipping, setSelectedShipping] = useState('standard')
-	const [formOpen, setFormOpen] = useState(false)
-	const currentUser = useSelector((state) => state.user.currentUser) || {
-		first_name: '',
-		last_name: '',
-	}
-	const userAddress = useSelector((state) =>
-		state.addresses.addresses.find((address) => address.is_default)
-	) || {
-		address_line1: '',
-		address_line2: '',
-		city: '',
-		postcode: '',
-		county: '',
-		country: '',
-	}
-	const [formData, setFormData] = useState({
-		guest_name: '',	
-		address_line1: '',
-		address_line2: '',
-		city: '',
-		postcode: '',
-		county: '',
-		country: '',
-	})
-	const [guestAddress, setGuestAddress] = useState(null)
+	const currentUser = useSelector((state) => state.user) || {}
+	const addresses = useSelector((state) => state.addresses.addresses)
+	const userAddress = useMemo(() => {
+		return addresses.find((address) => address.is_default) || {
+			address_line1: '',
+			address_line2: '',
+			city: '',
+			postcode: '',
+			county: '',
+			country: '',
+		}
+	}, [addresses])
+
 	const paymentMethod = useSelector(
 		(state) => state.paymentMethods.defaultPaymentMethod
 	)
@@ -66,31 +64,13 @@ export default function Checkout() {
 		dispatch(fetchAddresses())
 	}, [dispatch])
 
-	const handleAddressInputChange = (e) => {
-		e.preventDefault()
-		const { name, value } = e.target
-		setFormData({ ...formData, [name]: value })
-	}
+	useEffect(() => {
+		dispatch(fetchPaymentMethods())
+	}, [dispatch])
 
-	const handleFormOpen = () => {
-		setFormData({
-			guest_name: '',
-			address_line1: '',
-			address_line2: '',
-			city: '',
-			postcode: '',
-			county: '',
-			country: '',
-		})
-		setGuestAddress(null)
-		setFormOpen(true)
-	}
-
-	const handleSave = (e) => {
-		e.preventDefault()
-		setGuestAddress(formData)
-		setFormOpen(false)
-	}
+	useEffect(() => {	
+		dispatch(hydrateBasket())
+	}, [dispatch])
 
 	const HeaderLogo = () => (
 		<Link to="/">
@@ -112,14 +92,14 @@ export default function Checkout() {
 		setSelectedShipping(option)
 	}
 
-	const formattedAddress = {
+	const formattedAddress = useMemo(() => ({
 		address1: userAddress.address_line1,
 		address2: userAddress.address_line2,
 		city: userAddress.city,
 		postcode: userAddress.postcode,
 		county: userAddress.county,
 		country: userAddress.country,
-	}
+	}), [userAddress])
 
 
 	// Date utility functions
@@ -207,6 +187,8 @@ export default function Checkout() {
 		const rawDates = selectedOption.rawDates
 		const orderData = {
 			order_placed: new Date().toISOString().slice(0, 19).replace('T', ' '),
+			delivery_address: userAddress,
+			payment_method: paymentMethod,
 			shipping: {
 				method: selectedShipping,
 				price: selectedOption.price,
@@ -241,11 +223,9 @@ export default function Checkout() {
 		return (
 			<StyledPage>
 				<StyledMain>
-					<div className="container">
-						<div className="content">
-							<h3>Loading...</h3>
-						</div>
-					</div>
+					<Loader>
+						<div className="loader"></div>
+					</Loader>
 				</StyledMain>
 			</StyledPage>
 		)
@@ -263,127 +243,10 @@ export default function Checkout() {
 			<StyledMain>
 				<div className="container">
 					<div className="content">
-						<section className="address">
-							<div>
-								<h3>
-									Delivering to {currentUser.first_name}{' '}
-									{currentUser.last_name}
-								</h3>
-								{currentUser.isLoggedIn && (
-									<p>
-										{Object.values(formattedAddress).join(', ')}
-									</p>
-								)}
-								{(!currentUser.isLoggedIn && guestAddress === null) ? (
-									<p>
-										Enter delivery address.
-									</p>
-								) : (
-									<div>
-										<form action=""
-											onSubmit={(e) => e.preventDefault()}
-										>
-											<div className="input-group">
-												<label htmlFor="guest_name">Name</label>
-												<input
-													type="text"
-													name="guest_name"
-													id="guest_name"
-													onChange={handleAddressInputChange}
-												/>
-											</div>
-											<div className="input-group">
-												<label htmlFor="address_line1">Address Line 1</label>
-												<input
-													type="text"
-													name="address_line1"
-													id="address_line1"
-													onChange={handleAddressInputChange}
-												/>
-											</div>
-											<div className="input-group">
-												<label htmlFor="address_line2">Address Line 2</label>
-												<input
-													type="text"
-													name="address_line2"
-													id="address_line2"
-													onChange={handleAddressInputChange}
-												/>
-											</div>
-											<div className="input-group">
-												<label htmlFor="city">City</label>
-												<input
-													type="text"
-													name="city"
-													id="city"
-													onChange={handleAddressInputChange}
-												/>
-											</div>
-											<div className="input-group">
-												<label htmlFor="postcode">Postcode</label>
-												<input
-													type="text"
-													name="postcode"
-													id="postcode"
-													onChange={handleAddressInputChange}
-												/>
-											</div>
-											<div className="input-group">
-												<label htmlFor="county">County</label>
-												<input
-													type="text"
-													name="county"
-													id="county"
-													onChange={handleAddressInputChange}
-												/>
-											</div>
-											<div className="input-group">
-												<label htmlFor="country">Country</label>
-												<input
-													type="text"
-													name="country"
-													id="country"
-													onChange={handleAddressInputChange}
-												/>
-											</div>
-											<button
-												className="primary-link"
-												onClick={handleSave}
-											>
-												Save address
-											</button>
-										</form>
-									</div>
-								)}
+						
+						<AddressSection user={currentUser} address={formattedAddress} />
 
-								{!currentUser.isLoggedIn && guestAddress && (
-									<p>
-										{Object.values(guestAddress).join(', ')}
-									</p>
-								)}
-							
-								<button className="primary-link">
-									Add delivery instructions
-								</button>
-							</div>
-							{currentUser.isLoggedIn ? (
-								<button
-									className="primary-link"
-									onClick={() => navigate('/account/addresses')}
-								>
-									Change
-								</button>
-							) : (
-								<button
-									className="primary-link"
-									onClick={handleFormOpen}
-								>
-									Add
-								</button>
-							)}
-						</section>
-
-						<PaymentSection card={paymentMethod} />
+						<PaymentSection user={currentUser} card={paymentMethod} />
 
 						<section>
 							<GiftCardOffer />
@@ -464,183 +327,3 @@ export default function Checkout() {
 		</StyledPage>
 	)
 }
-
-// Styled components with simplified and organized CSS
-const StyledPage = styled.div`
-	min-height: 100svh;
-	display: flex;
-	flex-direction: column;
-`
-
-const StyledHeader = styled.header`
-	background-color: var(--dk-blue);
-	color: var(--white);
-	padding: var(--spacing-xs) var(--spacing-md);
-
-	@media only screen and (max-width: 450px) {
-		padding: var(--spacing-sm);
-	}
-
-	nav {
-		max-width: 120rem;
-		margin: 0 auto;
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-	}
-`
-
-const StyledLogo = styled.div`
-	display: flex;
-	align-items: center;
-	width: 15rem;
-
-	p {
-		margin-top: var(--spacing-sm);
-		color: var(--white);
-	}
-`
-
-const StyledBasket = styled.button`
-	display: flex;
-	align-items: center;
-	gap: var(--spacing-sm);
-	color: var(--white);
-	background: none;
-	border: none;
-	cursor: pointer;
-
-	span {
-		font-weight: bold;
-		@media (max-width: 768px) {
-			display: none;
-		}
-	}
-
-	path {
-		fill: var(--white);
-	}
-`
-
-const StyledMain = styled.main`
-	flex: 1;
-	background-color: var(--checkout-grey);
-	padding: var(--spacing-md) 0;
-
-	@media only screen and (max-width: 1199px) {
-		padding: var(--spacing-md);
-	}
-	@media only screen and (max-width: 450px) {
-		padding: var(--spacing-sm) 0;
-	}
-
-	.container {
-		max-width: 120rem;
-		margin: 0 auto;
-		display: grid;
-		grid-template-columns: 1fr 30rem;
-		gap: var(--spacing-md);
-
-		@media only screen and (max-width: 1024px) {
-			grid-template-columns: 1fr;
-			grid-template-areas:
-				'summary'
-				'content';
-
-			aside {
-				grid-area: summary;
-			}
-
-			.content {
-				grid-area: content;
-			}
-		}
-	}
-
-	.content {
-		display: flex;
-		flex-direction: column;
-		gap: var(--spacing-md);
-
-		section {
-			background: white;
-			padding: var(--spacing-md);
-			margin: 0;
-		}
-
-		@media only screen and (max-width: 450px) {
-			gap: var(--spacing-sm);
-			section {
-				padding: var(--spacing-sm);
-			}
-		}
-	}
-
-	h3 {
-		font-size: clamp(var(--font-sm), 2vw, var(--font-md));
-	}
-
-	p {
-		font-size: clamp(var(--font-xs), 2vw, var(--font-sm));
-	}
-
-	.delivery {
-		margin: var(--spacing-md) 0;
-	}
-
-	.address {
-		display: flex;
-		justify-content: space-between;
-		align-items: flex-start;
-	}
-
-	.small {
-		font-size: clamp(var(--font-xxs), 2vw, var(--font-xs));
-	}
-
-	.delivery-date {
-		padding: var(--spacing-sm) 0;
-	}
-
-	.items {
-		display: flex;
-		flex-direction: column;
-		gap: var(--spacing-md);
-	}
-
-	.order-controls {
-		display: flex;
-		gap: var(--spacing-md);
-	}
-
-	.btn-container {
-		margin: auto 0;
-		width: 20rem;
-	}
-
-	.order-subtotal {
-		display: flex;
-		justify-content: space-between;
-	}
-
-	.order-total {
-		background: white;
-		padding: var(--spacing-md) 0;
-	}
-
-	aside {
-		height: fit-content;
-		background: white;
-		padding: var(--spacing-md);
-	}
-
-	@media only screen and (max-width: 768px) {
-		.order-controls {
-			flex-direction: column;
-		}
-
-		.btn-container {
-			width: 100%;
-		}
-	}
-`

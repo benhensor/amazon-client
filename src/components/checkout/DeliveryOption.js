@@ -1,5 +1,7 @@
 import React from 'react'
-import styled from 'styled-components'
+import {
+  StyledDeliveryOption
+} from '../../assets/styles/CheckoutStyles'
 
 export default function DeliveryOption({ option, selected, onChange, shippingOption }) { 
 
@@ -28,21 +30,3 @@ export default function DeliveryOption({ option, selected, onChange, shippingOpt
     </StyledDeliveryOption>
   )
 }
-
-const StyledDeliveryOption = styled.label`
-	display: flex;
-	align-items: flex-start;
-	gap: var(--spacing-sm);
-	font-size: clamp(var(--font-xs), 2vw, var(--font-sm));
-	cursor: pointer;
-
-	input {
-		margin-top: var(--spacing-xs);
-	}
-
-	div {
-		display: flex;
-		flex-direction: column;
-		margin-bottom: var(--spacing-sm);
-	}
-`

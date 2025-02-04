@@ -1,4 +1,3 @@
-// Orders.js
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
@@ -8,7 +7,16 @@ import BuyAgain from '../components/orders/BuyAgain'
 import LocalStoreOrders from '../components/orders/LocalStoreOrders'
 import CancelledOrders from '../components/orders/CancelledOrders'
 import SearchIcon from '../icons/SearchIcon'
-import styled from 'styled-components'
+import {
+	StyledOrders,
+	OrdersContainer,
+	OrdersTopSection,
+	BreadcrumbNav,
+	PageHeader,
+	SearchForm,
+	OrderFilters,
+	OrderHistorySection,
+} from '../assets/styles/OrderStyles'
 
 export default function Orders() {
 	const dispatch = useDispatch()
@@ -92,7 +100,6 @@ export default function Orders() {
 			case 'cancelled orders':
 				return <CancelledOrders 
 						orders={cancelledOrders}
-						currentUser={currentUser}
 					/>
 			default:
 				return (
@@ -225,176 +232,3 @@ export default function Orders() {
 		</StyledOrders>
 	)
 }
-
-const StyledOrders = styled.div`
-	background-color: var(--white);
-	overflow-x: hidden;
-`
-
-const OrdersContainer = styled.div`
-	margin: 0 auto var(--spacing-lg) auto;
-
-	@media only screen and (max-width: 959px) {
-		padding: 0 var(--spacing-md);
-	}
-
-	@media only screen and (max-width: 879px) {
-		padding: 0 var(--spacing-sm);
-	}
-`
-
-const OrdersTopSection = styled.div`
-	max-width: 92rem;
-	margin: 0 auto;
-`
-
-const BreadcrumbNav = styled.div`
-	display: flex;
-	align-items: center;
-	gap: var(--spacing-xs);
-	margin: var(--spacing-md) 0;
-	font-size: var(--font-xs);
-
-	p {
-		color: var(--order-breadcrumb);
-	}
-
-	span {
-		margin-bottom: 2px;
-	}
-`
-
-const PageHeader = styled.div`
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	margin: var(--spacing-md) 0;
-`
-
-const SearchForm = styled.form`
-	display: flex;
-	align-items: center;
-	position: relative;
-
-	.icon-wrapper {
-		position: absolute;
-		top: 50%;
-		left: var(--spacing-sm);
-		transform: translateY(-50%);
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		width: 1.8rem;
-		height: 1.8rem;
-	}
-
-	input {
-		max-width: 50rem;
-		padding: var(--spacing-sm);
-		border: 1px solid var(--border-grey);
-		border-radius: var(--br-sm);
-		&::placeholder {
-			padding-left: 2rem;
-		}
-	}
-
-	button {
-		padding: var(--spacing-sm);
-		background-color: var(--order-search-btn-bg);
-		color: var(--white);
-		border: none;
-		border-radius: var(--br-25);
-		margin-left: var(--spacing-sm);
-		font-weight: bold;
-		&:hover {
-			background-color: var(--order-search-btn-bg-hover);
-		}
-	}
-
-	@media only screen and (max-width: 450px) {
-		display: none;
-	}
-`
-
-const OrderFilters = styled.div`
-	margin: 0 auto;
-	nav {
-		font-size: clamp(var(--font-xs), 3vw, var(--font-sm));
-		font-weight: 600;
-		border-bottom: 1px solid var(--lt-grey);
-
-		ul {
-			padding: 0 var(--spacing-md);
-			display: flex;
-			align-items: center;
-			gap: var(--spacing-lg);
-
-			li {
-				padding: var(--spacing-ms);
-				cursor: pointer;
-			}
-			.active {
-				color: var(--dk-blue);
-				position: relative;
-			}
-
-			.active::after {
-				content: '';
-				position: absolute;
-				bottom: -1px;
-				left: 0;
-				width: 100%;
-				height: 1px;
-				background-color: var(--star-rating);
-			}
-		}
-	}
-
-	@media only screen and (max-width: 879px) {
-		nav {
-			overflow-x: auto;
-			-webkit-overflow-scrolling: touch;
-			scrollbar-width: none; /* Firefox */
-		}
-
-		nav::-webkit-scrollbar {
-			display: none; /* Chrome/Safari */
-		}
-
-		nav ul {
-			flex-wrap: nowrap;
-			min-width: min-content;
-			padding-bottom: var(--spacing-xs); /* Space for scrollbar */
-		}
-
-		nav ul li {
-			flex-shrink: 0;
-		}
-
-		nav ul li .active::after {
-				content: '';
-				position: absolute;
-				bottom: -4px;
-				left: 0;
-				width: 100%;
-				height: 1px;
-				background-color: var(--star-rating);
-			}
-	}
-`
-
-const OrderHistorySection = styled.div`
-	display: flex;
-	align-items: center;
-	gap: var(--spacing-sm);
-	margin: var(--spacing-md) 0;
-	font-size: var(--font-xs);
-
-	select {
-		padding: var(--spacing-xs);
-		border: 1px solid var(--border-grey);
-		background-color: var(--lt-grey);
-		border-radius: var(--br-md);
-		font-size: var(--font-xs);
-	}
-`

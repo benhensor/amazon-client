@@ -4,7 +4,10 @@ import Sidebar from '../filters/Sidebar'
 import MobileFilterMenu from '../filters/MobileFilterMenu'
 import BuyAgainGrid from '../products/BuyAgainGrid'
 import FilterIcon from '../../icons/FilterIcon'
-import styled from 'styled-components'
+import {
+	ContentWrapper,
+	MobileFilterToggle,
+} from '../../assets/styles/OrderStyles'
 
 export default function BuyAgain({ products }) {
 	const [filters, setFilters] = useState([])
@@ -152,25 +155,3 @@ export default function BuyAgain({ products }) {
 		</ContentWrapper>
 	)
 }
-
-const ContentWrapper = styled.div`
-	display: flex;
-	position: relative;
-`
-
-
-const MobileFilterToggle = styled.button`
-	margin: var(--spacing-md) 0 0 0;
-	display: none;
-	align-items: center;
-	gap: var(--spacing-xs);
-	padding: var(--spacing-xs) var(--spacing-sm);
-	background: none;
-	border: 1px solid var(--lt-grey);
-	border-radius: 4px;
-	cursor: pointer;
-
-	@media only screen and (max-width: 768px) {
-		display: flex;
-	}
-`

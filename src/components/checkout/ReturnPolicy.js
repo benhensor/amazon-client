@@ -1,6 +1,8 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import styled from 'styled-components'
+import {
+	StyledReturnPolicy,
+} from '../../assets/styles/CheckoutStyles'
 
 export default function ReturnPolicy() {
 	return (
@@ -22,25 +24,9 @@ export default function ReturnPolicy() {
 				restrictions apply. See Scamazon's{' '}
 				<span className="primary-link">Return Policy</span>.
 			</p>
-			<Link to="/basket" className="primary-link">
+			<Link to="/basket" className="primary-link back-btn">
 				Back to basket
 			</Link>
 		</StyledReturnPolicy>
 	)
 }
-
-const StyledReturnPolicy = styled.section`
-	background: white;
-	padding: var(--spacing-md);
-	margin: 0;
-
-	display: flex;
-	flex-direction: column;
-	gap: var(--spacing-sm);
-
-	@media only screen and (max-width: 450px) {
-		section {
-			padding: var(--spacing-sm);
-		}
-	}
-`

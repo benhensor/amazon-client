@@ -32,7 +32,7 @@ export const addPaymentMethod = createAsyncThunk(
 				paymentMethodData,
 				{ withCredentials: true }
 			)
-			console.log('addPaymentMethod return: ', response.data)
+			// console.log('addPaymentMethod return: ', response.data)
 			return response.data.data
 		} catch (error) {
 			return rejectWithValue(error.response.data)
@@ -45,11 +45,11 @@ export const setDefaultPaymentMethod = createAsyncThunk(
 	async (paymentMethodId, { rejectWithValue }) => {
 		try {
 			const response = await axios.put(
-				`${API_URL}/api/payment-methods/default/${paymentMethodId}`,
+				`${API_URL}/api/payment-methods/${paymentMethodId}`,
 				{},
 				{ withCredentials: true }
 			)
-			console.log('setDefaultPaymentMethod return: ', response.data)
+			// console.log('setDefaultPaymentMethod return: ', response.data)
 			return response.data.data
 		} catch (error) {
 			return rejectWithValue(error.response.data)
@@ -65,7 +65,7 @@ export const deletePaymentMethod = createAsyncThunk(
 				`${API_URL}/api/payment-methods/${paymentMethodId}`,
 				{ withCredentials: true }
 			)
-			console.log('deletePaymentMethod return: ', response.data)
+			// console.log('deletePaymentMethod return: ', response.data)
 			return response.data
 		} catch (error) {
 			return rejectWithValue(error.response.data)

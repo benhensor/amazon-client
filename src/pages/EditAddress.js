@@ -5,7 +5,11 @@ import { updateAddress, fetchAddresses } from '../redux/slices/addressSlice'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useFormik } from 'formik'
 import PositionIcon from '../icons/PositionIcon'
-import styled from 'styled-components'
+import {
+  AddEditPageContainer,
+  AddEditPage,
+  AddEditPageHeader,
+} from '../assets/styles/AddressStyles'
 
 export default function EditAddress() {
   const dispatch = useDispatch()
@@ -17,10 +21,6 @@ export default function EditAddress() {
   // Get the specific address from the addresses array
   const { addresses } = useSelector(state => state.addresses)
   const currentAddress = addresses.find(addr => addr.address_id === addressId)
-
-  useEffect(() => {
-    console.log('edit address:', addressId, currentAddress)
-  }, [addressId, currentAddress])
 
   useEffect(() => {
     // Fetch addresses if not already loaded
@@ -51,11 +51,9 @@ export default function EditAddress() {
     enableReinitialize: true, // Important for when the address data loads
     onSubmit: (values, { setSubmitting }) => {
       setSubmitting(true)
-      console.log('Submitting:', addressId, values)
       dispatch(updateAddress({ addressId, addressData: values }))
         .unwrap()
         .then((response) => {
-          console.log('Successfully updated address:', response)
           navigate('/account/addresses')
         })
         .catch((error) => {
@@ -76,8 +74,8 @@ export default function EditAddress() {
   }
 
   return (
-    <PageContainer>
-      <Page>
+    <AddEditPageContainer>
+      <AddEditPage>
         <div className="breadcrumb">
           <Link to="/account" className="primary-link">
             Your Account
@@ -89,7 +87,7 @@ export default function EditAddress() {
           <span>▸</span>
           <p>Edit Address</p>
         </div>
-        <PageHeader>
+        <AddEditPageHeader>
           <h2>Edit address</h2>
           <div className="position-icon">
             <PositionIcon />
@@ -102,7 +100,7 @@ export default function EditAddress() {
             <p>Save time. Autofill your current location.</p>
             <button className="autofill-btn">Autofill</button>
           </div>
-        </PageHeader>
+        </AddEditPageHeader>
 
         <form onSubmit={formik.handleSubmit}>
           <div className="form-group">
@@ -270,138 +268,7 @@ export default function EditAddress() {
             Save changes
           </button>
         </form>
-      </Page>
-    </PageContainer>
+      </AddEditPage>
+    </AddEditPageContainer>
   )
 }
-
-// Styled components remain exactly the same
-const PageContainer = styled.div`
-  background-color: var(--white);
-  margin-bottom: 10rem;
-`
-
-const Page = styled.div`
-  max-width: 60rem;
-  margin: 0 auto;
-
-  .breadcrumb {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-xs);
-    margin: var(--spacing-md) 0;
-    font-size: var(--font-xs);
-    p {
-      color: var(--order-breadcrumb);
-    }
-    span {
-      margin-bottom: 2px;
-    }
-  }
-
-  form {
-    margin-top: var(--spacing-md);
-    .form-group {
-      margin-bottom: var(--spacing-md);
-      label {
-        display: block;
-        margin-bottom: var(--spacing-xs);
-        font-size: var(--font-sm);
-        font-weight: bold;
-      }
-      input,
-      select {
-        width: 100%;
-        padding: var(--spacing-sm);
-        border: 1px solid var(--border-grey);
-        border-radius: var(--br-sm);
-        font-size: var(--font-sm);
-      }
-      input::placeholder {
-        color: var(--lt-text);
-      }
-    }
-    .form-group.default {
-      display: flex;
-      align-items: center;
-      width: 100%;
-      input {
-        width: fit-content;
-        margin-right: var(--spacing-sm);
-        padding: 0;
-      }
-      p {
-        line-height: 1;
-      }
-    }
-    button {
-      border-radius: var(--br-25);
-      padding: var(--spacing-sm) var(--spacing-md);
-    }
-  }
-
-  @media only screen and (max-width: 1199px) {
-    padding: var(--spacing-md);
-  }
-  @media only screen and (max-width: 450px) {
-    padding: var(--spacing-sm);
-  }
-`
-
-const PageHeader = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-sm) 0;
-  .position-icon {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-sm);
-    position: relative;
-    svg {
-      width: 2rem;
-      height: auto;
-      z-index: 1;
-      path {
-        fill: var(--md-orange);
-      }
-    }
-    .scamazon-s {
-      position: absolute;
-      top: 0.2rem;
-      left: 0.6rem;
-      font-size: var(--font-md);
-      font-weight: bold;
-      line-height: 1;
-      color: var(--white);
-      z-index: 2;
-    }
-    p {
-      font-size: clamp(var(--font-xs), 2vw, var(--font-sm));
-      margin-bottom: var(--spacing-ms);
-    }
-  }
-  .autofill {
-    border: 1px solid var(--autofill-border);
-    border-radius: var(--br-md);
-    background: var(--autofill-gradient);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: var(--spacing-md) var(--spacing-lg);
-    font-weight: bold;
-    font-size: var(--font-sm);
-  }
-  .autofill-btn {
-    border: 1px solid var(--md-grey);
-    border-radius: var(--br-25);
-    background-color: var(--white);
-    padding: var(--spacing-ms) var(--spacing-md);
-  }
-  @media only screen and (max-width: 450px) {
-    padding: 0;
-    .autofill {
-      padding: var(--spacing-md);
-    }
-  }
-`

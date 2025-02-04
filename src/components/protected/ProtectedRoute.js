@@ -1,14 +1,18 @@
-import React from 'react'
-import { Navigate } from 'react-router-dom'
-import { useSelector } from 'react-redux'
+import React, { useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { checkLoggedIn } from '../../redux/slices/userSlice'
 import { Loader } from '../../assets/styles/GlobalStyles'
 //import { fetchUserProfile } from '../../redux/slices/userSlice' // Adjust the import path as needed
 
 const ProtectedRoute = ({ children }) => {
-	//const dispatch = useDispatch()
-	const { isLoggedIn, loading, currentUser } = useSelector(
+	const dispatch = useDispatch()
+	const { loading } = useSelector(
 		(state) => state.user
 	)
+	
+	useEffect(() => {
+		dispatch(checkLoggedIn())
+	}, [dispatch])
 
 	// console.log('protected route', { isLoggedIn, loading, currentUser })
 
@@ -26,9 +30,9 @@ const ProtectedRoute = ({ children }) => {
 		) 
 	}
 
-	if (!isLoggedIn && !currentUser) {
-		return <Navigate to="/" replace />
-	}
+	// if (!isLoggedIn && !currentUser) {
+	// 	return <Navigate to="/" replace />
+	// }
 
 	return children
 }

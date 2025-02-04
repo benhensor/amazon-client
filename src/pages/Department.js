@@ -11,7 +11,12 @@ import PageHeader from '../components/pageheader/PageHeader'
 import ProductsGrid from '../components/products/ProductsGrid'
 import Sidebar from '../components/filters/Sidebar'
 import MobileFilterMenu from '../components/filters/MobileFilterMenu'
-import styled from 'styled-components'
+import {
+	DepartmentContainer,
+	Content,
+	MainContent,
+	ResultCount,
+} from '../assets/styles/DepartmentStyles'
 
 export default function Department() {
 	const dispatch = useDispatch()
@@ -212,35 +217,3 @@ export default function Department() {
 		</DepartmentContainer>
 	)
 }
-
-// Styled components remain the same
-const DepartmentContainer = styled.div`
-	display: flex;
-	flex-direction: column;
-`
-
-const Content = styled.div`
-	display: flex;
-	background-color: var(--white);
-
-	@media only screen and (max-width: 768px) {
-		flex-direction: column;
-	}
-`
-
-const MainContent = styled.main`
-	flex: 1;
-	padding: var(--spacing-sm);
-	background-color: var(--white);
-
-	@media only screen and (max-width: 768px) {
-		padding: var(--spacing-sm);
-	}
-`
-
-const ResultCount = styled.p`
-	margin-bottom: var(--spacing-sm);
-	font-size: var(--font-sm);
-	color: var(--md-grey);
-	padding-left: var(--spacing-sm);
-`

@@ -12,7 +12,15 @@ import Sidebar from '../components/filters/Sidebar'
 import MobileFilterMenu from '../components/filters/MobileFilterMenu'
 import ProductsGrid from '../components/products/ProductsGrid'
 import FilterIcon from '../icons/FilterIcon'
-import styled from 'styled-components'
+import {
+	ProductsPage,
+	ProductsHeader,
+	HeaderContent,
+	Header,
+	ContentWrapper,
+	MobileFilterToggle,
+	MainContent,
+} from '../assets/styles/ProductsStyles'
 
 export default function Products() {
 	const dispatch = useDispatch()
@@ -229,62 +237,3 @@ export default function Products() {
 		</ProductsPage>
 	)
 }
-
-const ProductsPage = styled.div`
-	background-color: var(--white);
-`
-
-const ProductsHeader = styled.div`
-	position: sticky;
-	top: 0;
-	background-color: var(--white);
-	border-bottom: 1px solid var(--lt-grey);
-	z-index: 10;
-`
-
-const HeaderContent = styled.div`
-	display: flex;
-	justify-content: space-between;
-	align-items: flex-end;
-	padding: var(--spacing-sm) var(--spacing-md);
-
-	@media only screen and (max-width: 768px) {
-		padding: var(--spacing-sm);
-	}
-`
-
-const Header = styled.div`
-	line-height: 2.4rem;
-	h1 {
-		font-size: clamp(var(--font-lg), 3vw, var(--font-xxl));
-		color: var(--dk-blue);
-	}
-	p {
-		font-size: clamp(var(--font-xxs), 2vw, var(--font-sm));
-	}
-`
-
-const ContentWrapper = styled.div`
-	display: flex;
-	position: relative;
-`
-
-const MobileFilterToggle = styled.button`
-	display: none;
-	align-items: center;
-	gap: var(--spacing-xs);
-	padding: var(--spacing-xs) var(--spacing-sm);
-	background: none;
-	border: 1px solid var(--lt-grey);
-	border-radius: 4px;
-	cursor: pointer;
-
-	@media only screen and (max-width: 768px) {
-		display: flex;
-	}
-`
-
-const MainContent = styled.main`
-	flex: 1;
-	background-color: var(--white);
-`

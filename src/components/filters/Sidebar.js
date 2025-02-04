@@ -1,7 +1,14 @@
 import React from 'react'
 import formatQuery from '../../utils/formatQuery'
 import SortingBtn from '../buttons/SortingBtn'
-import styled from 'styled-components'
+import {
+	DesktopSidebar,
+	SectionContent,
+	FilterGroup,
+	FilterOption,
+	Separator,
+	SortingControls,
+} from '../../assets/styles/FilterStyles'
 
 export default function Sidebar({
 	filters,
@@ -108,56 +115,3 @@ export default function Sidebar({
 		</DesktopSidebar>
 	)
 }
-
-const DesktopSidebar = styled.aside`
-	position: sticky;
-	top: 4.6rem;
-	min-width: 25rem;
-	height: calc(100vh - 60px);
-	border-right: 1px solid var(--lt-grey);
-	background-color: var(--white);
-	overflow-y: auto;
-
-	@media only screen and (max-width: 768px) {
-		display: none;
-	}
-`
-
-const SectionContent = styled.div`
-	padding: var(--spacing-md) var(--spacing-md);
-
-	> p {
-		font-weight: bold;
-		margin-bottom: var(--spacing-xs);
-		color: var(--dk-blue);
-	}
-`
-
-const SortingControls = styled.div`
-	margin-top: var(--spacing-md);
-	display: flex;
-	flex-direction: column;
-	gap: var(--spacing-md);
-`
-
-const FilterGroup = styled.div`
-	margin-bottom: var(--spacing-md);
-`
-
-const FilterOption = styled.label`
-	display: flex;
-	align-items: center;
-	gap: var(--spacing-xs);
-	cursor: pointer;
-	font-size: var(--font-sm);
-	margin-bottom: var(--spacing-xs);
-
-	&:hover {
-		color: var(--md-grey);
-	}
-`
-
-const Separator = styled.hr`
-	margin: var(--spacing-md) 0;
-	border: 0.5px solid var(--lt-grey);
-`

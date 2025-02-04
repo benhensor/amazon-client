@@ -2,10 +2,15 @@ import React, { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { logoutUser } from '../../redux/slices/userSlice'
-import styled from 'styled-components'
 import ProfileIcon from '../../icons/ProfileIcon'
 import ChevronIcon from '../../icons/ChevronIcon'
 import CloseIcon from '../../icons/CloseIcon'
+import { 
+	ModalBackground,
+	NavModalContainer,
+	ModalHeader,
+	MenuItem
+} from '../../assets/styles/ModalStyles';
 
 export default function NavMenu({ menuOpen, closeMenu }) {
 	const dispatch = useDispatch()
@@ -83,7 +88,7 @@ export default function NavMenu({ menuOpen, closeMenu }) {
 	return (
 		<>
 			<ModalBackground $menuOpen={menuOpen} onClick={closeMenu} />
-			<ModalContainer $menuOpen={menuOpen}>
+			<NavModalContainer $menuOpen={menuOpen}>
 				<ModalHeader>
 					<div className="profile">
 						<ProfileIcon />
@@ -99,122 +104,7 @@ export default function NavMenu({ menuOpen, closeMenu }) {
 				<MenuItem>
 					<button className='signout-btn' onClick={handleLogoutClick}>Sign Out</button>
 				</MenuItem>
-			</ModalContainer>
+			</NavModalContainer>
 		</>
 	)
 }
-
-const ModalBackground = styled.div`
-	position: fixed;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100vh;
-	background: rgba(0, 0, 0, 0.7);
-	z-index: 100;
-	opacity: ${({ $menuOpen }) => ($menuOpen ? 1 : 0)};
-	visibility: ${({ $menuOpen }) => ($menuOpen ? 'visible' : 'hidden')};
-	transition: var(--tr-medium);
-`
-
-const ModalContainer = styled.div`
-	position: fixed;
-	top: 0;
-	right: 0;
-	height: 100vh;
-	width: 30rem;
-	background-color: var(--white);
-	color: var(--black);
-	z-index: 999;
-	overflow-y: auto;
-	transform: ${({ $menuOpen }) =>
-		$menuOpen ? 'translateX(0)' : 'translateX(100%)'};
-	opacity: ${({ $menuOpen }) => ($menuOpen ? 1 : 0)};
-	transition: var(--tr-medium);
-	@media only screen and (max-width: 450px) {
-		width: 100%;
-	}
-`
-
-const ModalHeader = styled.div`
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	width: 100%;
-	padding: var(--spacing-md) var(--spacing-lg);
-	background-color: var(--md-blue);
-	position: relative;
-	div.profile {
-		display: flex;
-		align-items: center;
-		gap: var(--spacing-md);
-		height: 3rem;
-		svg {
-			fill: var(--white);
-		}
-	}
-	
-	p {
-		display: flex;
-		align-items: center;
-		min-width: fit-content;
-		color: var(--white);
-		font-size: var(--font-lg);
-		font-weight: bold;
-	}
-
-	button {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		border: none;
-		background-color: transparent;
-		position: absolute;
-		right: var(--spacing-lg);
-	}
-`
-
-const MenuItem = styled.div`
-	display: flex;
-	align-items: center;
-	justify-content: flex-end;
-	gap: var(--spacing-sm);
-	width: 100%;
-	border-bottom: 1px solid var(--lt-grey);
-	position: relative; /* Needed for ::after positioning */
-	transition: var(--tr-fast);
-	padding: var(--spacing-md) var(--spacing-lg);
-	color: var(--black);
-	&:last-of-type {
-		border-bottom: none;
-	}
-	> p {
-		font-size: var(--font-sm);
-	}
-	button {
-		float: right;
-		background-color: transparent;
-		border: none;
-		font-size: var(--font-sm);
-	}
-	.signout-btn {
-		&:hover {
-			color: var(--highlight-red);
-		}
-	}
-	svg {
-		position: absolute;
-		left: var(--spacing-lg);
-		path {
-			stroke: var(--md-grey);
-		}
-	}
-	&:hover {
-		background-color: var(--lt-grey);
-		svg {
-			path {
-				stroke: var(--black);
-			}
-		}
-	}
-`

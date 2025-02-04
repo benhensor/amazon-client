@@ -2,8 +2,8 @@ import React, { useEffect, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { fetchCategoryList } from '../../redux/slices/productsSlice'
 import formatQuery from '../../utils/formatQuery'
-import styled from 'styled-components'
 import SearchIcon from '../../icons/SearchIcon'
+import { SearchbarContainer } from '../../assets/styles/HeaderStyles'
 
 export default function SearchBar({ onSearch }) {
 	const dispatch = useDispatch()
@@ -50,7 +50,7 @@ export default function SearchBar({ onSearch }) {
 	}
 
 	return (
-		<Container onSubmit={handleSubmit}>
+		<SearchbarContainer onSubmit={handleSubmit}>
 			<span
 				ref={spanRef}
 				style={{
@@ -88,61 +88,6 @@ export default function SearchBar({ onSearch }) {
 			<button type="submit">
 				<SearchIcon />
 			</button>
-		</Container>
+		</SearchbarContainer>
 	)
 }
-
-const Container = styled.form`
-	flex: 1;
-	display: flex;
-	align-items: center;
-	background-color: var(--white);
-	color: var(--dk-blue);
-	height: 4rem;
-	border-radius: var(--br-sm);
-	overflow: hidden;
-	margin-right: var(--spacing-md);
-	select {
-		height: 100%;
-		border: none;
-		background-color: var(--lt-grey);
-		font-size: var(--font-sm);
-		padding: 0 var(--spacing-sm);
-		outline: none;
-		option {
-			color: var(--yellow);
-		}
-		&:hover {
-			background-color: var(--lt-grey-hover);
-		}
-		@media only screen and (max-width: 768px) {
-			display: none;
-			margin-right: 0;
-		}
-	}
-	input {
-		flex: 1;
-		height: 100%;
-		border: none;
-		padding-left: var(--spacing-sm);
-		font-size: var(--font-md);
-		&:focus {
-			outline: none;
-		}
-	}
-	button {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		border: none;
-		background-color: var(--lt-orange);
-		width: 5rem;
-		height: 100%;
-		&:hover {
-			background-color: var(--lt-orange-hover);
-		}
-	}
-	@media only screen and (max-width: 768px) {
-		margin-right: 0;
-	}
-`

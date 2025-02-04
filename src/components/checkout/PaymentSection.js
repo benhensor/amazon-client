@@ -1,12 +1,12 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useSelector } from 'react-redux'
 import PaymentMethod from '../payments/PaymentMethod'
-import styled from 'styled-components'
+import {
+	StyledPaymentSection
+} from '../../assets/styles/CheckoutStyles'
 
-export default function PaymentSection({ card }) {
+export default function PaymentSection({ user, card }) {
 	const navigate = useNavigate()
-	const currentUser = useSelector((state) => state.currentUser) ?? {}
 	const [formOpen, setFormOpen] = useState(false)
 	const [formData, setFormData] = useState({
 		payment_method_id: '0',
@@ -20,7 +20,7 @@ export default function PaymentSection({ card }) {
 		status: 'default',
 	})
 	const [guestCard, setGuestCard] = useState(null)
-	// console.log(currentUser)
+
 	const paymentOptions = {
 		bank: ['Lloyds Bank', 'Barclays', 'HSBC', 'Natwest', 'Santander', 'Halifax', 'RBS', 'TSB', 'Nationwide', 'Metro Bank'],
 		type: ['Visa', 'Mastercard', 'American Express'],
@@ -52,11 +52,12 @@ export default function PaymentSection({ card }) {
 
 	const handleFormOpen = () => {
 		setFormData({
-			payment_method_id: '0',
+			payment_method_id: '',
 			bank: '',
-			type: '',
-			account: '',
-			number: '',
+			card_type: '',
+			cardholder_name: '',
+			card_account: '',
+			card_number: '',
 			start_date: '',
 			end_date: '',
 			cvv: '',
@@ -97,23 +98,21 @@ export default function PaymentSection({ card }) {
 			<div>
 				<h3>Payment method</h3>
 
-				{currentUser.isLoggedIn && (
+				{user.isLoggedIn && (
 					<div className="payment-method">
 						<PaymentMethod card={card} />
 					</div>
 				)}
-				{(!currentUser.isLoggedIn && guestCard !== null) && (
+				{(!user.isLoggedIn && guestCard !== null) && (
 					<div className="payment-method">
 						<PaymentMethod card={guestCard} />
 					</div>
 				)}
-				{!formOpen ? (
+				{user.isLoggedIn && !formOpen ? (
 					<div>
-						{guestCard === null && (
 						<p>
-							Set up a payment method
+							{guestCard !== null ? 'Set up a payment method' : ''}
 						</p>
-						)}
 					</div>
 				) : (
 					<div>
@@ -157,12 +156,18 @@ export default function PaymentSection({ card }) {
 									))}
 								</select>
 							</div>
-							<div>
+							<div className="input-controls">
 								<button
 									onClick={handleSave}
 									className="primary-link"
 								>
 									Save
+								</button>
+								<button
+									onClick={() => setFormOpen(false)}
+									className="primary-link"
+								>
+									Cancel
 								</button>
 							</div>
 						</form>
@@ -174,59 +179,22 @@ export default function PaymentSection({ card }) {
 					Use a gift card, voucher or promo code
 				</button>
 			</div>
-			{currentUser.isLoggedIn && (
+			{user.isLoggedIn ? (
 				<button
 					onClick={() => navigate('/account/payments')}
 					className="primary-link"
 				>
 					Change
 				</button>
-			)}
-			{!currentUser.isLoggedIn && (
+			) : (
 				<button
-          onClick={handleFormOpen}
-          className="primary-link"
-        >
-          {guestCard !== null ? 'Change' : 'Add'}
-        </button>
+					onClick={handleFormOpen}
+					className="primary-link"
+				>
+					{guestCard !== null ? 'Change' : 'Add'}
+				</button>
 			)}
+			
 		</StyledPaymentSection>
 	)
 }
-
-const StyledPaymentSection = styled.section`
-	background: white;
-	padding: var(--spacing-md);
-	margin: 0;
-
-	display: flex;
-	justify-content: space-between;
-	align-items: flex-start;
-
-	form {
-		display: flex;
-		flex-direction: column;
-		gap: var(--spacing-sm);
-
-		.input-group {
-			display: flex;
-			flex-direction: column;
-			gap: var(--spacing-xs);
-
-			label {
-				font-size: var(--font-xs);
-				color: var(--lt-text);
-			}
-
-			select {
-				padding: var(--spacing-xs);
-				border: 1px solid var(--lt-grey);
-				border-radius: var(--br-sm);
-			}
-		}
-	}
-
-	.payment-method {
-		width: 100%;
-	}
-`

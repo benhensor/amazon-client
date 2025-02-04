@@ -1,6 +1,6 @@
 import React from 'react'
 import GiftCard from '../../assets/img/checkout/gift-card.png'
-import styled from 'styled-components'
+import { StyledGiftCard } from '../../assets/styles/CheckoutStyles'
 
 export default function GiftCardOffer() {
 	return (
@@ -27,39 +27,3 @@ export default function GiftCardOffer() {
 		</StyledGiftCard>
 	)
 }
-
-const StyledGiftCard = styled.div`
-	display: flex;
-	align-items: center;
-	gap: var(--spacing-md);
-	border: 1px solid var(--border-grey);
-	padding: var(--spacing-md);
-
-	.image {
-		img {
-			max-width: 100%;
-			height: auto;
-			object-fit: cover;
-		}
-	}
-
-	.details {
-		flex: 5;
-		font-size: clamp(var(--font-xs), 2vw, var(--font-sm));
-	}
-
-	.old-price {
-		color: var(--lt-text);
-	}
-
-	.new-price {
-		color: var(--discount-red);
-	}
-
-	@media only screen and (max-width: 450px) {
-		padding: var(--spacing-sm);
-		.image {
-			width: 8.6rem;
-		}
-	}
-`

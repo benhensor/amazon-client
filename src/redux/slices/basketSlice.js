@@ -28,7 +28,6 @@ const loadBasketFromStorage = () => {
 		const storedBasket = sessionStorage.getItem(BASKET_STORAGE_KEY)
 		if (storedBasket) {
 			const parsedBasket = JSON.parse(storedBasket)
-			// console.log('parseddBasket', parsedBasket)
 			return {
 				items: parsedBasket.items || [],
 				count: calculateCount(parsedBasket.items),
@@ -47,9 +46,9 @@ const loadBasketFromDatabase = async () => {
   try {
     const basketData = await basketAPI.fetchBasket();
     return {
-      items: basketData.items || [],
-      count: calculateCount(basketData.items),
-      total: calculateTotal(basketData.items),
+      items: basketData.data.items || [],
+      count: calculateCount(basketData.data.items),
+      total: calculateTotal(basketData.data.items),
       loading: false,
       error: null,
     };

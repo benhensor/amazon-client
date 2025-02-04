@@ -6,15 +6,18 @@ import {
 } from '../../redux/slices/orderSlice'
 import { addItemToBasket } from '../../redux/slices/basketSlice'
 import OrderHeader from '../orders/OrderHeader'
-import styled from 'styled-components'
+import {
+	Orders,
+	OrderItem,
+	OrderBody,
+	OrderOptions,
+} from '../../assets/styles/OrderStyles'
 
-export default function CancelledOrders() {
+export default function CancelledOrders({ orders }) {
   const dispatch = useDispatch()
 	const navigate = useNavigate()
 	const currentUser = useSelector((state) => state.user.currentUser)
-	const orders = useSelector((state) => state.orders.orders)
 	const orderedProducts = useSelector((state) => state.products.orderedProducts)
-
 	const productMap = useMemo(() => {
 		const map = orderedProducts.reduce((acc, order) => {
 			order.products.forEach((product) => {
@@ -56,14 +59,35 @@ export default function CancelledOrders() {
 		return (
 			<OrderOptions>
 				<button>View order details</button>
-				<button>Delete order</button>
+				<button
+					onClick={() =>
+						dispatch(deleteOrderById(order.order_id))
+					}
+				>Delete order</button>
 			</OrderOptions>
 		)
 	}
 
+	if (orders.length === 0) {
+    return (
+      <Orders>
+        <OrderItem>
+          <OrderBody>
+            <div className="order-body-items">
+              <div className="order-status">
+                <h3>No orders found</h3>
+              </div>
+            </div>
+          </OrderBody>
+        </OrderItem>
+      </Orders>
+    )
+  }
+
 	return (
 		<Orders>
 			{Object.entries(groupedItems).map(([category, items]) => {
+				const noOrders = orders.length === 0
 				const pending = items[0].order.status === 'pending'
 				const delivered = items[0].order.status === 'delivered'
 				const cancelled = items[0].order.status === 'cancelled'
@@ -75,6 +99,7 @@ export default function CancelledOrders() {
 							<div className="order-body-items">
 								<div className="order-status">
 									<h3>
+										{noOrders ? 'No orders found' : ''}
 										{pending ? 'Not yet dispatched' : ''}
 										{delivered ? 'Order delivered' : ''}
 										{cancelled ? 'Order cancelled' : ''}
@@ -185,142 +210,3 @@ export default function CancelledOrders() {
 		</Orders>
 	)
 }
-
-const Orders = styled.section`
-	max-width: 92rem;
-	margin: 0 auto;
-`
-
-const OrderOptions = styled.div`
-	display: flex;
-	flex-direction: column;
-	gap: var(--spacing-xs);
-	padding-left: var(--spacing-lg);
-	min-width: 25rem;
-
-	button {
-		padding: var(--spacing-ms) var(--spacing-md);
-		background-color: transparent;
-		color: var(--paleblue);
-		border: 1px solid var(--lt-text);
-		border-radius: var(--br-25);
-		transition: var(--tr-fast);
-
-		&:hover {
-			background-color: var(--secondary-hover);
-		}
-
-		&.accent {
-			background-color: var(--yellow);
-		}
-	}
-
-	@media only screen and (max-width: 879px) {
-		padding: 0;
-	}
-`
-
-const OrderBody = styled.div`
-	display: flex;
-	padding: var(--spacing-md);
-	border-bottom: 1px solid var(--border-grey);
-
-	.order-body-items {
-		.order-status {
-			margin-bottom: var(--spacing-sm);
-			p {
-				font-weight: 600;
-			}
-		}
-
-		.cancelled {
-			color: var(--input-error);
-		}
-
-		.delivered {
-			color: var(--dk-blue);
-		}
-
-		.enroute {
-			color: var(--stock-green);
-		}
-
-		.order-item {
-			margin-bottom: var(--spacing-md);
-
-			.order-item-details {
-				display: flex;
-
-				.order-item-image {
-					max-width: 10rem;
-					height: auto;
-					margin-right: var(--spacing-md);
-					img {
-						max-width: 100%;
-						height: auto;
-					}
-				}
-
-				.order-item-info {
-					.description {
-						font-size: var(--font-xs);
-					}
-
-					p {
-						display: inline-block;
-						width: 100%;
-					}
-
-					.returns-policy {
-						font-size: var(--font-xs);
-						margin-bottom: var(--spacing-sm);
-					}
-				}
-
-				.order-buttons {
-					display: flex;
-					gap: var(--spacing-sm);
-
-					button {
-						width: 10rem;
-						border: 1px solid var(--lt-text);
-						color: var(--dk-blue);
-						border-radius: var(--br-25);
-						margin-right: var(--spacing-sm);
-						padding: var(--spacing-ms) var(--spacing-sm);
-						font-size: var(--font-xs);
-						&:hover {
-							background-color: var(--lt-grey);
-						}
-					}
-				}
-			}
-		}
-	}
-
-	@media only screen and (max-width: 879px) {
-		flex-direction: column;
-
-		.order-body-items {
-			margin-bottom: var(--spacing-md);
-		}
-	}
-`
-
-const OrderItem = styled.div`
-	border: 1px solid var(--border-grey);
-	border-radius: var(--br-lg);
-	overflow: hidden;
-	margin-bottom: var(--spacing-md);
-
-	.order-archive {
-		display: flex;
-		padding: var(--spacing-sm) var(--spacing-md);
-
-		.archive-btn {
-			background: none;
-			border: none;
-			cursor: pointer;
-		}
-	}
-`

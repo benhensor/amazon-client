@@ -1,6 +1,8 @@
 import React from 'react'
 import PrivacyNotice from './PrivacyNotice'
-import styled from 'styled-components'
+import {
+  StyledOrderSummary,
+} from '../../assets/styles/CheckoutStyles'
 
 export default function OrderSummary ({
   itemsTotal,
@@ -44,34 +46,3 @@ export default function OrderSummary ({
     </StyledOrderSummary>
   )
 }
-
-const StyledOrderSummary = styled.div`
-	background: white;
-
-	.subtotals {
-		display: flex;
-		flex-direction: column;
-		gap: var(--spacing-sm);
-	}
-
-	.row {
-		display: flex;
-		justify-content: space-between;
-	}
-
-	.total {
-		font-weight: bold;
-		margin-top: var(--spacing-sm);
-	}
-
-	hr {
-		margin: var(--spacing-md) 0;
-		border: none;
-		border-top: 1px solid var(--lt-grey);
-	}
-
-	button {
-		width: 100%;
-		margin-bottom: var(--spacing-md);
-	}
-`

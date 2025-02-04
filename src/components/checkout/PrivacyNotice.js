@@ -1,5 +1,5 @@
 import React from 'react'
-import styled from 'styled-components'
+import { StyledPrivacyNotice } from '../../assets/styles/CheckoutStyles'
 
 export default function PrivacyNotice() {
 	return (
@@ -14,9 +14,3 @@ export default function PrivacyNotice() {
     </StyledPrivacyNotice>
 	)
 }
-
-const StyledPrivacyNotice = styled.div`
-	.small {
-		font-size: clamp(var(--font-xxs), 2vw, var(--font-xs));
-	}
-`

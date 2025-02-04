@@ -1,19 +1,23 @@
 import React from 'react'
-import styled from 'styled-components'
+import {
+  Orders,
+  OrderItem,
+  OrderBody,
+} from '../../assets/styles/OrderStyles'
 
 export default function LocalStoreOrders() {
+ 
   return (
-    <StyledLocalStoreOrders>
-      <h3>No orders found</h3>
-    </StyledLocalStoreOrders>
+    <Orders>
+      <OrderItem>
+          <OrderBody>
+            <div className="order-body-items">
+              <div className="order-status">
+                <h3>No orders found</h3>
+              </div>
+            </div>
+          </OrderBody>
+        </OrderItem>
+    </Orders>
   )
 }
-
-
-const StyledLocalStoreOrders = styled.div`
-  max-width: 92rem;
-  margin: 0 auto;
-  h3 {
-    font-size: 2rem;
-  }
-`
