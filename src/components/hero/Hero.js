@@ -31,6 +31,7 @@ export default function Hero() {
 					alt={superCategories[heroImageIndex].title}
 				/>
 				<ChevronButton
+					id="left-chevron"
 					onClick={() =>
 						setHeroImageIndex((prevIndex) =>
 							prevIndex === 0
@@ -45,6 +46,7 @@ export default function Hero() {
 					{superCategories[heroImageIndex].cta}
 				</CTAButton>
 				<ChevronButton
+					id="right-chevron"
 					onClick={() =>
 						setHeroImageIndex((prevIndex) =>
 							prevIndex === superCategories.length - 1

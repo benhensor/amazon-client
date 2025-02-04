@@ -83,6 +83,7 @@ export default function Carousel({ superCategory, products }) {
 			<CarouselWrapper>
 				<DesktopButtons>
 					<ChevronButton
+						id="left-chevron"
 						type='button'
 						className="left"
 						onClick={handlePrev}
@@ -91,6 +92,7 @@ export default function Carousel({ superCategory, products }) {
 						<ChevronIcon direction="left" />
 					</ChevronButton>
 					<ChevronButton
+						id="right-chevron"
 						type='button'
 						className="right"
 						onClick={handleNext}
