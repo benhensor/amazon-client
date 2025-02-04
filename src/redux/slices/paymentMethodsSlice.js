@@ -98,8 +98,8 @@ const paymentMethodsSlice = createSlice({
 			})
 			.addCase(fetchPaymentMethods.fulfilled, (state, action) => {
 				state.loading = false
-				state.paymentMethods = action.payload  // Set the fetched payment methods
-				state.defaultPaymentMethod = action.payload.find((method) => method.status === 'default')  // Set the default payment method
+				state.paymentMethods = action.payload  
+				state.defaultPaymentMethod = action.payload.find((method) => method.status === 'default')  
 			})
 			.addCase(fetchPaymentMethods.rejected, (state, action) => {
 				state.loading = false
@@ -114,7 +114,6 @@ const paymentMethodsSlice = createSlice({
 			})
 			.addCase(addPaymentMethod.fulfilled, (state, action) => {
 				state.loading = false
-				// Add the new payment method to the list
 				state.paymentMethods.push(action.payload)
 			})
 			.addCase(addPaymentMethod.rejected, (state, action) => {
@@ -130,9 +129,7 @@ const paymentMethodsSlice = createSlice({
 			})
 			.addCase(setDefaultPaymentMethod.fulfilled, (state, action) => {
 				state.loading = false
-				// Update the default payment method
 				state.defaultPaymentMethod = action.payload
-				// Update the status of all payment methods
 				state.paymentMethods = state.paymentMethods.map((method) =>
 					method.payment_method_id === action.payload.payment_method_id
 						? { ...method, status: 'default' }
@@ -152,7 +149,6 @@ const paymentMethodsSlice = createSlice({
 			})
 			.addCase(deletePaymentMethod.fulfilled, (state, action) => {
 				state.loading = false
-				// Remove the deleted payment method from the list
 				state.paymentMethods = state.paymentMethods.filter(
 					(method) => method.payment_method_id !== action.meta.arg
 				)

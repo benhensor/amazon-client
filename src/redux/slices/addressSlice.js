@@ -141,7 +141,7 @@ export const createNewAddress = createAsyncThunk(
 	'address/addAddress',
 	async (addressData, { rejectWithValue }) => {
 		try {
-			console.log('createNewAddress', addressData)
+			// console.log('createNewAddress', addressData)
 			const response = await axios.post(
 				`${API_URL}/api/addresses/add`,
 				addressData,

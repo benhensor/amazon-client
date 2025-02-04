@@ -52,8 +52,7 @@ export const fetchOrders = createAsyncThunk(
 			})
 			const orders = response.data.data.orders
 			// console.log('Orders fetched:', orders) // Check orders data
-			
-			// Fetch product data for all order items
+
 			await dispatch(fetchOrderedProducts(orders))
 			// console.log('Products fetched:', productResponse) 
 			return response.data.data.orders
@@ -67,13 +66,13 @@ export const updateOrderStatus = createAsyncThunk(
 	'orders/updateOrderStatus',
 	async ({ orderId, status }, { rejectWithValue }) => {
 		try {
-			console.log('updateOrderStatus', orderId, status)
+			// console.log('updateOrderStatus', orderId, status)
 			const response = await axios.put(
 				`${API_URL}/api/order/update/${orderId}`,
 				{ status },
 				{ withCredentials: true }
 			)
-			console.log('updateOrderStatus return: ', response)
+			// console.log('updateOrderStatus return: ', response)
 			return response.data.data.order
 		} catch (error) {
 			return rejectWithValue(error.response.data)
@@ -144,13 +143,12 @@ const orderSlice = createSlice({
 			})
 			.addCase(updateOrderStatus.fulfilled, (state, action) => {
 				state.status = 'succeeded'
-				// Update the specific order in the state
 				const updatedOrder = action.payload
 				const index = state.orders.findIndex(
 					(order) => order.order_id === updatedOrder.order_id
 				)
 				if (index !== -1) {
-					state.orders[index] = updatedOrder // Replace the old order with the updated one
+					state.orders[index] = updatedOrder 
 				}
 			})
 			.addCase(updateOrderStatus.rejected, (state, action) => {
@@ -159,7 +157,7 @@ const orderSlice = createSlice({
 			})
 			// Delete Order
 			.addCase(deleteOrderById.fulfilled, (state, action) => {
-				const deletedOrderId = action.meta.arg // The `orderId` passed to the thunk
+				const deletedOrderId = action.meta.arg 
 				state.orders = state.orders.filter(
 					(order) => order.order_id !== deletedOrderId
 				)
