@@ -83,6 +83,7 @@ export default function Carousel({ superCategory, products }) {
 			<CarouselWrapper>
 				<DesktopButtons>
 					<ChevronButton
+						type='button'
 						className="left"
 						onClick={handlePrev}
 						disabled={currentPage === 0}
@@ -90,6 +91,7 @@ export default function Carousel({ superCategory, products }) {
 						<ChevronIcon direction="left" />
 					</ChevronButton>
 					<ChevronButton
+						type='button'
 						className="right"
 						onClick={handleNext}
 						disabled={currentPage === pageCount - 1}
@@ -111,11 +113,12 @@ export default function Carousel({ superCategory, products }) {
 							/>
 							<div className="btn-container">
 								<BuyButton
+									type="button"
 									onClick={() =>
 										handleAddToBasket(product)
 									}
 									text="Add to Basket"
-									type="small"
+									buttonType="small"
 								/>
 							</div>
 						</ProductItem>

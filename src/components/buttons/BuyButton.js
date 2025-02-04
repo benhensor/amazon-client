@@ -1,12 +1,12 @@
 import React from 'react'
 import styled from 'styled-components'
 
-export default function BuyButton({ onClick, text, type }) {
+export default function BuyButton({ onClick, text, buttonType }) {
 
 
 	return (
 		<Container>
-			<Button type="button" onClick={onClick} $text={text} $type={type}>
+			<Button type="button" onClick={onClick} $text={text} $type={buttonType}>
 				{text}
 			</Button>
 		</Container>

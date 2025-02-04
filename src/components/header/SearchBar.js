@@ -60,6 +60,7 @@ export default function SearchBar({ onSearch }) {
 				}}
 			></span>
 
+			<label htmlFor="category" className="sr-only"></label>
 			<select
 				id="category"
 				name="category"
@@ -85,7 +86,10 @@ export default function SearchBar({ onSearch }) {
 				value={!error ? localSearchTerm : 'Error fetching categories'}
 				onChange={handleSearchChange}
 			/>
-			<button type="submit">
+			<button 
+				aria-label="Search"
+				type="submit"
+			>
 				<SearchIcon />
 			</button>
 		</SearchbarContainer>

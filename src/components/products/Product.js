@@ -48,9 +48,10 @@ export default function CarouselItem({ product }) {
 					</div>
 				</div>
 				<BuyButton
+					type="button"
 					onClick={() => handleAddToBasket(product)}
 					text="Add to Basket"
-					type="small"
+					buttonType="small"
 				/>
 			</ProductCard>
 		</>

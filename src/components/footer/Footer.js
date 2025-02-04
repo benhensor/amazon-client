@@ -64,9 +64,9 @@ export default function Footer() {
 			</a>
 			<div className="footer-links">
 				<div className="column">
-					<h5 onClick={() => toggleSection('getToKnowUs')}>
+					<p onClick={() => toggleSection('getToKnowUs')}>
 						Get to Know Us
-					</h5>
+					</p>
 					<ul className={openSection === 'getToKnowUs' ? 'open' : ''}>
 						{footerLists.getToKnowUs.map((item, i) => (
 							<li key={i}>{item}</li>
@@ -74,9 +74,9 @@ export default function Footer() {
 					</ul>
 				</div>
 				<div className="column">
-					<h5 onClick={() => toggleSection('makeMoneyWithUs')}>
+					<p onClick={() => toggleSection('makeMoneyWithUs')}>
 						Make Money with Us
-					</h5>
+					</p>
 					<ul
 						className={
 							openSection === 'makeMoneyWithUs' ? 'open' : ''
@@ -88,9 +88,9 @@ export default function Footer() {
 					</ul>
 				</div>
 				<div className="column">
-					<h5 onClick={() => toggleSection('scamazonPaymentMethods')}>
+					<p onClick={() => toggleSection('scamazonPaymentMethods')}>
 						Scamazon Payment Methods
-					</h5>
+					</p>
 					<ul
 						className={
 							openSection === 'scamazonPaymentMethods'
@@ -104,9 +104,9 @@ export default function Footer() {
 					</ul>
 				</div>
 				<div className="column">
-					<h5 onClick={() => toggleSection('letUsHelpYou')}>
+					<p onClick={() => toggleSection('letUsHelpYou')}>
 						Let Us Help You
-					</h5>
+					</p>
 					<ul
 						className={openSection === 'letUsHelpYou' ? 'open' : ''}
 					>
@@ -159,7 +159,8 @@ const StyledFooter = styled.footer`
 		padding: var(--spacing-lg) 0;
 		div.column {
 			text-align: left;
-			h5 {
+			p {
+				font-weight: bold;
 				color: var(--white);
 				font-size: clamp(var(--font-sm), 2vw, var(--font-md));
 			}

@@ -98,7 +98,7 @@ const ProductPrice = styled.div`
 		}
 	}
 	.whole {
-		color: var(--md-grey);
+		color: var(--pale-blue);
 		text-decoration: line-through;
 	}
 `

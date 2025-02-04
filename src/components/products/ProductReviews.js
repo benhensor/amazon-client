@@ -18,7 +18,11 @@ export default function ProductReviews({ reviews }) {
 
 	return (
 		<ReviewsContainer>
-			<Button onClick={() => setOpen(!open)}>
+			<Button
+				type="button"
+				aria-expanded={open}
+				onClick={() => setOpen(!open)}
+			>
 				Reviews
 				<ChevronIcon direction={open ? 'up' : 'right'} />
 			</Button>

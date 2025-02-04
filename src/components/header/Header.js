@@ -18,9 +18,9 @@ import {
 	Content,
 	ContentTabletView,
 	Nav,
-	NavItems,
+	NavList,
+	ScrollableNavList,
 	NavItem,
-	ScrollableNavItems,
 	HeaderItem,
 	LogoContainer,
 	BasketContainer,
@@ -139,13 +139,9 @@ export default function Header() {
 		<HeaderItem>
 			<BasketContainer onClick={() => handleBasketClick()}>
 				<BasketIcon />
-					<p
-						className={`total ${
-							basketCount >= 10 ? 'over-ten' : ''
-						}`}
-					>
-						{basketCount || 0}
-					</p>
+				<p className={`total ${basketCount >= 10 ? 'over-ten' : ''}`}>
+					{basketCount || 0}
+				</p>
 				<span>Basket</span>
 			</BasketContainer>
 		</HeaderItem>
@@ -164,6 +160,8 @@ export default function Header() {
 				<SearchBar onSearch={handleSearch} />
 				<HeaderItem>
 					<button
+						aria-label="Go to account"
+						type="button"
 						className="got-to-account"
 						onClick={() => handleHeaderItemClick('/account')}
 					>
@@ -202,7 +200,10 @@ export default function Header() {
 					)}
 				</HeaderItem>
 				<HeaderItem>
-					<button className="go-to-account" onClick={() => handleHeaderItemClick('/account/orders')}>
+					<button
+						className="go-to-account"
+						onClick={() => handleHeaderItemClick('/account/orders')}
+					>
 						<p>Returns</p>
 						<span>& Orders</span>
 					</button>
@@ -210,17 +211,17 @@ export default function Header() {
 				<BasketSection />
 			</Content>
 			<Nav>
-				<NavItems>
+				<NavList>
 					<NavItem onClick={() => setCategoryMenuOpen(true)}>
 						<MenuIcon />
 						<p>All</p>
 					</NavItem>
-					<ScrollableNavItems>
+					<ScrollableNavList>
 						{NAV_ITEMS.map((item) => (
 							<NavItem key={item}>{item}</NavItem>
 						))}
-					</ScrollableNavItems>
-				</NavItems>
+					</ScrollableNavList>
+				</NavList>
 				<CategoryMenu
 					closeMenu={() => setCategoryMenuOpen(false)}
 					menuOpen={categoryMenuOpen}
@@ -245,41 +246,48 @@ export default function Header() {
 						<UnionJackIcon />
 					</HeaderItem>
 					<HeaderItem>
-					{currentUser ? (
-						<button
-							className="go-to-account"
-							onClick={() => handleHeaderItemClick('/account')}
-						>
-							<p>Hello {userFirstName}</p>
-							<span>
-								Account & Lists
-								<ArrowheadIcon
-									fill="var(--lt-grey)"
-									direction="down"
-								/>
-							</span>
-						</button>
-					) : (
-						<button
-							className="go-to-account"
-							onClick={() => handleHeaderItemClick('/auth')}
-						>
-							<p>Hello, Sign in</p>
-							<span>
-								Account & Lists
-								<ArrowheadIcon
-									fill="var(--lt-grey)"
-									direction="down"
-								/>
-							</span>
-						</button>
-					)}
-				</HeaderItem>
+						{currentUser ? (
+							<button
+								className="go-to-account"
+								onClick={() =>
+									handleHeaderItemClick('/account')
+								}
+							>
+								<p>Hello {userFirstName}</p>
+								<span>
+									Account & Lists
+									<ArrowheadIcon
+										fill="var(--lt-grey)"
+										direction="down"
+									/>
+								</span>
+							</button>
+						) : (
+							<button
+								className="go-to-account"
+								onClick={() => handleHeaderItemClick('/auth')}
+							>
+								<p>Hello, Sign in</p>
+								<span>
+									Account & Lists
+									<ArrowheadIcon
+										fill="var(--lt-grey)"
+										direction="down"
+									/>
+								</span>
+							</button>
+						)}
+					</HeaderItem>
 					<HeaderItem>
-					<button className="go-to-account" onClick={() => handleHeaderItemClick('/account/orders')}>
-						<p>Returns</p>
-						<span>& Orders</span>
-					</button>
+						<button
+							className="go-to-account"
+							onClick={() =>
+								handleHeaderItemClick('/account/orders')
+							}
+						>
+							<p>Returns</p>
+							<span>& Orders</span>
+						</button>
 					</HeaderItem>
 					<BasketSection />
 				</ContentTabletView>

@@ -145,6 +145,23 @@ export const Nav = styled.nav`
 	}
 `
 
+export const NavList = styled.ul`
+  display: flex;
+  align-items: center;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+`
+
+export const ScrollableNavList = styled.ul`
+  overflow-x: auto;
+  white-space: nowrap;
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+`
+
 export const MenuControl = styled.div`
 	width: fit-content;
 	height: 100%;
@@ -166,19 +183,6 @@ export const MenuControl = styled.div`
 	@media only screen and (max-width: 450px) {
 		padding: var(--spacing-sm) 0;
 	}
-`
-
-export const ScrollableNavItems = styled.div`
-	overflow-x: auto;
-	white-space: nowrap;
-	display: flex;
-`
-
-export const NavItems = styled.ul`
-	display: flex;
-	align-items: center;
-	overflow-x: auto;
-	white-space: nowrap;
 `
 
 export const NavItem = styled.li`
