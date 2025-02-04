@@ -418,7 +418,7 @@ export default function AuthPortal() {
 				</li>
 			</ul>
 			<div className="copyright">
-				<p>@ 1996-2024, Scamazon.com, Inc. or its affiliates</p>
+				<p>@ 1996-2025, Scamazon.com, Inc. or its affiliates</p>
 			</div>
 		</Container>
 	)

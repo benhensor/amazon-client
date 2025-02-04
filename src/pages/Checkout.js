@@ -200,7 +200,6 @@ export default function Checkout() {
 			order_items: orderItems,
 			total: itemsTotal
 		}
-		console.log('orderData:', orderData)
 		dispatch(createOrder(orderData))
 		dispatch(clearBasket())
 		dispatch(clearBasketItems())

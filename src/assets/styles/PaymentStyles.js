@@ -244,7 +244,8 @@ export const CardContainer = styled.div`
 export const Thumbnail = styled.div`
 	border-radius: var(--br-sm);
 	width: 100%;
-	height: 100%;
+	height: auto;
+	aspect-ratio: 1.585/1;
 	padding: var(--spacing-xs);
 	position: relative;
 
@@ -339,7 +340,7 @@ export const Thumbnail = styled.div`
 		align-items: flex-end;
 		svg {
 			width: ${($props) =>
-				$props.$isMethodInListDisplay ? '1.2rem' : '5rem'};
+				$props.$isMethodInListDisplay ? '1.2rem' : '4rem'};
 			height: auto;
 		}
 		p {

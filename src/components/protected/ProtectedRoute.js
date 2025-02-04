@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { checkLoggedIn } from '../../redux/slices/userSlice'
 import { Loader } from '../../assets/styles/GlobalStyles'
@@ -6,7 +7,8 @@ import { Loader } from '../../assets/styles/GlobalStyles'
 
 const ProtectedRoute = ({ children }) => {
 	const dispatch = useDispatch()
-	const { loading } = useSelector(
+	const navigate = useNavigate()
+	const { isLoggedIn, loading } = useSelector(
 		(state) => state.user
 	)
 	
@@ -30,9 +32,9 @@ const ProtectedRoute = ({ children }) => {
 		) 
 	}
 
-	// if (!isLoggedIn && !currentUser) {
-	// 	return <Navigate to="/" replace />
-	// }
+	if (!isLoggedIn) {
+		return navigate('/auth')
+	}
 
 	return children
 }

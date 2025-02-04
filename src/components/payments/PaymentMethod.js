@@ -17,11 +17,11 @@ export default function PaymentMethod({ card }) {
 	const isDefault = card?.payment_method_id === defaultPaymentMethodId
 
 	const handleSetDefaultPaymentMethod = (card) => {
-		if (card.status === 'expired') {
+		if (card?.status === 'expired') {
 			console.log('Expired card cannot be set as default')
 			return
 		} else {
-			dispatch(setDefaultPaymentMethod(card.payment_method_id))
+			dispatch(setDefaultPaymentMethod(card?.payment_method_id))
 		}
 	}
 	return (
@@ -38,7 +38,7 @@ export default function PaymentMethod({ card }) {
 					className="card-details"
 				>
 					<p className="card-account">
-						{`${card?.bank} ${card.card_type
+						{`${card?.bank} ${card?.card_type
 							.split(' ')
 							.map(
 								(word) =>
