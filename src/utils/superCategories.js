@@ -1,10 +1,10 @@
-import ClothingImg from '../assets/img/hero/clothing.webp'
-import CosmeticsImg from '../assets/img/hero/cosmetics.webp'
-import ElectronicsImg from '../assets/img/hero/gadgets.webp'
-import GroceriesImg from '../assets/img/hero/groceries.webp'
-import VehiclesImg from '../assets/img/hero/vehicles.webp'
-import HomeImg from '../assets/img/hero/home.webp'
-import SportsImg from '../assets/img/hero/sports.webp'
+import ClothingImg from '../assets/img/hero/clothing_xwide.webp'
+import CosmeticsImg from '../assets/img/hero/cosmetics_xwide.webp'
+import ElectronicsImg from '../assets/img/hero/gadgets_xwide.webp'
+import GroceriesImg from '../assets/img/hero/groceries_xwide.webp'
+import VehiclesImg from '../assets/img/hero/vehicles_xwide.webp'
+import HomeImg from '../assets/img/hero/home_xwide.webp'
+import SportsImg from '../assets/img/hero/sports_xwide.webp'
 
 
 export const superCategories = [
@@ -24,7 +24,7 @@ export const superCategories = [
 			'tops',
 		],
 		image: ClothingImg,
-		cta: 'make yourself presentable',
+		cta: 'conform',
 		previewHeading: 'Clothing',
 	},
 	{
@@ -33,7 +33,7 @@ export const superCategories = [
 		title: 'Beauty & Personal Care',
 		subCategories: ['beauty', 'fragrances', 'skin-care'],
 		image: CosmeticsImg,
-		cta: 'fix your face',
+		cta: 'integrate',
 		previewHeading: 'Beauty Products',
 	},
 	{
@@ -47,7 +47,7 @@ export const superCategories = [
 			'tablets',
 		],
 		image: ElectronicsImg,
-		cta: 'pointless gadgets?',
+		cta: 'obey',
 		previewHeading: 'Consumer Electronics',
 	},
 	{
@@ -56,7 +56,7 @@ export const superCategories = [
 		title: 'Groceries',
 		subCategories: ['groceries'],
 		image: GroceriesImg,
-		cta: 'consume more',
+		cta: 'consume',
 		previewHeading: 'Groceries',
 	},
 	{
@@ -65,7 +65,7 @@ export const superCategories = [
 		title: 'Home & Living',
 		subCategories: ['furniture', 'home-decoration', 'kitchen-accessories'],
 		image: HomeImg,
-		cta: 'sort your life out',
+		cta: 'comply',
 		previewHeading: 'Home & Living',
 	},
 	{

@@ -11,6 +11,8 @@ export default function CarouselItem({ product }) {
 	const dispatch = useDispatch()
 	const navigate = useNavigate()
 
+	const count = product.reviews.length
+
 	const handleProductClick = () => {
 		dispatch(setCurrentProduct(product))
 		navigate(`/product/${product.id}`)
@@ -32,7 +34,7 @@ export default function CarouselItem({ product }) {
 						</p>
 					</div>
 					<div className="block">
-						<ProductRating rating={product.rating} />
+						<ProductRating rating={product.rating} count={count}/>
 						<div className="price-container">
 							<p className="discount">
 								-{product.discountPercentage}%

@@ -2,7 +2,13 @@ import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { superCategories } from '../../utils/superCategories'
 import ChevronIcon from '../../icons/ChevronIcon'
-import styled from 'styled-components'
+import {
+	HeroContainer,
+	HeroTint,
+	HeroContent,
+	ChevronButton,
+	CTAButton,
+} from '../../assets/styles/HeroStyles'
 
 export default function Hero() {
 	const navigate = useNavigate()
@@ -25,6 +31,7 @@ export default function Hero() {
 
 	return (
 		<HeroContainer>
+			<HeroTint />
 			<HeroContent>
 				<img
 					src={superCategories[heroImageIndex].image}
@@ -43,7 +50,7 @@ export default function Hero() {
 					<ChevronIcon direction="left" />
 				</ChevronButton>
 				<CTAButton onClick={handleHeroClick}>
-					{superCategories[heroImageIndex].cta}
+					<span>{superCategories[heroImageIndex].cta}</span>
 				</CTAButton>
 				<ChevronButton
 					id="right-chevron"
@@ -62,66 +69,3 @@ export default function Hero() {
 	)
 }
 
-const HeroContainer = styled.div`
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-`
-
-const HeroContent = styled.div`
-	width: 100%;
-	height: 100%;
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	background: var(--dk-blue-50);
-	position: relative;
-	overflow: hidden;
-	img {
-		position: absolute;
-		top: 0;
-		left: 50%;
-		transform: translateX(-50%);
-		width: 100%;
-		max-width: 100%;
-		height: 100%;
-		object-fit: cover;
-		object-position: center;
-		z-index: 0;
-	}
-`
-
-const ChevronButton = styled.button`
-	width: 5rem;
-	height: 100%;
-	svg {
-		width: 50%;
-		stroke: var(--white);
-		stroke-width: 1;
-	}
-	@media (max-width: 768px) {
-		width: 4rem;
-	}
-	@media (max-width: 450px) {
-		width: 3rem;
-	}
-`
-
-const CTAButton = styled.button`
-	text-transform: uppercase;
-	font-size: var(--font-cta);
-	color: var(--white);
-	width: 100%;
-	height: 30rem;
-	overflow: hidden;
-	position: relative;
-	@media (max-width: 1199px) {
-		height: 25rem;
-	}
-	@media (max-width: 768px) {
-		height: 20rem;
-	}
-	@media (max-width: 450px) {
-		height: 15rem;
-	}
-`

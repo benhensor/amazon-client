@@ -5,6 +5,7 @@ import CrimeLogo from '../../icons/CrimeLogo'
 
 export default function CarouselItem({ onClick, product, BREAKPOINTS }) {
 	const [isImageLoaded, setIsImageLoaded] = useState(false)
+	const count = product.reviews.length
 
 	useEffect(() => {
 		const img = new Image()
@@ -25,7 +26,7 @@ export default function CarouselItem({ onClick, product, BREAKPOINTS }) {
 				<LoadingSpinner>Loading Image...</LoadingSpinner>
 			)}
 			<ProductTitle>{product.title}</ProductTitle>
-			<ProductRating rating={product.rating} review={false} />
+			<ProductRating rating={product.rating} review={false} count={count} />
 			<ProductPrice>
 				<p className="price">
 					£
