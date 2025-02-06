@@ -86,7 +86,7 @@ const HeroContent = styled.div`
 		max-width: 100%;
 		height: 100%;
 		object-fit: cover;
-		object-position: center bottom;
+		object-position: center;
 		z-index: 0;
 	}
 `
