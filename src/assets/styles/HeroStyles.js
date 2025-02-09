@@ -67,7 +67,7 @@ export const CTAButton = styled.button`
     color: var(--white);
     background: var(--dk-blue-50);
     padding: var(--spacing-xs) var(--spacing-md);
-    z-index: 999;
+    z-index: 99;
   }
 	width: 100%;
 	height: 30rem;
