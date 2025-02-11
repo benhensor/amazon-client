@@ -1,6 +1,6 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useFormik } from 'formik'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { registerSchema, loginSchema } from '../schemas/index'
 import { useDispatch, useSelector } from 'react-redux'
 import { registerUser, loginUser } from '../redux/slices/userSlice'
@@ -17,66 +17,65 @@ import {
 export default function AuthPortal() {
 	const dispatch = useDispatch()
 	const navigate = useNavigate()
+	const location = useLocation()
 
 	const [showPasswordField, setShowPasswordField] = useState(false)
 	const [isSignIn, setIsSignIn] = useState(true)
 
-	const { loading, error } = useSelector((state) => state.user)
+	const { loading, error, isLoggedIn } = useSelector((state) => state.user)
+
+useEffect(() => {
+  if (isLoggedIn) {
+    const from = location.state?.from?.pathname || '/'
+    navigate(from, { replace: true })
+  }
+}, [isLoggedIn, navigate, location])
 
 	const handleHomeClick = () => {
-		// console.log('Home clicked')
-		navigate('/')
-	}
+    navigate('/')
+  }
 
 	const handleAuth = async (values) => {
-		const { passwordConfirm, ...userData } = values
-		// console.log('Register Payload:', userData);
-		try {
-			let result
-			if (isSignIn) {
-				if (showPasswordField) {
-					result = await dispatch(loginUser(userData))
-					if (
-						result.payload &&
-						result.payload.status &&
-						result.payload.status.code === 200
-					) {
-						navigate('/')
-					}
-				} else {
-					setShowPasswordField(true)
-				}
-			} else {
-				result = await dispatch(registerUser(userData))
-				const registerResult = result.payload
-				if (registerResult.status.code === 201) {
-					setIsSignIn(true) // Switch to sign-in after successful registration
-					formik.resetForm({
-						values: {
-							fullname: '',
-							email: values.email, // Pre-fill email for sign-in
-							password: '',
-							passwordConfirm: '',
-						},
-					})
-				}
-			}
-		} catch (err) {
-			console.error('Authentication error:', err)
-		}
-	}
+    const { passwordConfirm, ...userData } = values
+    try {
+      let result
+      if (isSignIn) {
+        if (showPasswordField) {
+          result = await dispatch(loginUser(userData)).unwrap()
+        } else {
+          setShowPasswordField(true)
+        }
+      } else {
+        result = await dispatch(registerUser(userData)).unwrap()
+        if (result.status.code === 201) {
+          setIsSignIn(true)
+          formik.resetForm({
+            values: {
+              fullname: '',
+              email: values.email,
+              password: '',
+              passwordConfirm: '',
+            },
+          })
+        }
+      }
+    } catch (err) {
+      console.error('Authentication error:', err)
+    }
+  }
 
 	const handleToggle = () => {
-		formik.resetForm({
-			values: {
-				fullname: '',
-				email: '',
-				password: '',
-				passwordConfirm: '',
-			},
-		})
-		setIsSignIn(!isSignIn)
-	}
+    formik.resetForm({
+      values: {
+        fullname: '',
+        email: '',
+        password: '',
+        passwordConfirm: '',
+      },
+    })
+    setIsSignIn(!isSignIn)
+    setShowPasswordField(false) 
+  }
 
 	const formik = useFormik({
 		initialValues: {
@@ -175,7 +174,7 @@ export default function AuthPortal() {
 		legalese: (
 			<div className="legalese">
 				<p>
-					By continuing, you agree to Scamazon's{' '}
+					By continuing, you agree to Amazon's{' '}
 					<span className="auth-link">
 						Conditions of Use and Sale
 					</span>
@@ -195,13 +194,13 @@ export default function AuthPortal() {
 		buying: (
 			<div className="schizzness">
 				<p>Buying for work?</p>
-				<span className="auth-link">Shop on Scamazon Schizzness</span>
+				<span className="auth-link">Shop on Amazon Business</span>
 			</div>
 		),
 		textOverLine: (
 			<div className="text-over-line">
 				<hr />
-				<p>New to Scamazon?</p>
+				<p>New to Amazon?</p>
 			</div>
 		),
 	}
@@ -304,7 +303,7 @@ export default function AuthPortal() {
 		legalese: (
 			<div className="legalese">
 				<p>
-					By creating an account, you agree to Scamazon's{' '}
+					By creating an account, you agree to Amazon's{' '}
 					<span className="auth-link">
 						Conditions of Use and Sale
 					</span>
@@ -320,7 +319,7 @@ export default function AuthPortal() {
 			<div className="schizzness">
 				<p>Buying for work?</p>
 				<span className="auth-link">
-					Create a free Schizzness account
+					Create a free Business account
 				</span>
 			</div>
 		),
@@ -394,7 +393,7 @@ export default function AuthPortal() {
 						className="secondary-btn auth-btn"
 						type="button"
 					>
-						Create your Scamazon account
+						Create your Amazon account
 					</button>
 				)}
 			</InnerContainer>
@@ -418,7 +417,7 @@ export default function AuthPortal() {
 				</li>
 			</ul>
 			<div className="copyright">
-				<p>@ 1996-2025, Scamazon.com, Inc. or its affiliates</p>
+				<p>@ 1996-2025, Amazon.com, Inc. or its affiliates</p>
 			</div>
 		</Container>
 	)

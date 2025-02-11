@@ -54,8 +54,8 @@ export default function Header() {
 	const navigate = useNavigate()
 	const windowWidth = useWindowWidth()
 	const currentUser = useSelector((state) => state.user.currentUser)
-	const addresses = useSelector((state) => state.addresses?.addresses)
-	const defaultAddress = addresses.find((addr) => addr.is_default) || null
+	const addresses = useSelector((state) => state.addresses?.addresses) ?? []
+	const defaultAddress = addresses ? addresses.find((addr) => addr.is_default) : null
 	const basketCount = useSelector(selectBasketItemCount)
 	const [categoryMenuOpen, setCategoryMenuOpen] = useState(false)
 	const [navMenuOpen, setNavMenuOpen] = useState(false)

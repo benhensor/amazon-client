@@ -36,7 +36,7 @@ const userSlice = createSlice({
 			})
 			.addCase(checkLoggedIn.fulfilled, (state, action) => {
 				state.loading = false
-				if (action.payload.status.code === 200) {
+				if (action.payload.status?.code === 200) {
 					// console.log('checkLoggedIn', action.payload.data)
 					state.currentUser = action.payload.data.user
 					state.isLoggedIn = true
@@ -46,28 +46,9 @@ const userSlice = createSlice({
 				}
 			})
 			.addCase(checkLoggedIn.rejected, (state, action) => {
-				state.loading = false
-				// Only set error if it's a genuine error, not just an unauthenticated state
-				if (
-					action.payload?.status?.description === 'Token expired' ||
-					action.payload?.status?.code >= 500
-				) {
-					state.error =
-						action.payload?.status?.description ||
-						'An error occurred'
-					if (
-						action.payload?.status?.description === 'Token expired'
-					) {
-						state.currentUser = null
-						state.isLoggedIn = false
-						window.location.href = '/auth'
-					}
-				} else {
-					// Just handle as unauthenticated without setting error
-					state.currentUser = null
-					state.isLoggedIn = false
-					state.error = null
-				}
+				state.loading = false;
+        state.currentUser = null;
+        state.isLoggedIn = false;
 			})
 		// Handle registration
 		builder
@@ -115,8 +96,9 @@ const userSlice = createSlice({
 				state.error = null
 			})
 			.addCase(logoutUser.rejected, (state, action) => {
-				state.loading = false
-				state.error = action.payload?.status?.description
+				state.loading = false;
+        state.currentUser = null;
+        state.isLoggedIn = false;
 			})
 
 		// Handle fetch user profile
@@ -141,84 +123,66 @@ export const { setUser, logout, initializeUser, clearError } = userSlice.actions
 
 // Thunk to check if a user is logged in
 export const checkLoggedIn = createAsyncThunk(
-	'user/checkLoggedIn',
-	async (_, { rejectWithValue }) => {
-		try {
-			const response = await userAPI.checkAuth()
-			// console.log('checkLoggedIn', response)
-			return response
-		} catch (error) {
-			if (
-				error.response?.status.code === 401 ||
-				error.response?.status.code === 403
-			) {
-				return { data: { user: null } }
-			}
-			return rejectWithValue(
-				error.response?.data || {
-					status: {
-						description: 'An error occurred',
-					},
-				}
-			)
-		}
-	}
-)
+  'user/checkLoggedIn',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await userAPI.checkAuth();
+      return response;
+    } catch (error) {
+      return rejectWithValue(error.response?.data);
+    }
+  }
+);
 
 export const registerUser = createAsyncThunk(
-	'user/registerUser',
-	async (userData, { rejectWithValue }) => {
-		try {
-			const response = await userAPI.registerUser(userData)
-			// console.log('registerUser', response)
-			return response
-		} catch (error) {
-			return rejectWithValue(
-				error.response?.data || {
-					status: {
-						description: 'An error occurred',
-					},
-				}
-			)
-		}
-	}
-)
+  'user/registerUser',
+  async (userData, { rejectWithValue }) => {
+    try {
+      const response = await userAPI.registerUser(userData);
+      return response;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data || {
+          status: {
+            description: 'An error occurred',
+          },
+        }
+      );
+    }
+  }
+);
 
 export const loginUser = createAsyncThunk(
-	'user/loginUser',
-	async (userData, { rejectWithValue }) => {
-		try {
-			const response = await userAPI.loginUser(userData)
-			// console.log('loginUser', response)
-			return response
-		} catch (error) {
-			return rejectWithValue(
-				error.response?.data || {
-					status: {
-						description: 'An error occurred',
-					},
-				}
-			)
-		}
-	}
-)
+  'user/loginUser',
+  async (userData, { rejectWithValue }) => {
+    try {
+      const response = await userAPI.loginUser(userData);
+      return response;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data || {
+          status: {
+            description: 'An error occurred',
+          },
+        }
+      );
+    }
+  }
+);
 
 // Thunk to logout a user
 export const logoutUser = createAsyncThunk(
-	'user/logoutUser',
-	async (_, { dispatch, rejectWithValue }) => {
-		try {
-			const response = await userAPI.logoutUser()
-			dispatch(logout())
-			console.log('logoutUser', response)
-			return response
-		} catch (error) {
-			return rejectWithValue(
-				error.response?.data?.message || 'An error occurred'
-			)
-		}
-	}
-)
+  'user/logoutUser',
+  async (_, { dispatch }) => {
+    try {
+      await userAPI.logoutUser();
+      dispatch(logout());
+    } catch (error) {
+      dispatch(logout());
+      throw error;
+    }
+  }
+);
 
 // Thunk to fetch user profile
 export const fetchUserProfile = createAsyncThunk(

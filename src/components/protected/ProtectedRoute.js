@@ -1,42 +1,22 @@
-import React, { useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { useDispatch, useSelector } from 'react-redux'
-import { checkLoggedIn } from '../../redux/slices/userSlice'
-import { Loader } from '../../assets/styles/GlobalStyles'
-//import { fetchUserProfile } from '../../redux/slices/userSlice' // Adjust the import path as needed
+import React from 'react'
+import { Navigate, useLocation } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 
 const ProtectedRoute = ({ children }) => {
-	const dispatch = useDispatch()
-	const navigate = useNavigate()
-	const { isLoggedIn, loading } = useSelector(
-		(state) => state.user
-	)
-	
-	useEffect(() => {
-		dispatch(checkLoggedIn())
-	}, [dispatch])
+  const { isLoggedIn, loading } = useSelector((state) => state.user)
+  const location = useLocation()
 
-	// console.log('protected route', { isLoggedIn, loading, currentUser })
+  // Don't redirect while checking auth status
+  if (loading) {
+    return <div>Loading...</div>
+  }
 
-	// useEffect(() => {
-	//     if (authToken && !isLoggedIn && !currentUser) {
-	//         dispatch(fetchUserProfile())
-	//     }
-	// }, [dispatch, authToken, isLoggedIn, currentUser])
+  // if (!isLoggedIn) {
+  //   console.log('Not logged in - redirecting to auth')
+  //   return <Navigate to="/" state={{ from: location }} replace />
+  // }
 
-	if (loading) {
-		return (
-			<Loader>
-				<div className="loader"></div>
-			</Loader>
-		) 
-	}
-
-	if (!isLoggedIn) {
-		return navigate('/auth')
-	}
-
-	return children
+  return children
 }
 
 export default ProtectedRoute

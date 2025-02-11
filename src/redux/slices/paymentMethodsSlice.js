@@ -1,23 +1,15 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
-import axios from 'axios'
-
-const API_URL = process.env.REACT_APP_API_URL
+import { paymentMethodsAPI } from '../../api/paymentMethodsAPI'
 
 export const fetchPaymentMethods = createAsyncThunk(
 	'paymentMethods/fetchPaymentMethods',
 	async (_, { dispatch, rejectWithValue }) => {
 		// console.log('fetchPaymentMethods called')
-		dispatch(setLoading(true))
 		try {
-			const response = await axios.get(
-				`${API_URL}/api/payment-methods`,
-				{ withCredentials: true }
-			)
+			const response = await paymentMethodsAPI.fetchPaymentMethods()
 			// console.log('fetchPaymentMethods return: ', response.data)
-			dispatch(setLoading(false))
-			return response.data.data
+			return response.data
 		} catch (error) {
-			dispatch(setLoading(false))
 			return rejectWithValue(error.response.data)
 		}
 	}
@@ -27,13 +19,9 @@ export const addPaymentMethod = createAsyncThunk(
 	'paymentMethods/addPaymentMethod',
 	async (paymentMethodData, { rejectWithValue }) => {
 		try {
-			const response = await axios.post(
-				`${API_URL}/api/payment-methods`,
-				paymentMethodData,
-				{ withCredentials: true }
-			)
+			const response = await paymentMethodsAPI.addPaymentMethod(paymentMethodData)
 			// console.log('addPaymentMethod return: ', response.data)
-			return response.data.data
+			return response.data
 		} catch (error) {
 			return rejectWithValue(error.response.data)
 		}
@@ -44,13 +32,9 @@ export const setDefaultPaymentMethod = createAsyncThunk(
 	'paymentMethods/setDefaultPaymentMethod',
 	async (paymentMethodId, { rejectWithValue }) => {
 		try {
-			const response = await axios.put(
-				`${API_URL}/api/payment-methods/${paymentMethodId}`,
-				{},
-				{ withCredentials: true }
-			)
+			const response = await paymentMethodsAPI.setDefaultPaymentMethod(paymentMethodId)
 			// console.log('setDefaultPaymentMethod return: ', response.data)
-			return response.data.data
+			return response.data
 		} catch (error) {
 			return rejectWithValue(error.response.data)
 		}
@@ -61,10 +45,7 @@ export const deletePaymentMethod = createAsyncThunk(
 	'paymentMethods/deletePaymentMethod',
 	async (paymentMethodId, { rejectWithValue }) => {
 		try {
-			const response = await axios.delete(
-				`${API_URL}/api/payment-methods/${paymentMethodId}`,
-				{ withCredentials: true }
-			)
+			const response = await paymentMethodsAPI.deletePaymentMethod(paymentMethodId)
 			// console.log('deletePaymentMethod return: ', response.data)
 			return response.data
 		} catch (error) {
@@ -98,7 +79,8 @@ const paymentMethodsSlice = createSlice({
 			})
 			.addCase(fetchPaymentMethods.fulfilled, (state, action) => {
 				state.loading = false
-				state.paymentMethods = action.payload  
+				state.paymentMethods = action.payload 
+				console.log('fetchPaymentMethods.fulfilled: ', action.payload) 
 				state.defaultPaymentMethod = action.payload.find((method) => method.status === 'default')  
 			})
 			.addCase(fetchPaymentMethods.rejected, (state, action) => {

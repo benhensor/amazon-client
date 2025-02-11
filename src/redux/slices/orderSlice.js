@@ -1,8 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import { fetchOrderedProducts } from './productsSlice'
-import axios from 'axios'
-
-const API_URL = process.env.REACT_APP_API_URL
+import { orderAPI } from '../../api/orderAPI'
 
 const initialState = {
 	orders: [],
@@ -14,13 +12,9 @@ export const createOrder = createAsyncThunk(
 	'orders/add',
 	async (orderData, { rejectWithValue }) => {
 		try {
-			const response = await axios.post(
-				`${API_URL}/api/order/add`,
-				orderData,
-				{ withCredentials: true }
-			)
+			const response = await orderAPI.createOrder(orderData)
 			// console.log('createOrder return: ', response.data)
-			return response.data.data.order // Return the order object
+			return response.data.order // Return the order object
 		} catch (error) {
 			return rejectWithValue(error.response.data)
 		}
@@ -31,12 +25,9 @@ export const fetchOrderById = createAsyncThunk(
 	'orders/fetchOrderById',
 	async (orderId, { rejectWithValue }) => {
 		try {
-			const response = await axios.get(
-				`${API_URL}/api/order/fetch/${orderId}`,
-				{ withCredentials: true }
-			)
+			const response = await orderAPI.fetchOrderById(orderId)
 			// console.log('fetchOrderById return: ', response.data.order)
-			return response.data.data.order
+			return response.data.order
 		} catch (error) {
 			return rejectWithValue(error.response.data)
 		}
@@ -47,15 +38,13 @@ export const fetchOrders = createAsyncThunk(
 	'orders/fetchOrders',
 	async (_, { dispatch, rejectWithValue }) => {
 		try {
-			const response = await axios.get(`${API_URL}/api/order/fetch`, {
-				withCredentials: true,
-			})
-			const orders = response.data.data.orders
+			const response = await orderAPI.fetchOrders()
+			const orders = response.data.orders
 			// console.log('Orders fetched:', orders) // Check orders data
 
 			await dispatch(fetchOrderedProducts(orders))
 			// console.log('Products fetched:', productResponse) 
-			return response.data.data.orders
+			return response.data.orders
 		} catch (error) {
 			throw rejectWithValue(error.response.data)
 		}
@@ -67,13 +56,9 @@ export const updateOrderStatus = createAsyncThunk(
 	async ({ orderId, status }, { rejectWithValue }) => {
 		try {
 			// console.log('updateOrderStatus', orderId, status)
-			const response = await axios.put(
-				`${API_URL}/api/order/update/${orderId}`,
-				{ status },
-				{ withCredentials: true }
-			)
+			const response = await orderAPI.updateOrderStatus(orderId, { status })
 			// console.log('updateOrderStatus return: ', response)
-			return response.data.data.order
+			return response.data.order
 		} catch (error) {
 			return rejectWithValue(error.response.data)
 		}
@@ -84,10 +69,7 @@ export const deleteOrderById = createAsyncThunk(
 	'orders/deleteOrder',
 	async (orderId, { rejectWithValue }) => {
 		try {
-			const response = await axios.delete(
-				`${API_URL}/api/order/delete/${orderId}`,
-				{ withCredentials: true }
-			)
+			const response = await orderAPI.deleteOrder(orderId)
 			return response.data
 		} catch (error) {
 			return rejectWithValue(error.response.data)
