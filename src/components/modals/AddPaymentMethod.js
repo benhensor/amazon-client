@@ -123,7 +123,7 @@ export default function AddPaymentMethod({ isOpen, setIsOpen, onSubmit }) {
 				</div>
 				<div className="modal-header">
 					<p className="modal-heading">Add a credit or debit card</p>
-					<p>Scamazon supports all major credit and debit cards</p>
+					<p>Amazon supports all major credit and debit cards</p>
 					<p>
 						<span>
 							All fields marked with an asterisk &#40;*&#41; are

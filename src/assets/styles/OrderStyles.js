@@ -416,7 +416,7 @@ export const OrderConfirmationContainer = styled.div`
 		flex: 3;
 	}
 
-	.scamazon-music-promo {
+	.amazon-music-promo {
 		flex: 2;
 		padding: var(--spacing-md);
 		display: flex;
@@ -491,7 +491,7 @@ export const OrderConfirmationContainer = styled.div`
 			flex-direction: column;
 		}
 
-		.scamazon-music-promo {
+		.amazon-music-promo {
 			margin-top: var(--spacing-lg);
 			flex-direction: column;
 			padding: 0;
@@ -520,7 +520,7 @@ export const OrderConfirmationContainer = styled.div`
 			display: flex;
 		}
 
-		.scamazon-music-promo {
+		.amazon-music-promo {
 			margin-top: var(--spacing-md);
 			flex-direction: column;
 			padding: 0;
@@ -545,7 +545,7 @@ export const OrderConfirmationContainer = styled.div`
 			flex-direction: column;
 		}
 
-		.scamazon-music-promo {
+		.amazon-music-promo {
 			margin-top: var(--spacing-lg);
 			flex-direction: column;
 			padding: 0;

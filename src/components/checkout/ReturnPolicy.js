@@ -21,7 +21,7 @@ export default function ReturnPolicy() {
 			<p>
 				Within 30 days of delivery, you may return new, unopened
 				physical merchandise in its original condition. Exceptions and
-				restrictions apply. See Scamazon's{' '}
+				restrictions apply. See Amazon's{' '}
 				<span className="primary-link">Return Policy</span>.
 			</p>
 			<Link to="/basket" className="primary-link back-btn">

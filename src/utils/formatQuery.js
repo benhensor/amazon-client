@@ -1,12 +1,16 @@
 const formatQuery = (query) => {
-  if (!query) return ''; // Handle empty or undefined query
-  
+  // Handle non-string inputs
+  if (!query || typeof query !== 'string') {
+    console.warn('formatQuery received non-string input:', query);
+    return '';
+  }
+
   // Check if the query contains 'search=' and extract the part after it
   if (query.includes('search=')) {
     query = query.split('search=')[1];
   }
 
-  // Now, format the query (e.g., split by hyphen, capitalize first letter)
+  // Format the query
   return query
     .split('-') // Split by hyphen if exists
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize first letter of each word

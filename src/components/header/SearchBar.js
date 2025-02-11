@@ -82,7 +82,7 @@ export default function SearchBar({ onSearch }) {
 				id="search"
 				name="search"
 				type="text"
-				placeholder="Search Scamazon"
+				placeholder="Search Amazon"
 				value={!error ? localSearchTerm : 'Error fetching categories'}
 				onChange={handleSearchChange}
 			/>

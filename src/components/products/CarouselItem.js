@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import styled from 'styled-components'
 import ProductRating from './ProductRating'
-import CrimeLogo from '../../icons/CrimeLogo'
+import PrimeLogo from '../../icons/PrimeLogo'
 
 export default function CarouselItem({ onClick, product, BREAKPOINTS }) {
 	const [isImageLoaded, setIsImageLoaded] = useState(false)
@@ -26,7 +26,11 @@ export default function CarouselItem({ onClick, product, BREAKPOINTS }) {
 				<LoadingSpinner>Loading Image...</LoadingSpinner>
 			)}
 			<ProductTitle>{product.title}</ProductTitle>
-			<ProductRating rating={product.rating} review={false} count={count} />
+			<ProductRating
+				rating={product.rating}
+				review={false}
+				count={count}
+			/>
 			<ProductPrice>
 				<p className="price">
 					£
@@ -43,7 +47,7 @@ export default function CarouselItem({ onClick, product, BREAKPOINTS }) {
 				</p>
 			</ProductPrice>
 			<Discount>-{product.discountPercentage}%</Discount>
-			<CrimeLogo />
+			<PrimeLogo />
 		</ProductCard>
 	)
 }

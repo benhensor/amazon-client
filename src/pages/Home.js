@@ -23,7 +23,6 @@ export default function Home() {
 	useEffect(() => {
 		const fetchData = async () => {
 			try {
-				// Dispatch both actions and wait for them to resolve
 				await Promise.all([
 					dispatch(fetchAllProducts()),
 					dispatch(fetchCategoryList()),

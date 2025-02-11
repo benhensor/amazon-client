@@ -66,7 +66,6 @@ export default function Products() {
 	useEffect(() => {
 		// console.log('Selected category:', selectedCategory, products)
 		if (selectedCategory) {
-			console.log('Selected category:', selectedCategory, products)
 			const newFilters = categoryFilters(selectedCategory, products)
 			setFilters(newFilters)
 

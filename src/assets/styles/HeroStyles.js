@@ -14,7 +14,7 @@ export const HeroTint = styled.div`
   right: 0;
   bottom: 0;
   background: var(--dk-blue-50);
-  opacity: 0.6;
+  opacity: 0.9;
   z-index: 1;
 `
 
@@ -44,6 +44,7 @@ export const HeroContent = styled.div`
 export const ChevronButton = styled.button`
 	width: 5rem;
 	height: 100%;
+	z-index: 99;
 	svg {
 		width: 50%;
 		stroke: var(--white);
@@ -58,6 +59,7 @@ export const ChevronButton = styled.button`
 `
 
 export const CTAButton = styled.button`
+	z-index: 99;
   span {
     position: relative;
     text-transform: uppercase;
@@ -65,9 +67,6 @@ export const CTAButton = styled.button`
     font-weight: bold;
     letter-spacing: 0.4rem;
     color: var(--white);
-    background: var(--dk-blue-50);
-    padding: var(--spacing-xs) var(--spacing-md);
-    z-index: 99;
   }
 	width: 100%;
 	height: 30rem;

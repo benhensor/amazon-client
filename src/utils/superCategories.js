@@ -24,7 +24,7 @@ export const superCategories = [
 			'tops',
 		],
 		image: ClothingImg,
-		cta: 'conform',
+		cta: 'Fashion & Accessories',
 		previewHeading: 'Clothing',
 	},
 	{
@@ -33,7 +33,7 @@ export const superCategories = [
 		title: 'Beauty & Personal Care',
 		subCategories: ['beauty', 'fragrances', 'skin-care'],
 		image: CosmeticsImg,
-		cta: 'integrate',
+		cta: 'Beauty & Personal Care',
 		previewHeading: 'Beauty Products',
 	},
 	{
@@ -47,7 +47,7 @@ export const superCategories = [
 			'tablets',
 		],
 		image: ElectronicsImg,
-		cta: 'obey',
+		cta: 'Consumer Electronics',
 		previewHeading: 'Consumer Electronics',
 	},
 	{
@@ -56,7 +56,7 @@ export const superCategories = [
 		title: 'Groceries',
 		subCategories: ['groceries'],
 		image: GroceriesImg,
-		cta: 'consume',
+		cta: 'Groceries',
 		previewHeading: 'Groceries',
 	},
 	{
@@ -65,7 +65,7 @@ export const superCategories = [
 		title: 'Home & Living',
 		subCategories: ['furniture', 'home-decoration', 'kitchen-accessories'],
 		image: HomeImg,
-		cta: 'comply',
+		cta: 'Home & Living',
 		previewHeading: 'Home & Living',
 	},
 	{
@@ -74,7 +74,7 @@ export const superCategories = [
 		title: 'Automotive & Vehicles',
 		subCategories: ['motorcycle', 'vehicle'],
 		image: VehiclesImg,
-		cta: 'midlife crisis?',
+		cta: 'Automotive & Vehicles',
 		previewHeading: 'Automotive & Vehicles',
 	},
 	{
@@ -83,7 +83,7 @@ export const superCategories = [
 		title: 'Sports & Outdoor',
 		subCategories: ['sports-accessories', 'sunglasses'],
 		image: SportsImg,
-		cta: 'maybe go outside?',
+		cta: 'Sports & Outdoor',
 		previewHeading: 'Sports & Outdoor',
 	},
 ]

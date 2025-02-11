@@ -26,11 +26,11 @@ export default function Account() {
 				return '/account/orders'
 			case 'Login & Security':
 				return '/account/under-construction'
-			case 'Crime':
+			case 'Prime':
 				return '/account/under-construction'
 			case 'Your Addresses':
 				return '/account/addresses'
-			case 'Your Schizzness Account':
+			case 'Your Business Account':
 				return '/account/under-construction'
 			case 'Your Payments':
 				return '/account/payments'

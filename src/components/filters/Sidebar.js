@@ -22,14 +22,13 @@ export default function Sidebar({
 		if (sortType === buttonType) {
 			return sortDirection === 'asc' ? 'up' : 'down'
 		}
-		return 'right' // default direction for inactive buttons
+		return 'right'
 	}
 
 	return (
 		<DesktopSidebar>
 			{Object.entries(filters).map(([filterType, values]) => (
 				<SectionContent key={filterType}>
-					{/* Handle the filter type and capitalize the first letter */}
 					<h3>Filters</h3>
 					<p>
 						{filterType.charAt(0).toUpperCase() +
@@ -37,51 +36,57 @@ export default function Sidebar({
 						:
 					</p>
 					{Array.isArray(values) ? (
-						// If the filter values are an array (e.g., for category, tags, brands)
 						<FilterGroup>
-							{values.map((value) => (
-								<FilterOption key={value}>
-									<input
-										type="checkbox"
-										checked={selectedFilters[
-											filterType
-										]?.includes(value)}
-										onChange={() =>
-											handleFilterChange(
-												filterType,
-												value
-											)
-										}
-									/>
-									{formatQuery(value)}
-								</FilterOption>
-							))}
+							{/* Filter out non-string values before mapping */}
+							{values
+								.filter((value) => typeof value === 'string')
+								.map((value) => (
+									<FilterOption key={value}>
+										<input
+											type="checkbox"
+											checked={selectedFilters[
+												filterType
+											]?.includes(value)}
+											onChange={() =>
+												handleFilterChange(
+													filterType,
+													value
+												)
+											}
+										/>
+										{formatQuery(value)}
+									</FilterOption>
+								))}
 							<Separator />
 						</FilterGroup>
 					) : (
-						// If the filter values are an object (e.g., simulated filters)
 						<FilterGroup>
 							{Object.entries(values).map(
 								([subFilterType, subValues]) => (
 									<FilterOption key={subFilterType}>
 										<p>{subFilterType}:</p>
-										{subValues.map((subValue) => (
-											<label key={subValue}>
-												<input
-													type="checkbox"
-													checked={selectedFilters[
-														subFilterType
-													]?.includes(subValue)}
-													onChange={() =>
-														handleFilterChange(
-															subFilterType,
-															subValue
-														)
-													}
-												/>
-												{subValue}
-											</label>
-										))}
+										{subValues
+											.filter(
+												(value) =>
+													typeof value === 'string'
+											)
+											.map((subValue) => (
+												<label key={subValue}>
+													<input
+														type="checkbox"
+														checked={selectedFilters[
+															subFilterType
+														]?.includes(subValue)}
+														onChange={() =>
+															handleFilterChange(
+																subFilterType,
+																subValue
+															)
+														}
+													/>
+													{subValue}
+												</label>
+											))}
 									</FilterOption>
 								)
 							)}

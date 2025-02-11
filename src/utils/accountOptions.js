@@ -1,8 +1,8 @@
 import OrdersImg from '../assets/img/account/order.png';
 import SecurityImg from '../assets/img/account/security.png';
-import CrimeImg from '../assets/img/account/crime.png';
+import PrimeImg from '../assets/img/account/prime.png';
 import AddressesImg from '../assets/img/account/addresses.png';
-import SchiznessImg from '../assets/img/account/scamazonSchizness.png';
+import BusinessImg from '../assets/img/account/amazonBusiness.png';
 import PaymentsImg from '../assets/img/account/payments.png';
 import GiftsImg from '../assets/img/account/gifts.png';
 import MessagesImg from '../assets/img/account/messages.png';
@@ -26,8 +26,8 @@ export const accountOptions = [
   },
   {
     id: 2,
-    image: CrimeImg,
-    title: 'Crime',
+    image: PrimeImg,
+    title: 'Prime',
     text: 'Manage your membership, view benefits and payment settings'
   },
   {
@@ -38,8 +38,8 @@ export const accountOptions = [
   },
   {
     id: 4,
-    image: SchiznessImg,
-    title: 'Your Schizzness Account',
+    image: BusinessImg,
+    title: 'Your Business Account',
     text: 'Sign up for free to separate your work purchases and download VAT invoices easily'
   },
   {
@@ -75,8 +75,8 @@ export const accountOptions = [
   {
     id: 10,
     image: AppImg,
-    title: 'Scamazon Mobile App',
-    text: 'Download the Scamazon App'
+    title: 'Amazon Mobile App',
+    text: 'Download the Amazon App'
   },
   {
     id: 11,
@@ -91,7 +91,7 @@ export const accountLinks = [
     id: 1,
     title: 'Digital content and devices',
     links: [
-      'Scamazon Drive',
+      'Amazon Drive',
       'Apps and more',
       'Audible settings',
       'Content and devices',
@@ -118,12 +118,12 @@ export const accountLinks = [
     title: 'More ways to pay',
     links: [
       'Your purchase preferences',
-      'Scamazon Pay',
-      'Scamazon Coins',
+      'Amazon Pay',
+      'Amazon Coins',
       'Vouchers',
       'Shop with Points',
       'Product vouchers',
-      'Scamazon Business Scamex Card'
+      'Amazon Business Amex Card'
     ]
   },
   {
@@ -131,7 +131,7 @@ export const accountLinks = [
     title: 'Ordering and shopping preferences',
     links: [
       'Your transactions',
-      'Scamazon Currency Converter',
+      'Amazon Currency Converter',
       'Change Currency Settings',
       'Archived Orders',
       'Lists',
@@ -146,8 +146,8 @@ export const accountLinks = [
     title: 'Other accounts',
     links: [
       'Account linking',
-      'Sell on Scamazon',
-      'Scamazon Web Services',
+      'Sell on Amazon',
+      'Amazon Web Services',
       'Audible membership',
       'Twitch account settings'
     ]
@@ -156,8 +156,8 @@ export const accountLinks = [
     id: 6,
     title: 'Shopping programmes',
     links: [
-      'Manage Your Scamazon Family',
-      'Scamazon Household',
+      'Manage Your Amazon Family',
+      'Amazon Household',
       'Subscribe & Save',
       'Manage parent shopping preferences',
       'Your interests',
@@ -169,7 +169,7 @@ export const accountLinks = [
     title: 'Memberships and subscriptions',
     links: [
       'Email',
-      'Crime Video Channels',
+      'Prime Video Channels',
       'Memberships & Subscriptions'
     ]
   },
@@ -179,7 +179,7 @@ export const accountLinks = [
     links: [
       'Request your data',
       'Manage apps and services with data access',
-      'Close Your Scamazon Account',
+      'Close Your Amazon Account',
       'Privacy Notice'
     ]
   },

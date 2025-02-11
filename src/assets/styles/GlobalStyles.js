@@ -41,9 +41,9 @@ const GlobalStyles = createGlobalStyle`
     --price-red: #B12704;
     --link-blue: #007185;
     --link-hover: #C7511F;
-    --crime-blue: #2193C2;
+    --prime-blue: #1399ff;
     --basket-total: #91F6FE;
-    --crime-orange: #F8991D;
+    --prime-orange: #F8991D;
     --active-payment-method: #FF8F00;
     --inactive-payment-method: #E0E1E1;
     --link-white-hover: #F7FAFA;
@@ -90,7 +90,7 @@ const GlobalStyles = createGlobalStyle`
     --font-xl: 2.4rem;
     --font-xxl: 3.2rem;
     --font-xxxl: 4rem;
-    --font-cta: clamp(2rem, 5vw, 5rem);
+    --font-cta: clamp(1rem, 3vw, 5rem);
 
     // line-heights
     --lh-xs: 1.2rem;

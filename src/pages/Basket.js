@@ -20,7 +20,7 @@ import formatQuery from '../utils/formatQuery'
 import { checkIsAllSelected } from '../utils/checkIsAllSelected'
 import BuyButton from '../components/buttons/BuyButton'
 import BasketQuantityBtn from '../components/buttons/BasketQuantityBtn'
-import CrimeLogo from '../icons/CrimeLogo'
+import CrimeLogo from '../icons/PrimeLogo'
 import {
 	ShoppingBasket,
 	ShoppingBasketContainer,

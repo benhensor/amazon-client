@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import Logo from '../../icons/Logo'
+import Logo from '../../icons/AmazonLogo'
 import UnionJackIcon from '../../icons/UnionJackIcon'
 import styled from 'styled-components'
 
@@ -14,44 +14,44 @@ export default function Footer() {
 			'About Us',
 			'UK Modern Slavery Statement',
 			'Sustainability',
-			'Scamazon Science',
+			'Amazon Science',
 		],
 		makeMoneyWithUs: [
-			'Sell on Scamazon',
-			'Sell on Scamazon Schizzness',
-			'Sell on Scamazon Handmade',
-			'Sell on Scamazon Launchpad',
-			'Supply to Scamazon',
+			'Sell on Amazon',
+			'Sell on Amazon Business',
+			'Sell on Amazon Handmade',
+			'Sell on Amazon Launchpad',
+			'Supply to Amazon',
 			'Protect and build your brand',
 			'Associates Programme',
-			'Fulfilment by Scamazon',
-			'Seller Fulfilled Crime',
+			'Fulfilment by Amazon',
+			'Seller Fulfilled Prime',
 			'Advertise Your Products',
 			'Independently Publish with Us',
-			'Scamazon Pay',
-			'Host a Scamazon Hub',
+			'Amazon Pay',
+			'Host a Amazon Hub',
 			'› See More Make Money with Us',
 		],
-		scamazonPaymentMethods: [
-			'Instalments by Gnarlays',
-			'The Scamazon Gnarlaycard',
-			'Scamazon Schizzness Annexe Card',
+		amazonPaymentMethods: [
+			'Instalments by Barclays',
+			'The Amazon Barclaycard',
+			'Amazon Business Amex Card',
 			'Gift Cards',
-			'Scamazon Currency Converter',
+			'Amazon Currency Converter',
 			'Payment Methods Help',
 			'Shop with Points',
 			'Top Up Your Account',
 			'Top Up Your Account in Store',
 		],
 		letUsHelpYou: [
-			'COVID-19 and Scamazon',
+			'COVID-19 and Amazon',
 			'Track Packages or View Orders',
 			'Delivery Rates & Policies',
-			'Scamazon Crime',
+			'Amazon Prime',
 			'Returns & Replacements',
 			'Recycling',
 			'Manage Your Content and Devices',
-			'Scamazon Mobile App',
+			'Amazon Mobile App',
 			'Customer Service',
 			'Accessibility',
 			'Grift List',
@@ -88,17 +88,17 @@ export default function Footer() {
 					</ul>
 				</div>
 				<div className="column">
-					<p onClick={() => toggleSection('scamazonPaymentMethods')}>
-						Scamazon Payment Methods
+					<p onClick={() => toggleSection('amazonPaymentMethods')}>
+						Amazon Payment Methods
 					</p>
 					<ul
 						className={
-							openSection === 'scamazonPaymentMethods'
+							openSection === 'amazonPaymentMethods'
 								? 'open'
 								: ''
 						}
 					>
-						{footerLists.scamazonPaymentMethods.map((item, i) => (
+						{footerLists.amazonPaymentMethods.map((item, i) => (
 							<li key={i}>{item}</li>
 						))}
 					</ul>

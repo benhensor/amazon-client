@@ -6,7 +6,7 @@ export default function GiftCardOffer() {
 	return (
 		<StyledGiftCard>
 			<div className="image">
-				<img src={GiftCard} alt="Scamazon gift card" />
+				<img src={GiftCard} alt="Amazon gift card" />
 			</div>
 			<div className="details">
 				Get a{' '}
@@ -17,12 +17,12 @@ export default function GiftCardOffer() {
 					<strong>£30</strong>
 				</span>{' '}
 				<strong>Gift Card</strong> if approved for{' '}
-				<strong>The Scamazon Gnarlaycard</strong>.{' '}
+				<strong>The Amazon Barclaycard</strong>.{' '}
 				<span className="primary-link">
 					<strong>Apply now</strong>
 				</span>
 				. <strong>Representative 28.9% APR variable</strong>. Credit
-				broker: Scamazon EU S.A.R.L. Lender: Gnarlays. T&Cs apply.
+				broker: Amazon EU S.A.R.L. Lender: Barclays. T&Cs apply.
 			</div>
 		</StyledGiftCard>
 	)

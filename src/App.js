@@ -120,7 +120,7 @@ function App() {
 	}, [dispatch])
 	
 	return (
-		<Router basename='/scamazon'>
+		<Router basename='/amazon'>
 			<Routes>
 				{/* Auth routes without header */}
 				<Route path="/auth" element={<AuthPortal />} />

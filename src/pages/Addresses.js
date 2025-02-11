@@ -9,7 +9,7 @@ import {
 } from '../redux/slices/addressSlice'
 import PlusIcon from '../icons/PlusIcon'
 import ChevronIcon from '../icons/ChevronIcon'
-import Logo from '../icons/Logo'
+import Logo from '../icons/AmazonLogo'
 import {
 	PageContainer,
 	AddressesPage,

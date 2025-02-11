@@ -1,6 +1,6 @@
 import React from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import ScamazonMusicImg from '../assets/img/scamazon_music.png'
+import AmazonMusicImg from '../assets/img/amazon_music.png'
 import GiftCard from '../assets/img/checkout/gift-card.png'
 import {
 	OrderConfirmationContainer,
@@ -10,7 +10,7 @@ import {
 const GiftCardOffer = () => (
 	<StyledGiftCard>
 		<div className="image">
-			<img src={GiftCard} alt="Scamazon gift card" />
+			<img src={GiftCard} alt="Amazon gift card" />
 		</div>
 		<div className="details">
 			Get a{' '}
@@ -21,12 +21,12 @@ const GiftCardOffer = () => (
 				<strong>£30</strong>
 			</span>{' '}
 			<strong>Gift Card</strong> if approved for{' '}
-			<strong>The Scamazon Gnarlaycard</strong>.{' '}
+			<strong>The Amazon Barclaycard</strong>.{' '}
 			<span className="primary-link">
 				<strong>Apply now</strong>
 			</span>
 			. <strong>Representative 28.9% APR variable</strong>. Credit broker:
-			Scamazon EU S.A.R.L. Lender: Gnarlays. T&Cs apply.
+			Amazon EU S.A.R.L. Lender: Barclays. T&Cs apply.
 		</div>
 	</StyledGiftCard>
 )
@@ -77,7 +77,7 @@ export default function OrderConfirmation() {
 							<div className="column">
 								<p>
 									You saved £4.99 in delivery fees on this
-									order with Crime.{' '}
+									order with Prime.{' '}
 									<span className="primary-link">
 										Learn more
 									</span>
@@ -88,12 +88,12 @@ export default function OrderConfirmation() {
 							</div>
 						</div>
 					</div>
-					<div className="column scamazon-music-promo">
+					<div className="column amazon-music-promo">
 						<div className="row promo-elements">
 							<div className="promo-image">
 								<img
-									src={ScamazonMusicImg}
-									alt="Scamazon Music"
+									src={AmazonMusicImg}
+									alt="Amazon Music"
 								/>
 							</div>
 							<div className="promo-details">
@@ -114,11 +114,11 @@ export default function OrderConfirmation() {
 								By clicking "Sign up and pay now", you
 								acknowledge that you have read and agree to{' '}
 								<span className="primary-link">
-									Scamazon’s Conditions of Use
+									Amazon’s Conditions of Use
 								</span>
 								and{' '}
 								<span className="primary-link">
-									Scamazon Music Terms of Use
+									Amazon Music Terms of Use
 								</span>
 								. You authorise us to charge your default card
 								or another card on file,{' '}
@@ -132,7 +132,7 @@ export default function OrderConfirmation() {
 									after the introductory offer. Cancel renewal
 									any time by visiting{' '}
 									<span className="primary-link">
-										Scamazon Music Settings
+										Amazon Music Settings
 									</span>
 									.
 								</strong>

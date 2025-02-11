@@ -12,7 +12,7 @@ import { useWindowWidth } from '../utils/useWindowWidth'
 import { generateVoteCount } from '../utils/starCalculator'
 import BuyButton from '../components/buttons/BuyButton'
 import QuantityBtn from '../components/buttons/QuantityBtn'
-import CrimeLogo from '../icons/CrimeLogo'
+import CrimeLogo from '../icons/PrimeLogo'
 import ProductRating from '../components/products/ProductRating'
 import ProductReviews from '../components/products/ProductReviews'
 import {
@@ -41,12 +41,6 @@ export default function Product() {
 		currentProduct?.images[0] || null
 	)
 	const [itemQuantity, setItemQuantity] = useState(1)
-
-	// debugging
-	useEffect(() => {
-		console.log('currentProduct:', currentProduct)
-		console.log('updateItemQuantity:', itemQuantity)
-	}, [currentProduct, itemQuantity])
 
 	useEffect(() => {
 		const loadProduct = async () => {
@@ -165,7 +159,7 @@ export default function Product() {
 			<InfoBlock>
 				<ProductRating
 					rating={currentProduct.rating}
-					voteCount={voteCount}
+					count={voteCount}
 				/>
 				<p
 					className={
