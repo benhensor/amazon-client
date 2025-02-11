@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { registerSchema, loginSchema } from '../schemas/index'
 import { useDispatch, useSelector } from 'react-redux'
 import { registerUser, loginUser } from '../redux/slices/userSlice'
-import Logo from '../icons/Logo'
+import Logo from '../icons/AmazonLogo'
 import {
 	Container,
 	InnerContainer,
