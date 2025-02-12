@@ -43,7 +43,7 @@ export const fetchOrders = createAsyncThunk(
 			// console.log('Orders fetched:', orders) // Check orders data
 
 			await dispatch(fetchOrderedProducts(orders))
-			// console.log('Products fetched:', productResponse) 
+			// console.log('Products fetched:', productResponse)
 			return response.data.orders
 		} catch (error) {
 			throw rejectWithValue(error.response.data)
@@ -56,7 +56,9 @@ export const updateOrderStatus = createAsyncThunk(
 	async ({ orderId, status }, { rejectWithValue }) => {
 		try {
 			// console.log('updateOrderStatus', orderId, status)
-			const response = await orderAPI.updateOrderStatus(orderId, { status })
+			const response = await orderAPI.updateOrderStatus(orderId, {
+				status,
+			})
 			// console.log('updateOrderStatus return: ', response)
 			return response.data.order
 		} catch (error) {
@@ -70,6 +72,7 @@ export const deleteOrderById = createAsyncThunk(
 	async (orderId, { rejectWithValue }) => {
 		try {
 			const response = await orderAPI.deleteOrder(orderId)
+			console.log('deleteOrder return: ', response.data)
 			return response.data
 		} catch (error) {
 			return rejectWithValue(error.response.data)
@@ -119,7 +122,7 @@ const orderSlice = createSlice({
 				state.status = 'failed'
 				state.error = action.payload || action.error.message
 			})
-		// Update Order Status
+			// Update Order Status
 			.addCase(updateOrderStatus.pending, (state) => {
 				state.status = 'loading'
 			})
@@ -130,7 +133,7 @@ const orderSlice = createSlice({
 					(order) => order.order_id === updatedOrder.order_id
 				)
 				if (index !== -1) {
-					state.orders[index] = updatedOrder 
+					state.orders[index] = updatedOrder
 				}
 			})
 			.addCase(updateOrderStatus.rejected, (state, action) => {
@@ -138,10 +141,13 @@ const orderSlice = createSlice({
 				state.error = action.payload || action.error.message
 			})
 			// Delete Order
+			.addCase(deleteOrderById.pending, (state) => {
+				state.status = 'loading'
+			})
 			.addCase(deleteOrderById.fulfilled, (state, action) => {
-				const deletedOrderId = action.meta.arg 
+				state.status = 'succeeded'
 				state.orders = state.orders.filter(
-					(order) => order.order_id !== deletedOrderId
+					(order) => order.order_id !== action.payload
 				)
 			})
 			.addCase(deleteOrderById.rejected, (state, action) => {

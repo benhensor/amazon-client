@@ -9,6 +9,10 @@ const userSlice = createSlice({
 		isLoggedIn: false,
 		loading: false,
 		error: null,
+		tokens: {
+			accessToken: null,
+			refreshToken: null,
+		}
 	},
 	reducers: {
 		setUser(state, action) {
@@ -18,6 +22,12 @@ const userSlice = createSlice({
 		logout(state) {
 			state.currentUser = null
 			state.isLoggedIn = false
+			state.tokens = {
+				accessToken: null,
+				refreshToken: null,
+			}
+			localStorage.removeItem('accessToken')
+			localStorage.removeItem('refreshToken')
 		},
 		initializeUser(state, action) {
 			state.currentUser = action.payload.data.user
@@ -26,6 +36,9 @@ const userSlice = createSlice({
 		clearError(state) {
 			state.error = null
 		},
+		setTokens(state, action) {		
+			state.tokens = action.payload
+		}
 	},
 	extraReducers: (builder) => {
 		// Check if user is logged in
@@ -57,14 +70,22 @@ const userSlice = createSlice({
 				state.error = null
 			})
 			.addCase(registerUser.fulfilled, (state, action) => {
-				state.loading = false
-				state.currentUser = action.payload.data.user
-				state.isLoggedIn = true
+				if (action.payload.status?.code === 201) {
+						state.currentUser = action.payload.data.user;
+						state.isLoggedIn = true;
+						state.loading = false;
+						state.error = null;
+				} else {
+						state.loading = false;
+						state.error = action.payload.status.description;
+				}
 			})
 			.addCase(registerUser.rejected, (state, action) => {
 				state.loading = false
-				state.error =
-					action.payload?.status?.description || 'An error occurred'
+				// Only set error state for non-409 errors
+				if (!action.payload?.status?.code || action.payload.status.code !== 409) {
+					state.error = action.payload?.status?.description || 'An error occurred'
+				}
 			})
 
 		// Handle login
@@ -74,9 +95,15 @@ const userSlice = createSlice({
 				state.error = null
 			})
 			.addCase(loginUser.fulfilled, (state, action) => {
-				state.loading = false
-				state.currentUser = action.payload.data.user
-				state.isLoggedIn = true
+				if (action.payload.status?.code === 200) {
+						state.currentUser = action.payload.data.user;
+						state.isLoggedIn = true;
+						state.loading = false;
+						state.error = null;
+				} else {
+						state.loading = false;
+						state.error = action.payload.status.description;
+				}
 			})
 			.addCase(loginUser.rejected, (state, action) => {
 				state.loading = false
@@ -119,7 +146,7 @@ const userSlice = createSlice({
 	},
 })
 
-export const { setUser, logout, initializeUser, clearError } = userSlice.actions
+export const { setUser, setTokens, logout, initializeUser, clearError } = userSlice.actions
 
 // Thunk to check if a user is logged in
 export const checkLoggedIn = createAsyncThunk(
@@ -127,6 +154,7 @@ export const checkLoggedIn = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await userAPI.checkAuth();
+			// console.log('checkLoggedIn response: ', response)
       return response;
     } catch (error) {
       return rejectWithValue(error.response?.data);
@@ -139,15 +167,21 @@ export const registerUser = createAsyncThunk(
   async (userData, { rejectWithValue }) => {
     try {
       const response = await userAPI.registerUser(userData);
+			// console.log('registerUser response: ', response)
+			if (response.status.code >= 400) {
+				return rejectWithValue(response)
+			}
       return response;
     } catch (error) {
-      return rejectWithValue(
-        error.response?.data || {
-          status: {
-            description: 'An error occurred',
-          },
-        }
-      );
+			if (error.response?.data) {
+				return rejectWithValue(error.response.data)
+			}
+      return rejectWithValue({
+				status: {
+					code: 500,
+					description: 'An unexpected error occurred'
+				}
+			});
     }
   }
 );
@@ -157,6 +191,7 @@ export const loginUser = createAsyncThunk(
   async (userData, { rejectWithValue }) => {
     try {
       const response = await userAPI.loginUser(userData);
+			// console.log('loginUser response: ', response)
       return response;
     } catch (error) {
       return rejectWithValue(

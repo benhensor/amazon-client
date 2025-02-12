@@ -1,4 +1,6 @@
 import axios from 'axios'
+import { store } from '../redux/store'; 
+import { logout, setTokens } from '../redux/slices/userSlice'; 
 
 const API_URL = process.env.REACT_APP_API_URL
 
@@ -14,10 +16,47 @@ let isRefreshing = false;
 // Store callbacks for requests that came in while refreshing
 let refreshSubscribers = [];
 
+const decodeToken = (token) => {
+  try {
+    return JSON.parse(atob(token.split('.')[1]));
+  } catch (e) {
+    return null;
+  }
+};
+
+const needsRefresh = (token) => {
+  const decoded = decodeToken(token);
+  if (!decoded) return true;
+  
+  const expiresIn = decoded.exp * 1000 - Date.now();
+  return expiresIn < 5 * 60 * 1000; // 5 minutes
+};
+
 // Helper to process queued requests
 const processQueue = (error, token = null) => {
   refreshSubscribers.forEach(callback => callback(error, token));
   refreshSubscribers = [];
+};
+
+// Modified refresh token logic
+const refreshAuthToken = async () => {
+  const refreshToken = localStorage.getItem('refreshToken');
+  if (!refreshToken) throw new Error('No refresh token available');
+
+  const response = await axios.post(`${API_URL}/api/user/refresh-token`, {
+    refreshToken
+  });
+
+  const { accessToken, refreshToken: newRefreshToken } = response.data.data;
+  
+  // Update localStorage
+  localStorage.setItem('accessToken', accessToken);
+  localStorage.setItem('refreshToken', newRefreshToken);
+  
+  // Update Redux state
+  store.dispatch(setTokens({ accessToken, refreshToken: newRefreshToken }));
+  
+  return accessToken;
 };
 
 // Add token refresh interceptor
@@ -25,101 +64,112 @@ userAxios.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
+    
+    // Handle 401 errors
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      if (isRefreshing) {
+        return new Promise((resolve, reject) => {
+          refreshSubscribers.push((error, token) => {
+            if (error) {
+              reject(error);
+            } else {
+              originalRequest.headers.Authorization = `Bearer ${token}`;
+              resolve(axios(originalRequest));
+            }
+          });
+        });
+      }
 
-    // If error wasn't 401 or request was for refreshing token, reject
-    if (error.response?.status !== 401 || originalRequest.url === '/refresh-token') {
-      return Promise.reject(error);
-    }
-
-    // If not refreshing already, initiate refresh
-    if (!isRefreshing) {
+      originalRequest._retry = true;
       isRefreshing = true;
 
       try {
-        const refreshToken = localStorage.getItem('refreshToken');
-        if (!refreshToken) {
-          throw new Error('No refresh token available');
-        }
-
-        // Call refresh token endpoint
-        const response = await axios.post(`${API_URL}/api/user/refresh-token`, {
-          refreshToken
-        });
-
-        const { accessToken, refreshToken: newRefreshToken } = response.data.data;
-        
-        // Store new tokens
-        localStorage.setItem('accessToken', accessToken);
-        localStorage.setItem('refreshToken', newRefreshToken);
-
-        // Process queued requests with new token
+        const accessToken = await refreshAuthToken();
         processQueue(null, accessToken);
-        
-        // Retry original request with new token
         originalRequest.headers.Authorization = `Bearer ${accessToken}`;
         return axios(originalRequest);
-
       } catch (refreshError) {
-        // Process queued requests with error
         processQueue(refreshError, null);
-        
-        // Clear tokens and reject
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
-        
+        store.dispatch(logout());
         return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;
       }
     }
 
-    // If already refreshing, queue this request
-    return new Promise((resolve, reject) => {
-      refreshSubscribers.push((error, token) => {
-        if (error) {
-          reject(error);
-        } else {
-          originalRequest.headers.Authorization = `Bearer ${token}`;
-          resolve(axios(originalRequest));
-        }
-      });
-    });
+    return Promise.reject(error);
   }
 );
 
 // Add access token to requests
 userAxios.interceptors.request.use(
-  (config) => {
-    const accessToken = localStorage.getItem('accessToken')
-    if (accessToken) {
-      config.headers.Authorization = `Bearer ${accessToken}`
+  async (config) => {
+    const accessToken = localStorage.getItem('accessToken');
+    
+    if (accessToken && needsRefresh(accessToken)) {
+      try {
+        const newAccessToken = await refreshAuthToken();
+        config.headers.Authorization = `Bearer ${newAccessToken}`;
+      } catch (error) {
+        store.dispatch(logout());
+        throw error;
+      }
+    } else if (accessToken) {
+      config.headers.Authorization = `Bearer ${accessToken}`;
     }
-    return config
+    
+    return config;
   },
   (error) => Promise.reject(error)
 );
 
 export const userAPI = {
   loginUser: async (credentials) => {
-    const response = await userAxios.post('/login', credentials)
-    const { accessToken, refreshToken } = response.data.data
-    
-    // Store both tokens
-    localStorage.setItem('accessToken', accessToken)
-    localStorage.setItem('refreshToken', refreshToken)
-    
-    return response.data
+    try {
+      const response = await userAxios.post('/login', credentials);
+      const { accessToken, refreshToken } = response.data.data;
+      
+      if (response.data.status.code === 200) {
+        localStorage.setItem('accessToken', accessToken);
+        localStorage.setItem('refreshToken', refreshToken);
+      }
+        
+      return response.data;
+    } catch (error) {
+      if (error.response?.data) {
+        throw error.response.data;
+      }
+      throw new Error({
+        status: {
+        code: 500,
+        description: 'An unexpected error occurred'
+      }
+    });
+    }
   },
 
   registerUser: async (userData) => {
-    const response = await userAxios.post('/register', userData)
-    const { accessToken, refreshToken } = response.data.data
-    
-    // Store both tokens
-    localStorage.setItem('accessToken', accessToken)
-    localStorage.setItem('refreshToken', refreshToken)
-    
-    return response.data
+    try {
+      const response = await userAxios.post('/register', userData);
+      const { accessToken, refreshToken } = response.data.data;
+        
+      if (response.data.status.code === 201) {
+        localStorage.setItem('accessToken', accessToken);
+        localStorage.setItem('refreshToken', refreshToken);
+      }
+        
+        return response.data;
+    } catch (error) {
+      if (error.response?.data) {
+        throw error.response.data;
+      }
+      throw new Error({
+          status: {
+          code: 500,
+          description: 'An unexpected error occurred'
+        }
+      });
+    }
   },
 
   logoutUser: async () => {
@@ -133,17 +183,28 @@ export const userAPI = {
     }
   },
 
+  updateUser: async (userData) => {
+    const response = await userAxios.put('/update', userData)
+    return response.data
+  },
+
   checkAuth: async () => {
     // If no access token exists, don't even try the request
-    if (!localStorage.getItem('accessToken')) {
-      throw new Error('No access token')
-    }
+    // if (!localStorage.getItem('accessToken')) {
+    //   throw new Error('No access token')
+    // }
     const response = await userAxios.get('/current')
+    // console.log('checkAuth response: ', response)
     return response.data
   },
 
   fetchProfile: async () => {
     const response = await userAxios.get('/profile')
+    return response.data
+  },
+
+  deleteUser: async () => {
+    const response = await userAxios.delete('/delete')
     return response.data
   }
 }

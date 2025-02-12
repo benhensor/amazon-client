@@ -3,7 +3,7 @@ import { useFormik } from 'formik'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { registerSchema, loginSchema } from '../schemas/index'
 import { useDispatch, useSelector } from 'react-redux'
-import { registerUser, loginUser } from '../redux/slices/userSlice'
+import { registerUser, loginUser, clearError } from '../redux/slices/userSlice'
 import Logo from '../icons/AmazonLogo'
 import {
 	Container,
@@ -21,47 +21,75 @@ export default function AuthPortal() {
 
 	const [showPasswordField, setShowPasswordField] = useState(false)
 	const [isSignIn, setIsSignIn] = useState(true)
+	const [authError, setAuthError] = useState(null)
 
 	const { loading, error, isLoggedIn } = useSelector((state) => state.user)
 
-useEffect(() => {
-  if (isLoggedIn) {
-    const from = location.state?.from?.pathname || '/'
-    navigate(from, { replace: true })
-  }
-}, [isLoggedIn, navigate, location])
+	useEffect(() => {
+		if (isLoggedIn) {
+			const from = location.state?.from?.pathname || '/'
+			navigate(from, { replace: true })
+		}
+	}, [isLoggedIn, navigate, location])
+
+	useEffect(() => {
+		return () => {
+			dispatch(clearError())
+			setAuthError(null)
+		};
+	}, [dispatch])
 
 	const handleHomeClick = () => {
     navigate('/')
   }
 
+	const handleLogin = async (values) => {
+		try {
+			const result = await dispatch(loginUser(values)).unwrap()
+			if (result.status.code === 401) {
+				setAuthError(result.status.description)
+			}
+			if (result.status.code === 200) {
+				const from = location.state?.from?.pathname || '/'
+				navigate(from, { replace: true })
+			}
+		} catch (err) {
+			console.error('Authentication error:', err)
+		}
+	}
+	
+	const handleRegister = async (values) => {
+		try {
+			const result = await dispatch(registerUser(values)).unwrap()
+			
+			if (result.status.code === 201) {
+				setIsSignIn(true)
+				formik.resetForm({
+					values: {
+						fullname: '',
+						email: values.email,
+						password: '',
+						passwordConfirm: '',
+					},
+				})
+				setShowPasswordField(true)
+				setAuthError(null)
+			}
+		} catch (err) {
+			setAuthError(err.status?.description || 'An error occurred')
+		}
+	}
+
 	const handleAuth = async (values) => {
-    const { passwordConfirm, ...userData } = values
-    try {
-      let result
-      if (isSignIn) {
-        if (showPasswordField) {
-          result = await dispatch(loginUser(userData)).unwrap()
-        } else {
-          setShowPasswordField(true)
-        }
-      } else {
-        result = await dispatch(registerUser(userData)).unwrap()
-        if (result.status.code === 201) {
-          setIsSignIn(true)
-          formik.resetForm({
-            values: {
-              fullname: '',
-              email: values.email,
-              password: '',
-              passwordConfirm: '',
-            },
-          })
-        }
-      }
-    } catch (err) {
-      console.error('Authentication error:', err)
-    }
+		if (isSignIn) {
+			if (showPasswordField) {
+				handleLogin(values)
+			} else {
+				setShowPasswordField(true)
+			}
+		} else {
+			handleRegister(values)
+		}
   }
 
 	const handleToggle = () => {
@@ -75,6 +103,8 @@ useEffect(() => {
     })
     setIsSignIn(!isSignIn)
     setShowPasswordField(false) 
+		setAuthError(null)
+		dispatch(clearError())
   }
 
 	const formik = useFormik({
@@ -102,18 +132,21 @@ useEffect(() => {
 							type="text"
 							name="email"
 							id="email"
-							onChange={formik.handleChange}
+							onChange={(e) => {
+								formik.handleChange(e);
+								setAuthError(null);
+							}}
 							onBlur={formik.handleBlur}
 							value={formik.values.email || ''}
 							autoComplete="email"
 							className={
-								formik.touched.email && formik.errors.email
+								(formik.touched.email && formik.errors.email) || authError
 									? 'error'
 									: ''
 							}
 						/>
-						{formik.touched.email && formik.errors.email && (
-							<div className="error">{formik.errors.email}</div>
+						{((formik.touched.email && formik.errors.email) || authError) && (
+							<div className="error">{authError || formik.errors.email}</div>
 						)}
 					</div>
 				) : (

@@ -194,9 +194,9 @@ export default function CancelledOrders({ orders }) {
 						</OrderBody>
 						<div className="order-archive">
 							<button
-								onClick={() =>
+								onClick={() => 
 									dispatch(
-										deleteOrderById(items.order.order_id)
+										deleteOrderById(items[0].order_id)
 									)
 								}
 								className="primary-link"

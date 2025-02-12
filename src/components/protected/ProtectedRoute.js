@@ -11,10 +11,10 @@ const ProtectedRoute = ({ children }) => {
     return <div>Loading...</div>
   }
 
-  // if (!isLoggedIn) {
-  //   console.log('Not logged in - redirecting to auth')
-  //   return <Navigate to="/" state={{ from: location }} replace />
-  // }
+  if (!isLoggedIn) {
+    console.log('Not logged in - redirecting to auth')
+    return <Navigate to="/" state={{ from: location }} replace />
+  }
 
   return children
 }

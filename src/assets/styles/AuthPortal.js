@@ -156,6 +156,16 @@ export const Form = styled.form`
 				background-color: var(--input-focus-bg);
 			}
 		}
+
+		.input-group input.error {
+			border-color: #c40000;
+		}
+
+		.input-group .error {
+			color: #c40000;
+			font-size: 0.9em;
+			margin-top: 0.2em;
+		}
 	}
 `
 

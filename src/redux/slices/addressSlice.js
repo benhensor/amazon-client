@@ -1,67 +1,68 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { addressAPI } from '../../api/addressAPI';
+import { addressAPI } from '../../api/addressesAPI';
+import { handleApiError } from '../../utils/errorHandler';
 
 export const fetchAddresses = createAsyncThunk(
   'address/fetchAddresses',
-  async (_, { rejectWithValue }) => {
+  async (_, thunkAPI) => {
     try {
       const response = await addressAPI.fetchAddresses();
-      console.log('fetchAddresses response: ', response);
+      // console.log('fetchAddresses response: ', response);
       return response || [];
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message || 'An error occurred');
+      return handleApiError(error, thunkAPI);
     }
   }
 );
 
 export const createNewAddress = createAsyncThunk(
   'address/addAddress',
-  async (addressData, { rejectWithValue }) => {
+  async (addressData, thunkAPI) => {
     try {
       const response = await addressAPI.createAddress(addressData);
-      console.log('createNewAddress response: ', response);
+      // console.log('createNewAddress response: ', response);
       return response;
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message || 'An error occurred');
+      return handleApiError(error, thunkAPI);
     }
   }
 );
 
 export const setDefaultAddress = createAsyncThunk(
   'address/setDefaultAddress',
-  async (addressId, { rejectWithValue }) => {
+  async (addressId, thunkAPI) => {
     try {
       const response = await addressAPI.setDefaultAddress(addressId);
-      console.log('setDefaultAddress response: ', response);
+      // console.log('setDefaultAddress response: ', response);
       return response;
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message || 'An error occurred');
+      return handleApiError(error, thunkAPI);
     }
   }
 );
 
 export const updateAddress = createAsyncThunk(
   'address/updateAddress',
-  async ({ addressId, addressData }, { rejectWithValue }) => {
+  async ({ addressId, addressData }, thunkAPI) => {
     try {
       const response = await addressAPI.updateAddress(addressId, addressData);
-      console.log('updateAddress response: ', response);
+      // console.log('updateAddress response: ', response);
       return response;
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message || 'An error occurred');
+      return handleApiError(error, thunkAPI);
     }
   }
 );
 
 export const deleteAddress = createAsyncThunk(
   'address/deleteAddress',
-  async (addressId, { rejectWithValue }) => {
+  async (addressId, thunkAPI) => {
     try {
       const response = await addressAPI.deleteAddress(addressId);
-      console.log('deleteAddress response: ', response);
+      // console.log('deleteAddress response: ', response);
       return response.data.address_id;
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message || 'An error occurred');
+      return handleApiError(error, thunkAPI);
     }
   }
 );
@@ -79,9 +80,13 @@ const addressSlice = createSlice({
     },
     removeAddress(state, action) {
       state.addresses = state.addresses.filter(
-        (address) => address.id !== action.payload
+        (address) => address.address_id !== action.payload
       );
     },
+    clearAddresses(state) {
+      state.addresses = [];
+      state.error = null;
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -96,7 +101,10 @@ const addressSlice = createSlice({
       })
       .addCase(fetchAddresses.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload;
+        state.error = action.payload?.status?.description;
+        if (action.payload?.status?.code === 401) {
+          state.addresses = [];
+        }
       })
       // Create address
       .addCase(createNewAddress.pending, (state) => {
@@ -109,7 +117,7 @@ const addressSlice = createSlice({
       })
       .addCase(createNewAddress.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload;
+        state.error = action.payload?.status?.description;
       })
       // Set default address
       .addCase(setDefaultAddress.pending, (state) => {
@@ -127,7 +135,7 @@ const addressSlice = createSlice({
       })
       .addCase(setDefaultAddress.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload;
+        state.error = action.payload?.status?.description;
       })
       // Update address
       .addCase(updateAddress.pending, (state) => {
@@ -145,7 +153,7 @@ const addressSlice = createSlice({
       })
       .addCase(updateAddress.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload;
+        state.error = action.payload?.status?.description;
       })
       // Delete address
       .addCase(deleteAddress.pending, (state) => {
@@ -160,10 +168,16 @@ const addressSlice = createSlice({
       })
       .addCase(deleteAddress.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload;
+        state.error = action.payload?.status?.description;
+      })
+      // Handle user logout
+      .addCase('user/logout', (state) => {
+        state.addresses = [];
+        state.error = null;
+        state.loading = false;
       });
   },
 });
 
-export const { addAddress, removeAddress } = addressSlice.actions;
+export const { addAddress, removeAddress, clearAddresses } = addressSlice.actions;
 export default addressSlice.reducer;

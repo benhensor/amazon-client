@@ -11,7 +11,6 @@ import PaymentMethodThumbnail from '../components/payments/PaymentMethodThumbnai
 import AddPaymentMethod from '../components/modals/AddPaymentMethod'
 import PlusIcon from '../icons/PlusIcon'
 import GiftCard from '../assets/img/payments/wallet-gift-card.png'
-import ExclamationIcon from '../icons/ExclaimationIcon'
 import { Loader } from '../assets/styles/GlobalStyles'
 import {
 	PaymentsPage,
@@ -143,26 +142,31 @@ export default function Payments() {
 								<div className="gift-card">
 									<img
 										src={GiftCard}
-										alt="Scamazon gift card"
+										alt="Amazon gift card"
 									/>
 								</div>
 								<div className="gift-card-text">
-									<p>Scamazon gift card</p>
+									<p>Amazon gift card</p>
 									<p>Balance £0.00</p>
 								</div>
 							</div>
 						</PaymentMethods>
 						<DefaultPaymentMethod>
-							<div className="default-method-container">
-								<PaymentMethodThumbnail
-									card={defaultPaymentMethod}
-									isMethodInListDisplay={false}
-									defaultPaymentMethodId={
-										defaultPaymentMethodId
-									}
-								/>
-							</div>
+								<div className="default-method-container">
+									<PaymentMethodThumbnail
+										card={defaultPaymentMethod}
+										isMethodInListDisplay={false}
+										defaultPaymentMethodId={
+											defaultPaymentMethodId
+										}
+									/>
+								</div>
 							<div className="card-details">
+								{!defaultPaymentMethod && (
+									<div className="no-thumbnail">
+										<p>No default payment method</p>
+									</div>
+								)}
 								{defaultPaymentMethod?.bank && (
 									<p className="card-account">
 										{defaultPaymentMethod?.bank}{' '}
@@ -188,27 +192,22 @@ export default function Payments() {
 										)}
 									</p>
 								)}
-								{defaultPaymentMethod?.status === 'expired' &&
-									defaultPaymentMethod?.end_date && (
-										<div className="expired">
-											<div>
-												<ExclamationIcon /> Expired on{' '}
-												{defaultPaymentMethod?.end_date}
-											</div>
-											<button
-												className="primary-link"
-												onClick={() => {
-													dispatch(
-														deletePaymentMethod(
-															defaultPaymentMethod?.payment_method_id
-														)
-													)
-												}}
-											>
-												Remove
-											</button>
-										</div>
-									)}
+								{(defaultPaymentMethod && 
+								<div className="remove">
+									<button
+										className="primary-link"
+										onClick={() => {
+											dispatch(
+												deletePaymentMethod(
+													defaultPaymentMethod?.payment_method_id
+												)
+											)
+										}}
+									>
+										Remove
+									</button>
+								</div>
+								)}
 							</div>
 						</DefaultPaymentMethod>
 					</Content>

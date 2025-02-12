@@ -15,6 +15,19 @@ export default function AddNewAddress() {
 	const dispatch = useDispatch()
 	const navigate = useNavigate()
 
+	const handleSubmit = async (values, { setSubmitting }) => {
+		console.log('handleSubmit called with values:', values);
+		try {
+			const result = await dispatch(createNewAddress(values)).unwrap();
+			console.log('Address created:', result);
+			navigate('/account/addresses');
+		} catch (error) {
+			console.error('Failed to add address:', error);
+		} finally {
+			setSubmitting(false);
+		}
+	};
+
 	const formik = useFormik({
     initialValues: {
       country: 'United Kingdom',  
@@ -31,27 +44,7 @@ export default function AddNewAddress() {
 			is_billing: false,	          
     },
     validationSchema: addressSchema,  
-		validate: values => {
-      return {};
-    },
-    onSubmit: (values, { setSubmitting }) => {
-			// if (formik.isSubmitting) {
-			// 	return
-			// }
-			setSubmitting(true)
-      dispatch(createNewAddress(values))    
-        .unwrap()
-        .then((response) => {
-          navigate('/account/addresses');  
-        })
-        .catch((error) => {
-      		console.error('Raw error object:', JSON.stringify(error, null, 2));
-          console.error('Failed to add address:', error);
-        })
-        .finally(() => {
-          setSubmitting(false);
-        });
-    },
+    onSubmit: handleSubmit,
   });
 
 	return (
@@ -83,7 +76,14 @@ export default function AddNewAddress() {
 					</div>
 				</AddEditPageHeader>
 
-				<form onSubmit={formik.handleSubmit}>
+				<form 
+					onSubmit={(e) => {
+						e.preventDefault(); // Explicitly prevent default
+						console.log('Raw form submit triggered');
+						formik.handleSubmit(e); // Pass the event to formik
+					}}
+					noValidate // Add this to prevent native browser validation
+				>
 					<div className="form-group">
 						<label htmlFor="country">Country/Region</label>
 						<select
@@ -278,7 +278,12 @@ export default function AddNewAddress() {
 							<div className="error">{formik.errors.is_billing}</div>
 						) : null}
 					</div>
-					<button type="submit" className="primary-btn" disabled={formik.isSubmitting}>Add address</button>
+					<button 
+						type="submit" 
+						className="primary-btn" 
+					>
+						Add address
+					</button>
 				</form>
 			</AddEditPage>
 		</AddEditPageContainer>

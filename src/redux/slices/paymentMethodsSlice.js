@@ -97,6 +97,9 @@ const paymentMethodsSlice = createSlice({
 			.addCase(addPaymentMethod.fulfilled, (state, action) => {
 				state.loading = false
 				state.paymentMethods.push(action.payload)
+				if (action.payload.status === 'default') {
+					state.defaultPaymentMethod = action.payload
+				}
 			})
 			.addCase(addPaymentMethod.rejected, (state, action) => {
 				state.loading = false
@@ -134,6 +137,9 @@ const paymentMethodsSlice = createSlice({
 				state.paymentMethods = state.paymentMethods.filter(
 					(method) => method.payment_method_id !== action.meta.arg
 				)
+				if (state.defaultPaymentMethod?.payment_method_id === action.meta.arg) {
+					state.defaultPaymentMethod = null
+				}
 			})
 			.addCase(deletePaymentMethod.rejected, (state, action) => {
 				state.loading = false

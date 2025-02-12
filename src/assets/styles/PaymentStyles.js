@@ -66,7 +66,8 @@ export const PaymentMethods = styled.div`
 		display: flex;
 		flex-direction: column;
 		gap: var(--spacing-xs);
-		height: 50rem;
+		height: fit-content;
+		max-height: 50rem;
 		overflow-y: scroll;
 		/* Enable scrollbar specifically for this element */
 		scrollbar-width: thin; /* For Firefox */
@@ -154,10 +155,16 @@ export const PaymentMethods = styled.div`
 				}
 			}
 		}
+		
 		p {
 			margin: auto 0;
 			font-size: var(--font-sm);
 			text-align: center;
+		}
+		
+		&:hover .img-placeholder {
+			cursor: pointer;
+			border: 2px dashed var(--link-hover);
 		}
 	}
 `
@@ -217,6 +224,10 @@ export const CardContainer = styled.div`
 		flex-direction: column;
 		gap: var(--spacing-xs);
 		line-height: 1.2;
+		.no-thumbnail {
+			width: fit-content;
+			font-weight: bold;
+		}
 		.card-account {
 			font-size: var(--font-sm);
 			font-weight: 700;
@@ -226,7 +237,7 @@ export const CardContainer = styled.div`
 			font-size: var(--font-xs);
 		}
 	}
-	.expired {
+	.remove {
 		font-size: var(--font-xs);
 		color: var(--input-error);
 		width: 100%;
@@ -236,7 +247,7 @@ export const CardContainer = styled.div`
 		gap: var(--spacing-xs);
 	}
 
-	.expired button {
+	.remove button {
 		margin-left: auto;
 	}
 `

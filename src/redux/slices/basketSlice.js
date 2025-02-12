@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk, createSelector } from '@reduxjs/toolkit'
 import { v4 as uuidV4 } from 'uuid';
 import { basketAPI } from '../../api/basketAPI'
 import { logoutUser } from './userSlice'
+import { handleApiError } from '../../utils/errorHandler';
 
 // Session Storage Keys
 const BASKET_STORAGE_KEY = 'shopping_basket'
@@ -116,92 +117,106 @@ const initialState = {
 
 // Thunks
 export const loadBasket = createAsyncThunk(
-	'basket/loadBasket',
-	async (_, { rejectWithValue }) => {
-		try {
-			const basketData = await loadBasketFromDatabase()
-			return basketData || { items: [], count: 0, total: 0 }
-		} catch (error) {
-			return rejectWithValue('Failed to load basket from database')
-		}
-	}
-)
+  'basket/loadBasket',
+  async (_, thunkAPI) => {
+    try {
+      const basketData = await loadBasketFromDatabase();
+      return basketData || { items: [], count: 0, total: 0 };
+    } catch (error) {
+      // Fall back to session storage on auth error
+      if (error.response?.status === 401) {
+        const sessionBasket = loadBasketFromStorage();
+        if (sessionBasket) {
+          return sessionBasket;
+        }
+      }
+      return handleApiError(error, thunkAPI);
+    }
+  }
+);
 
 // Thunks
 export const fetchUserBasket = createAsyncThunk(
   'basket/fetchUserBasket',
-  async (_, { getState, rejectWithValue }) => {
+  async (_, thunkAPI) => {
     try {
-      const { user } = getState()
-      let basketItems
+      const { user } = thunkAPI.getState();
+      let basketItems;
 
       if (user.isLoggedIn) {
         try {
-          const response = await basketAPI.fetchBasket()
-          basketItems = response.BasketItems
+          const response = await basketAPI.fetchBasket();
+          basketItems = response.BasketItems;
         } catch (error) {
-          // For unauthorized requests, fallback to guest basket without error
-          if (error.response?.status === 401 || error.message?.includes('unauthorized')) {
-            const guestBasketData = loadBasketFromStorage()
-            basketItems = guestBasketData?.items || []
+          // Fall back to guest basket on auth error
+          if (error.response?.status === 401) {
+            const guestBasketData = loadBasketFromStorage();
+            basketItems = guestBasketData?.items || [];
           } else {
-            throw error; // Re-throw non-auth related errors
+            throw error;
           }
         }
       } else {
-        const guestBasketData = loadBasketFromStorage()
-        basketItems = guestBasketData?.items || []
+        const guestBasketData = loadBasketFromStorage();
+        basketItems = guestBasketData?.items || [];
       }
 
-      return basketItems
+      return basketItems;
     } catch (error) {
-      return rejectWithValue(
-        error.response?.data || 'Failed to fetch basket'
-      )
+      return handleApiError(error, thunkAPI);
     }
   }
-)
+);
 
 export const addItemToBasket = createAsyncThunk(
-	'basket/addItemToBasket',
-	async ({ product, quantity = 1 }, { getState, rejectWithValue }) => {
-		try {
-			const { user, basket } = getState()
-			const productId = product.id
-			// console.log('user', user.currentUser)
-			// Check if item already exists
-			const existingItemIndex = basket.items.findIndex(
-				(item) => item.product_data.id === productId
-			)
+  'basket/addItemToBasket',
+  async ({ product, quantity = 1 }, thunkAPI) => {
+    try {
+      const { user, basket } = thunkAPI.getState();
+      const productId = product.id;
+      
+      // Check if item already exists
+      const existingItemIndex = basket.items.findIndex(
+        (item) => item.product_data.id === productId
+      );
 
-			if (existingItemIndex !== -1) {
-				// Update quantity of existing item
-				const updatedItems = [...basket.items]
-				updatedItems[existingItemIndex] = {
-					...updatedItems[existingItemIndex],
-					quantity:
-						updatedItems[existingItemIndex].quantity + quantity,
-				}
-				return updatedItems
-			}
+      if (existingItemIndex !== -1) {
+        const updatedItems = [...basket.items];
+        updatedItems[existingItemIndex] = {
+          ...updatedItems[existingItemIndex],
+          quantity: updatedItems[existingItemIndex].quantity + quantity,
+        };
+        return { items: updatedItems, user };
+      }
 
-			// Create new basket item if not existing
-			const newBasketItem = {
-				basket_item_id: uuidV4(),
-				basket_id: user.isLoggedIn
-					? user.currentUser.user_id
-					: uuidV4(),
-				product_data: product,
-				quantity: quantity,
-				is_selected: true,
-			}
+      const newBasketItem = {
+        basket_item_id: uuidV4(),
+        basket_id: user.isLoggedIn ? user.currentUser.user_id : uuidV4(),
+        product_data: product,
+        quantity: quantity,
+        is_selected: true,
+      };
 
-			return { items: [...basket.items, newBasketItem], user }
-		} catch (error) {
-			return rejectWithValue('Failed to add item to basket')
-		}
-	}
-)
+      try {
+        await saveBasketToStorage({ 
+          items: [...basket.items, newBasketItem],
+          count: calculateCount([...basket.items, newBasketItem]),
+          total: calculateTotal([...basket.items, newBasketItem])
+        }, user);
+      } catch (error) {
+        if (error.response?.status === 401) {
+          return handleApiError(error, thunkAPI);
+        }
+        // For non-auth errors, still update local state but log the error
+        console.error('Failed to sync basket with server:', error);
+      }
+
+      return { items: [...basket.items, newBasketItem], user };
+    } catch (error) {
+      return handleApiError(error, thunkAPI);
+    }
+  }
+);
 
 export const updateItemQuantity = createAsyncThunk(
 	'basket/updateItemQuantity',
@@ -318,14 +333,26 @@ const basketSlice = createSlice({
 	},
 	extraReducers: (builder) => {
 		builder
+			.addCase(loadBasket.pending, (state) => {
+				state.loading = true;
+				state.error = null;
+			})
 			.addCase(loadBasket.fulfilled, (state, action) => {
 				const { items, count, total } = action.payload
 				state.items = items
 				state.count = count
 				state.total = total
+				state.loading = false
 			})
 			.addCase(loadBasket.rejected, (state, action) => {
-				state.error = action.payload || 'Failed to load basket'
+				state.loading = false;
+        state.error = action.payload?.status?.description;
+        // On auth error, don't clear basket - keep session storage data
+        if (action.payload?.status?.code !== 401) {
+          state.items = [];
+          state.count = 0;
+          state.total = 0;
+        }
 			})
 			.addCase(addItemToBasket.fulfilled, (state, action) => {
 				const { items, user } = action.payload
