@@ -1,70 +1,28 @@
-# Getting Started with Create React App
+# Amazon e-commerce UI clone
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+What began as a front-end project to practice working with APIs has snowballed into a full stack emulation of Amazon's e-commerce site.
 
-## Available Scripts
+## Tech Stack
 
-In the project directory, you can run:
+This project consists of a React JS front end with Styled Component CSS, React Router & Axios. The back-end for this project is in another respository. For product data, I am working with the products API provided by dummyjson.com.
 
-### `npm start`
+### Features
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+I conveived of this project as a portfolio piece to simulate the entire process of online retail. The site works for both guest users who can access all UI features and authenticated users who can access the account section and manage addresses, payment methods and more. Features include:
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+• User authentication with JWT
+• Add, edit and delete addresses with controls for adding default status
+• Add and remove fake payment methods (a fake bank card can be created by choosing from a few options)
+• Browse products, add to basket, edit quantities and remove from basket
+• Select shipping details
+• Generate orders and manage them from the Orders page
+• Fully responsive layout for mobile and desktop
+• And much more!
 
-### `npm test`
+### Purpose
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+I am particularly interested in UI design and front end development so this was an excellent way to practice reproducing pixel perfect layout designs and practice the development of a range of front end related challenges. Where possible, I have tried to faithfully reproduce the appearance and behaviour of the real Amazon site to the best of my ability. 
 
-### `npm run build`
+### Disclaimer
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+All brand imagery and promo imagery used throughout the site is property of Amazon and this project was created purely for educational purposes as a way to practice full stack engineering principles and UI design. 
