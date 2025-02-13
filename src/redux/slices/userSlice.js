@@ -157,7 +157,14 @@ export const checkLoggedIn = createAsyncThunk(
 			// console.log('checkLoggedIn response: ', response)
       return response;
     } catch (error) {
-      return rejectWithValue(error.response?.data);
+      // For unauthorized requests (401) or any auth-related errors, 
+			// silently return null without logging the error
+			if (error.response?.status === 401 || error.message?.includes('unauthorized')) {
+				return null;
+			}
+			// Only log actual errors that aren't related to authorization
+			console.error('Error loading basket from database:', error.message);
+			return null;
     }
   }
 );

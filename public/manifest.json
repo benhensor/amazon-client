@@ -1,6 +1,6 @@
 {
-  "short_name": "scamazon",
-  "name": "scamazon",
+  "short_name": "amazon",
+  "name": "amazon",
   "icons": [
     {
       "src": "favicon.ico",
@@ -8,7 +8,7 @@
       "type": "image/x-icon"
     }
   ],
-  "start_url": "/scamazon/",
+  "start_url": "/amazon/",
   "display": "standalone",
   "theme_color": "#000000",
   "background_color": "#ffffff"
