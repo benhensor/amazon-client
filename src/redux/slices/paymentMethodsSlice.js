@@ -22,7 +22,7 @@ export const addPaymentMethod = createAsyncThunk(
 			const response = await paymentMethodsAPI.addPaymentMethod(
 				paymentMethodData
 			)
-			console.log('addPaymentMethod return: ', response.data)
+			// console.log('addPaymentMethod return: ', response.data)
 			return response.data
 		} catch (error) {
 			return rejectWithValue(error.response.data)
@@ -104,8 +104,7 @@ const paymentMethodsSlice = createSlice({
 			.addCase(addPaymentMethod.fulfilled, (state, action) => {
 				state.loading = false
 				// Safely access the payment method data from the response
-				const newPaymentMethod = action.payload?.data
-				console.log('newPaymentMethod: ', newPaymentMethod)
+				const newPaymentMethod = action.payload
 				if (newPaymentMethod) {
 					// Ensure paymentMethods is an array before pushing
 					if (!Array.isArray(state.paymentMethods)) {
