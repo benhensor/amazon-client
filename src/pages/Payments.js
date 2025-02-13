@@ -29,7 +29,7 @@ export default function Payments() {
 	const [addPaymentMethodModalOpen, setAddPaymentMethodModalOpen] =
 		useState(false)
 	const paymentMethods = useSelector(
-		(state) => state.paymentMethods?.paymentMethods
+		(state) => state.paymentMethods?.paymentMethods ?? []
 	)
 	const defaultPaymentMethod = useSelector(
 		(state) => state.paymentMethods?.defaultPaymentMethod
@@ -39,7 +39,7 @@ export default function Payments() {
 	)
 
 	const getSortedPaymentMethods = () => {
-		if (loading) {
+		if (loading || !Array.isArray(paymentMethods)) {
 			return []
 		}
 		const now = new Date()
@@ -58,7 +58,12 @@ export default function Payments() {
 					status: isExpired ? 'expired' : method.status,
 				}
 			})
-			.filter((method) => method && method.payment_method_id)
+			.filter(
+				(method) =>
+					method &&
+					typeof method === 'object' &&
+					method.payment_method_id
+			)
 			.sort((a, b) => {
 				if (a.payment_method_id === defaultPaymentMethodId) {
 					return -1
@@ -106,7 +111,8 @@ export default function Payments() {
 						<PaymentMethods>
 							<h2>Cards & accounts</h2>
 							<div className="cards-container">
-								{sortedPaymentMethods.length > 0 &&
+								{Array.isArray(sortedPaymentMethods) &&
+									sortedPaymentMethods.length > 0 &&
 									sortedPaymentMethods?.map((card) => (
 										<React.Fragment
 											key={card?.payment_method_id}
@@ -152,15 +158,15 @@ export default function Payments() {
 							</div>
 						</PaymentMethods>
 						<DefaultPaymentMethod>
-								<div className="default-method-container">
-									<PaymentMethodThumbnail
-										card={defaultPaymentMethod}
-										isMethodInListDisplay={false}
-										defaultPaymentMethodId={
-											defaultPaymentMethodId
-										}
-									/>
-								</div>
+							<div className="default-method-container">
+								<PaymentMethodThumbnail
+									card={defaultPaymentMethod}
+									isMethodInListDisplay={false}
+									defaultPaymentMethodId={
+										defaultPaymentMethodId
+									}
+								/>
+							</div>
 							<div className="card-details">
 								{!defaultPaymentMethod && (
 									<div className="no-thumbnail">
@@ -169,8 +175,8 @@ export default function Payments() {
 								)}
 								{defaultPaymentMethod?.bank && (
 									<p className="card-account">
-										{defaultPaymentMethod?.bank}{' '}
-										{defaultPaymentMethod?.card_type
+										{defaultPaymentMethod.bank}{' '}
+										{(defaultPaymentMethod.card_type || '')
 											.split(' ')
 											.map(
 												(word) =>
@@ -180,7 +186,7 @@ export default function Payments() {
 													word.slice(1).toLowerCase()
 											)
 											.join(' ')}{' '}
-										{defaultPaymentMethod?.card_account}{' '}
+										{defaultPaymentMethod.card_account}{' '}
 										Account
 									</p>
 								)}
@@ -192,21 +198,21 @@ export default function Payments() {
 										)}
 									</p>
 								)}
-								{(defaultPaymentMethod && 
-								<div className="remove">
-									<button
-										className="primary-link"
-										onClick={() => {
-											dispatch(
-												deletePaymentMethod(
-													defaultPaymentMethod?.payment_method_id
+								{defaultPaymentMethod && (
+									<div className="remove">
+										<button
+											className="primary-link"
+											onClick={() => {
+												dispatch(
+													deletePaymentMethod(
+														defaultPaymentMethod?.payment_method_id
+													)
 												)
-											)
-										}}
-									>
-										Remove
-									</button>
-								</div>
+											}}
+										>
+											Remove
+										</button>
+									</div>
 								)}
 							</div>
 						</DefaultPaymentMethod>

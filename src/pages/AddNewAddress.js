@@ -16,10 +16,8 @@ export default function AddNewAddress() {
 	const navigate = useNavigate()
 
 	const handleSubmit = async (values, { setSubmitting }) => {
-		console.log('handleSubmit called with values:', values);
 		try {
-			const result = await dispatch(createNewAddress(values)).unwrap();
-			console.log('Address created:', result);
+			await dispatch(createNewAddress(values)).unwrap();
 			navigate('/account/addresses');
 		} catch (error) {
 			console.error('Failed to add address:', error);
@@ -78,11 +76,10 @@ export default function AddNewAddress() {
 
 				<form 
 					onSubmit={(e) => {
-						e.preventDefault(); // Explicitly prevent default
-						console.log('Raw form submit triggered');
-						formik.handleSubmit(e); // Pass the event to formik
+						e.preventDefault(); 
+						formik.handleSubmit(e); 
 					}}
-					noValidate // Add this to prevent native browser validation
+					noValidate
 				>
 					<div className="form-group">
 						<label htmlFor="country">Country/Region</label>
