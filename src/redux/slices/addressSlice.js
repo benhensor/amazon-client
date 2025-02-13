@@ -10,6 +10,11 @@ export const fetchAddresses = createAsyncThunk(
       // console.log('fetchAddresses response: ', response);
       return response || [];
     } catch (error) {
+      // For unauthorized requests (401) or any auth-related errors, 
+			// silently return null without logging the error
+			if (error.response?.status.code === 401 || error.message?.includes('Unauthorized')) {
+				return null;
+			}
       return handleApiError(error, thunkAPI);
     }
   }
@@ -71,6 +76,7 @@ const addressSlice = createSlice({
   name: 'address',
   initialState: {
     addresses: [],
+    defaultAddress: null,
     loading: false,
     error: null,
   },

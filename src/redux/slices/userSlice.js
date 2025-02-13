@@ -49,7 +49,7 @@ const userSlice = createSlice({
 			})
 			.addCase(checkLoggedIn.fulfilled, (state, action) => {
 				state.loading = false
-				if (action.payload.status?.code === 200) {
+				if (action.payload?.status?.code === 200) {
 					// console.log('checkLoggedIn', action.payload.data)
 					state.currentUser = action.payload.data.user
 					state.isLoggedIn = true
@@ -159,12 +159,16 @@ export const checkLoggedIn = createAsyncThunk(
     } catch (error) {
       // For unauthorized requests (401) or any auth-related errors, 
 			// silently return null without logging the error
-			if (error.response?.status === 401 || error.message?.includes('unauthorized')) {
+			if (error.response?.status.code === 401 || error.message?.includes('Unauthorized')) {
 				return null;
 			}
 			// Only log actual errors that aren't related to authorization
-			console.error('Error loading basket from database:', error.message);
-			return null;
+			if (error.message === 'No access token') {
+				return null;
+			} else {
+				console.error('Error checking if user is logged in:', error.message);
+				return rejectWithValue(error.message);
+			}
     }
   }
 );

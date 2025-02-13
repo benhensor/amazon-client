@@ -38,15 +38,9 @@ export default function Checkout() {
 	const currentUser = useSelector((state) => state.user) || {}
 	const addresses = useSelector((state) => state.addresses.addresses)
 	const userAddress = useMemo(() => {
-		return addresses.find((address) => address.is_default) || {
-			address_line1: '',
-			address_line2: '',
-			city: '',
-			postcode: '',
-			county: '',
-			country: '',
-		}
-	}, [addresses])
+		const defaultAddress = addresses.find((address) => address.is_default);
+		return defaultAddress || null;
+	}, [addresses]);
 
 	const paymentMethod = useSelector(
 		(state) => state.paymentMethods.defaultPaymentMethod
@@ -59,16 +53,35 @@ export default function Checkout() {
 		total: item.product_data.price * item.quantity,
 	}))
 	const itemsTotal = useSelector((state) => state.basket.total)
+	const [validationErrors, setValidationErrors] = useState({
+		address: null,
+		payment: null,
+	})
+	const [hasGuestAddress, setHasGuestAddress] = useState(false)
+	const [hasGuestPayment, setHasGuestPayment] = useState(false)
+
+	const canPlaceOrder = useMemo(() => {
+		if (currentUser?.isLoggedIn) {
+			return addresses.some((addr) => addr.is_default) && paymentMethod
+		} else {
+			return hasGuestAddress && hasGuestPayment
+		}
+	}, [
+		currentUser?.isLoggedIn,
+		addresses,
+		paymentMethod,
+		hasGuestAddress,
+		hasGuestPayment,
+	])
 
 	useEffect(() => {
-		dispatch(fetchAddresses())
-	}, [dispatch])
+		if (currentUser.isLoggedIn) {
+			dispatch(fetchAddresses())
+			dispatch(fetchPaymentMethods())
+		}
+	}, [dispatch, currentUser.isLoggedIn])
 
 	useEffect(() => {
-		dispatch(fetchPaymentMethods())
-	}, [dispatch])
-
-	useEffect(() => {	
 		dispatch(hydrateBasket())
 	}, [dispatch])
 
@@ -92,15 +105,18 @@ export default function Checkout() {
 		setSelectedShipping(option)
 	}
 
-	const formattedAddress = useMemo(() => ({
-		address1: userAddress.address_line1,
-		address2: userAddress.address_line2,
-		city: userAddress.city,
-		postcode: userAddress.postcode,
-		county: userAddress.county,
-		country: userAddress.country,
-	}), [userAddress])
-
+	const formattedAddress = useMemo(() => {
+		if (!userAddress) return null;
+		
+		return {
+			address1: userAddress.address_line1,
+			address2: userAddress.address_line2,
+			city: userAddress.city,
+			postcode: userAddress.postcode,
+			county: userAddress.county,
+			country: userAddress.country,
+		};
+	}, [userAddress]);
 
 	// Date utility functions
 	const formatDeliveryDate = (date) => {
@@ -183,10 +199,36 @@ export default function Checkout() {
 	const shippingOptions = useShippingOptions()
 
 	const handleOrderClick = () => {
+		const errors = {}
+
+		if (currentUser?.isLoggedIn) {
+			if (!addresses.some((addr) => addr.is_default)) {
+				errors.address = 'Please add a delivery address'
+			}
+			if (!paymentMethod) {
+				errors.payment = 'Please add a payment method'
+			}
+		} else {
+			if (!hasGuestAddress) {
+				errors.address = 'Please add a delivery address'
+			}
+			if (!hasGuestPayment) {
+				errors.payment = 'Please add a payment method'
+			}
+		}
+
+		if (Object.keys(errors).length > 0) {
+			setValidationErrors(errors)
+			return
+		}
+
 		const selectedOption = shippingOptions[selectedShipping]
 		const rawDates = selectedOption.rawDates
 		const orderData = {
-			order_placed: new Date().toISOString().slice(0, 19).replace('T', ' '),
+			order_placed: new Date()
+				.toISOString()
+				.slice(0, 19)
+				.replace('T', ' '),
 			delivery_address: userAddress,
 			payment_method: paymentMethod,
 			shipping: {
@@ -198,7 +240,7 @@ export default function Checkout() {
 				description: selectedOption.description,
 			},
 			order_items: orderItems,
-			total: itemsTotal
+			total: itemsTotal,
 		}
 		dispatch(createOrder(orderData))
 		dispatch(clearBasket())
@@ -242,10 +284,33 @@ export default function Checkout() {
 			<StyledMain>
 				<div className="container">
 					<div className="content">
-						
-						<AddressSection user={currentUser} address={formattedAddress} />
+						<AddressSection
+							user={currentUser}
+							address={formattedAddress}
+							error={validationErrors.address}
+							onAddressSet={() => {
+								setValidationErrors((prev) => ({
+									...prev,
+									address: null,
+								}))
+								setHasGuestAddress(true)
+							}}
+							onAddressRemoved={() => setHasGuestAddress(false)}
+						/>
 
-						<PaymentSection user={currentUser} card={paymentMethod} />
+						<PaymentSection
+							user={currentUser}
+							card={paymentMethod}
+							error={validationErrors.payment}
+							onPaymentSet={() => {
+								setValidationErrors((prev) => ({
+									...prev,
+									payment: null,
+								}))
+								setHasGuestPayment(true)
+							}}
+							onPaymentRemoved={() => setHasGuestPayment(false)}
+						/>
 
 						<section>
 							<GiftCardOffer />
@@ -291,6 +356,8 @@ export default function Checkout() {
 								<button
 									className="primary-btn pill-btn"
 									onClick={handleOrderClick}
+									disabled={!canPlaceOrder}
+									style={{ opacity: canPlaceOrder ? 1 : 0.6 }}
 								>
 									Buy Now
 								</button>

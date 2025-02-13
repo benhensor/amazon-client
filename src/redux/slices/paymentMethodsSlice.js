@@ -80,8 +80,7 @@ const paymentMethodsSlice = createSlice({
 			.addCase(fetchPaymentMethods.fulfilled, (state, action) => {
 				state.loading = false
 				state.paymentMethods = action.payload 
-				console.log('fetchPaymentMethods.fulfilled: ', action.payload) 
-				state.defaultPaymentMethod = action.payload.find((method) => method.status === 'default')  
+				state.defaultPaymentMethod = action.payload?.find((method) => method.status === 'default')  
 			})
 			.addCase(fetchPaymentMethods.rejected, (state, action) => {
 				state.loading = false

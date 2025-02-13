@@ -190,9 +190,9 @@ export const userAPI = {
 
   checkAuth: async () => {
     // If no access token exists, don't even try the request
-    // if (!localStorage.getItem('accessToken')) {
-    //   throw new Error('No access token')
-    // }
+    if (!localStorage.getItem('accessToken')) {
+      throw new Error('No access token')
+    }
     const response = await userAxios.get('/current')
     // console.log('checkAuth response: ', response)
     return response.data

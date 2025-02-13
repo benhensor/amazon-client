@@ -123,6 +123,13 @@ export default function AuthPortal() {
 		heading: 'Sign-In',
 		form: (
 			<Form onSubmit={formik.handleSubmit}>
+				<input
+					type="hidden"
+					name="username"
+					id="username"
+					autoComplete="username"
+					value={formik.values.email}
+				/>
 				{!showPasswordField ? (
 					<div className="input-group">
 						<label htmlFor="email">
@@ -161,13 +168,6 @@ export default function AuthPortal() {
 								Change
 							</button>
 						</div>
-						<input
-              type="hidden"
-              name="username"
-              id="username"
-              autoComplete="username"
-              value={formik.values.email}
-            />
 						<div className="input-group">
 							<div className="label-and-button">
 								<label htmlFor="password">Password</label>

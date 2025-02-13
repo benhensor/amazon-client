@@ -23,7 +23,6 @@ paymentMethodsAxios.interceptors.request.use(
 export const paymentMethodsAPI = {
   fetchPaymentMethods: async () => {
     const response = await paymentMethodsAxios.get('/');
-    console.log('fetchPaymentMethods return: ', response.data);
     return response.data;
   },
   addPaymentMethod: async (paymentMethodData) => {
