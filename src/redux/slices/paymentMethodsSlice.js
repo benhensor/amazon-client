@@ -19,8 +19,10 @@ export const addPaymentMethod = createAsyncThunk(
 	'paymentMethods/addPaymentMethod',
 	async (paymentMethodData, { rejectWithValue }) => {
 		try {
-			const response = await paymentMethodsAPI.addPaymentMethod(paymentMethodData)
-			// console.log('addPaymentMethod return: ', response.data)
+			const response = await paymentMethodsAPI.addPaymentMethod(
+				paymentMethodData
+			)
+			console.log('addPaymentMethod return: ', response.data)
 			return response.data
 		} catch (error) {
 			return rejectWithValue(error.response.data)
@@ -32,7 +34,9 @@ export const setDefaultPaymentMethod = createAsyncThunk(
 	'paymentMethods/setDefaultPaymentMethod',
 	async (paymentMethodId, { rejectWithValue }) => {
 		try {
-			const response = await paymentMethodsAPI.setDefaultPaymentMethod(paymentMethodId)
+			const response = await paymentMethodsAPI.setDefaultPaymentMethod(
+				paymentMethodId
+			)
 			// console.log('setDefaultPaymentMethod return: ', response.data)
 			return response.data
 		} catch (error) {
@@ -45,7 +49,9 @@ export const deletePaymentMethod = createAsyncThunk(
 	'paymentMethods/deletePaymentMethod',
 	async (paymentMethodId, { rejectWithValue }) => {
 		try {
-			const response = await paymentMethodsAPI.deletePaymentMethod(paymentMethodId)
+			const response = await paymentMethodsAPI.deletePaymentMethod(
+				paymentMethodId
+			)
 			// console.log('deletePaymentMethod return: ', response.data)
 			return response.data
 		} catch (error) {
@@ -79,12 +85,14 @@ const paymentMethodsSlice = createSlice({
 			})
 			.addCase(fetchPaymentMethods.fulfilled, (state, action) => {
 				state.loading = false
-				state.paymentMethods = action.payload 
-				state.defaultPaymentMethod = action.payload?.find((method) => method.status === 'default')  
+				// Access the payment methods array from the data property
+				state.paymentMethods = action.payload || []
+				state.defaultPaymentMethod = state.paymentMethods.find((method) => method.status === 'default')
 			})
 			.addCase(fetchPaymentMethods.rejected, (state, action) => {
 				state.loading = false
-				state.error = action.payload || 'Failed to fetch payment methods'
+				state.error =
+					action.payload || 'Failed to fetch payment methods'
 			})
 
 		// Handle adding a payment method
@@ -95,9 +103,28 @@ const paymentMethodsSlice = createSlice({
 			})
 			.addCase(addPaymentMethod.fulfilled, (state, action) => {
 				state.loading = false
-				state.paymentMethods.push(action.payload)
-				if (action.payload.status === 'default') {
-					state.defaultPaymentMethod = action.payload
+				// Safely access the payment method data from the response
+				const newPaymentMethod = action.payload?.data
+				console.log('newPaymentMethod: ', newPaymentMethod)
+				if (newPaymentMethod) {
+					// Ensure paymentMethods is an array before pushing
+					if (!Array.isArray(state.paymentMethods)) {
+						state.paymentMethods = []
+					}
+
+					state.paymentMethods.push(newPaymentMethod)
+
+					if (newPaymentMethod.status === 'default') {
+						// Update the status of all other payment methods
+						state.paymentMethods = state.paymentMethods.map(
+							(method) =>
+								method.payment_method_id !==
+								newPaymentMethod.payment_method_id
+									? { ...method, status: 'valid' }
+									: method
+						)
+						state.defaultPaymentMethod = newPaymentMethod
+					}
 				}
 			})
 			.addCase(addPaymentMethod.rejected, (state, action) => {
@@ -115,14 +142,16 @@ const paymentMethodsSlice = createSlice({
 				state.loading = false
 				state.defaultPaymentMethod = action.payload
 				state.paymentMethods = state.paymentMethods.map((method) =>
-					method.payment_method_id === action.payload.payment_method_id
+					method.payment_method_id ===
+					action.payload.payment_method_id
 						? { ...method, status: 'default' }
 						: { ...method, status: 'valid' }
 				)
 			})
 			.addCase(setDefaultPaymentMethod.rejected, (state, action) => {
 				state.loading = false
-				state.error = action.payload || 'Failed to set default payment method'
+				state.error =
+					action.payload || 'Failed to set default payment method'
 			})
 
 		// Handle deleting a payment method
@@ -136,15 +165,18 @@ const paymentMethodsSlice = createSlice({
 				state.paymentMethods = state.paymentMethods.filter(
 					(method) => method.payment_method_id !== action.meta.arg
 				)
-				if (state.defaultPaymentMethod?.payment_method_id === action.meta.arg) {
+				if (
+					state.defaultPaymentMethod?.payment_method_id ===
+					action.meta.arg
+				) {
 					state.defaultPaymentMethod = null
 				}
 			})
 			.addCase(deletePaymentMethod.rejected, (state, action) => {
 				state.loading = false
-				state.error = action.payload || 'Failed to delete payment method'
+				state.error =
+					action.payload || 'Failed to delete payment method'
 			})
-
 	},
 })
 
