@@ -48,7 +48,7 @@ export default function NavMenu({ menuOpen, closeMenu }) {
 	const menuItemProps = {
 		account: {
 			text: 'Account',
-			destination: '/account',
+			destination: isLoggedIn ? '/account' : '/auth',
 			label: 'Account',
 		},
 		lists: {
