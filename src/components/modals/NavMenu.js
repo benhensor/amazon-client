@@ -63,12 +63,12 @@ export default function NavMenu({ menuOpen, closeMenu }) {
 		},
 		addresses: {
 			text: 'Update location',
-			destination: '/account/addresses',
+			destination: isLoggedIn ? '/account/addresses' : '/auth',
 			label: 'Update location',
 		},
 		orders: {
 			text: 'Orders & Returns',
-			destination: '/account/orders',
+			destination: isLoggedIn ? '/account/orders' : '/auth',
 			label: 'Orders & Returns',
 		},
 	}
