@@ -332,7 +332,7 @@ export default function Basket() {
 						{basketItems.length > 0 ? (
 							<h1>Shopping Basket</h1>
 						) : (
-							<h1>Your Scamazon Basket is empty</h1>
+							<h1>Your Amazon Basket is empty</h1>
 						)}
 						{basketItems.length > 0 && (
 							<div className="basket-subheader">
